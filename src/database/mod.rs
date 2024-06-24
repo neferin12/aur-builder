@@ -1,8 +1,12 @@
 use sea_orm::{ActiveModelTrait, ActiveValue, DatabaseConnection, DbErr, EntityTrait};
 use sea_orm_migration::{MigratorTrait, SchemaManager};
-use crate::AurResultStruct;
-use crate::migrator::Migrator;
-use crate::entities::{prelude::*, *};
+
+pub mod entities;
+pub mod migrator;
+
+use migrator::Migrator;
+use entities::{prelude::*, *};
+use crate::types::AurRequestResultStruct;
 
 pub struct Database {
     db: DatabaseConnection,
@@ -20,7 +24,7 @@ impl Database {
 
     }
 
-    pub async fn update_metadata(&self, data: &AurResultStruct) -> bool {
+    pub async fn update_metadata(&self, data: &AurRequestResultStruct) -> bool {
         let mut new_timestamp = false;
 
         let existing = PackageMetadata::find_by_id(data.id).one(&self.db).await.unwrap();

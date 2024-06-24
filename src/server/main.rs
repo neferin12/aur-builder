@@ -1,22 +1,13 @@
-mod database;
-mod migrator;
-mod entities;
-
-use std::collections::HashMap;
-use std::env;
+use lapin::{Connection, ConnectionProperties};
+use lapin::options::QueueDeclareOptions;
+use lapin::types::FieldTable;
 use reqwest::Error;
-use crate::database::Database;
+use aur_builder_commons::database::Database;
+use aur_builder_commons::environment::get_environment_variable;
+use aur_builder_commons::types::AurRequestResultStruct;
 
-#[derive(Debug)]
-pub struct AurResultStruct {
-    id: i64,
-    name: String,
-    version: String,
-    maintainer: String,
-    last_modified: i64
-}
 
-pub type AurResult<'a> = Result<AurResultStruct, Error>;
+pub type AurResult<'a> = Result<AurRequestResultStruct, Error>;
 
 async fn get_aur_data(package: &str) -> AurResult {
     let url = format!("https://aur.archlinux.org/rpc/v5/info?arg[]={}", package);
@@ -25,7 +16,7 @@ async fn get_aur_data(package: &str) -> AurResult {
         return Err(resp.err().unwrap());
     };
     let data: serde_json::Value = resp.unwrap().json().await.unwrap();
-    let results: AurResultStruct = AurResultStruct {
+    let results: AurRequestResultStruct = AurRequestResultStruct {
         id: data["results"][0]["ID"].as_i64().unwrap(),
         name: String::from(data["results"][0]["Name"].as_str().unwrap()),
         version: String::from(data["results"][0]["Version"].as_str().unwrap()),
@@ -37,18 +28,13 @@ async fn get_aur_data(package: &str) -> AurResult {
 
 #[tokio::main]
 async fn main() {
-    let database_url = match env::var("DATABASE_URL") {
-        Ok(url) => url,
-        Err(_e) => panic!("Failed to read environment variable 'DATABASE_URL'")
-    };
+    let database_url = get_environment_variable("DATABASE_URL");
 
     let db = Database::new(database_url).await.unwrap();
     db.migrate().await;
 
-    let packages_string = match env::var("PACKAGES") {
-        Ok(pkgs) => pkgs,
-        Err(_e) => panic!("Failed to read environment variable 'PACKAGES'")
-    };
+    let packages_string = get_environment_variable("PACKAGES");
+
     let packages = packages_string.split(",").collect::<Vec<&str>>();
 
     let mut package_data = Vec::new();
@@ -58,10 +44,27 @@ async fn main() {
         package_data.push(data);
     }
 
+    let q_addr = std::env::var("AMQP_ADDR").unwrap_or_else(|_| "amqp://127.0.0.1:5672/%2f".into());
+
     for data in package_data {
         let updated = db.update_metadata(&data).await;
         if updated {
             println!("{} was updated!", data.name);
         }
     }
+
+
+    let conn = Connection::connect(
+            &q_addr,
+            ConnectionProperties::default(),
+        )
+        .await.unwrap();
+
+    let channel_send = conn.create_channel().await.unwrap();
+    let queue = channel_send.queue_declare(
+        "pkg_build",
+        QueueDeclareOptions::default(),
+        FieldTable::default(),
+    ).await.unwrap();
+
 }
