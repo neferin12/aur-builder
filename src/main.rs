@@ -1,5 +1,6 @@
 mod database;
 mod migrator;
+mod entities;
 
 use std::collections::HashMap;
 use std::env;
@@ -8,11 +9,11 @@ use crate::database::Database;
 
 #[derive(Debug)]
 pub struct AurResultStruct {
-    id: u64,
+    id: i64,
     name: String,
     version: String,
     maintainer: String,
-    last_modified: u64
+    last_modified: i64
 }
 
 pub type AurResult<'a> = Result<AurResultStruct, Error>;
@@ -25,11 +26,11 @@ async fn get_aur_data(package: &str) -> AurResult {
     };
     let data: serde_json::Value = resp.unwrap().json().await.unwrap();
     let results: AurResultStruct = AurResultStruct {
-        id: data["results"][0]["ID"].as_u64().unwrap(),
+        id: data["results"][0]["ID"].as_i64().unwrap(),
         name: String::from(data["results"][0]["Name"].as_str().unwrap()),
         version: String::from(data["results"][0]["Version"].as_str().unwrap()),
         maintainer: String::from(data["results"][0]["Maintainer"].as_str().unwrap()),
-        last_modified: data["results"][0]["LastModified"].as_u64().unwrap(),
+        last_modified: data["results"][0]["LastModified"].as_i64().unwrap(),
     };
     return Ok(results);
 }
@@ -57,5 +58,10 @@ async fn main() {
         package_data.push(data);
     }
 
-    dbg!(package_data);
+    for data in package_data {
+        let updated = db.update_metadata(&data).await;
+        if updated {
+            println!("{} was updated!", data.name);
+        }
+    }
 }
