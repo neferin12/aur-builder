@@ -1,0 +1,13 @@
+[package]
+name = "aur-builder"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+dotenvy = "0.15.7"
+native-tls = "0.2.12"
+reqwest = { version = "0.12", features = ["json", "native-tls"] }
+sea-orm = { version = "0.12.15", features = ["sqlx-postgres", "sqlx-sqlite", "runtime-tokio-native-tls", "macros"]}
+sea-orm-migration = "0.12.15"
+serde_json = "1.0.117"
+tokio = {version = "~1.37", features = ["full"] }
