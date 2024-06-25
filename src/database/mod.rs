@@ -8,22 +8,63 @@ use migrator::Migrator;
 use entities::{prelude::*, *};
 use crate::types::AurRequestResultStruct;
 
+/// The `Database` struct represents a database connection.
+///
+/// It contains methods to create a new database connection, apply migrations, and update metadata.
 pub struct Database {
     db: DatabaseConnection,
 }
 
+
 impl Database {
+    /// This asynchronous function creates a new database connection.
+    ///
+    /// # Arguments
+    ///
+    /// * `url` - A string that holds the URL of the database.
+    ///
+    /// # Returns
+    ///
+    /// * `Result<Self, DbErr>` - A Result type that returns `Self` on success, or `DbErr` on failure.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// let db = Database::new("postgres://localhost/test").await.unwrap();
+    /// ```
     pub async fn new(url: String) -> Result<Self, DbErr> {
         let db = sea_orm::Database::connect(&url).await?;
         Ok(Self { db })
     }
 
+    /// This asynchronous function applies migrations to the database.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// db.migrate().await;
+    /// ```
     pub async fn migrate(&self) {
         println!("Applying migrations...");
         Migrator::up(&self.db, None).await.unwrap();
 
     }
 
+    /// This asynchronous function updates the metadata of a package in the database.
+    ///
+    /// # Arguments
+    ///
+    /// * `data` - A reference to `AurRequestResultStruct` that holds the metadata of the package.
+    ///
+    /// # Returns
+    ///
+    /// * `bool` - A boolean value that indicates whether the metadata was updated.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// let updated = db.update_metadata(&data).await;
+    /// ```
     pub async fn update_metadata(&self, data: &AurRequestResultStruct) -> bool {
         let mut new_timestamp = false;
 

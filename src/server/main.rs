@@ -1,5 +1,5 @@
-use lapin::{Connection, ConnectionProperties};
-use lapin::options::QueueDeclareOptions;
+use lapin::{BasicProperties, Connection, ConnectionProperties};
+use lapin::options::{BasicPublishOptions, QueueDeclareOptions};
 use lapin::types::FieldTable;
 use reqwest::Error;
 use aur_builder_commons::database::Database;
@@ -9,6 +9,25 @@ use aur_builder_commons::types::AurRequestResultStruct;
 
 pub type AurResult<'a> = Result<AurRequestResultStruct, Error>;
 
+/// This asynchronous function fetches data from the Arch User Repository (AUR) for a given package.
+///
+/// # Arguments
+///
+/// * `package` - A string slice that holds the name of the package.
+///
+/// # Returns
+///
+/// * `AurResult` - A Result type that returns `AurRequestResultStruct` on success, or `Error` on failure.
+///
+/// # Errors
+///
+/// This function will return an error if the HTTP request fails or if the JSON parsing fails.
+///
+/// # Example
+///
+/// ```
+/// let data = get_aur_data("cvc5").await.unwrap();
+/// ```
 async fn get_aur_data(package: &str) -> AurResult {
     let url = format!("https://aur.archlinux.org/rpc/v5/info?arg[]={}", package);
     let resp = reqwest::get(url).await;
@@ -46,25 +65,35 @@ async fn main() {
 
     let q_addr = std::env::var("AMQP_ADDR").unwrap_or_else(|_| "amqp://127.0.0.1:5672/%2f".into());
 
-    for data in package_data {
-        let updated = db.update_metadata(&data).await;
-        if updated {
-            println!("{} was updated!", data.name);
-        }
-    }
-
-
     let conn = Connection::connect(
             &q_addr,
             ConnectionProperties::default(),
         )
         .await.unwrap();
 
-    let channel_send = conn.create_channel().await.unwrap();
-    let queue = channel_send.queue_declare(
+    let tx_channel = conn.create_channel().await.unwrap();
+    let queue = tx_channel.queue_declare(
         "pkg_build",
         QueueDeclareOptions::default(),
         FieldTable::default(),
     ).await.unwrap();
+
+    for data in package_data {
+        // let updated = db.update_metadata(&data).await;
+        let updated = true;
+        if updated {
+            println!("{} was updated!", data.name);
+            let d = tx_channel.basic_publish(
+                "",
+                "pkg_build",
+                BasicPublishOptions::default(),
+                data.name.as_ref(),
+                BasicProperties::default(),
+            ).await.unwrap().await.unwrap();
+        }
+    }
+
+
+
 
 }
