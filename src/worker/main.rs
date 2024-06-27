@@ -1,11 +1,14 @@
+mod build;
+
 use aur_builder_commons::environment::get_environment_variable;
 use std::time::Duration;
 use lapin::{Connection, ConnectionProperties};
-use lapin::options::{BasicAckOptions, BasicConsumeOptions};
+use lapin::options::{BasicAckOptions, BasicConsumeOptions, BasicNackOptions};
 use lapin::types::FieldTable;
 use aur_builder_commons::database::Database;
 use futures_util::stream::StreamExt;
 use tokio::time::sleep;
+use build::build;
 
 #[tokio::main]
 async fn main() {
@@ -31,14 +34,18 @@ async fn main() {
         let delivery = delivery.expect("error in consumer");
         // dbg!(&delivery);
         let name = match std::str::from_utf8(&*delivery.data) {
-            Ok(v) => v,
+            Ok(v) => v.to_owned(),
             Err(e) => panic!("Invalid UTF-8 sequence: {}", e),
         };
-        dbg!(name);
-        sleep(Duration::from_secs(10)).await;
-        delivery
-            .ack(BasicAckOptions::default())
-            .await
-            .expect("ack");
+        dbg!(&name);
+        let res = build(&name).await;
+        if res.is_err() {
+            delivery.nack(BasicNackOptions::default()).await.expect("nack");
+        } else {
+            delivery
+                .ack(BasicAckOptions::default())
+                .await
+                .expect("ack");
+        };
     };
 }

@@ -3,7 +3,7 @@
     <option name="command" value="run --package aur-builder --bin server" />
     <option name="workingDirectory" value="file://$PROJECT_DIR$" />
     <envs>
-      <env name="PACKAGES" value="cvc5-bin,cvc5" />
+      <env name="PACKAGES" value="cvc5-bin" />
       <env name="DATABASE_URL" value="sqlite:./sqlite.db?mode=rwc" />
     </envs>
     <option name="emulateTerminal" value="true" />
