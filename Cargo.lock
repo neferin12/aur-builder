@@ -415,6 +415,7 @@ dependencies = [
  "git2",
  "lapin",
  "native-tls",
+ "regex",
  "reqwest",
  "sea-orm",
  "sea-orm-migration",

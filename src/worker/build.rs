@@ -1,8 +1,10 @@
+use std::fs;
 use std::process::Command;
 use git2::Repository;
 use tempdir::TempDir;
+use regex::Regex;
 
-pub async fn build(name: &String) -> Result<&String, String> {
+pub async fn build(name: &String) -> Result<Vec<String>, String> {
     let tmp_dir = TempDir::new(name.as_str()).expect("Failed to create temp dir");
     dbg!(&tmp_dir);
     let mut git_url: String = "https://aur.archlinux.org/".to_owned();
@@ -22,8 +24,22 @@ pub async fn build(name: &String) -> Result<&String, String> {
         .expect("Failed to run makepkg");
     let status = makepkg.wait().unwrap();
     dbg!(status);
-    if !status.success(){
+    if !status.success() {
         return Err("Failed to run makepkg".to_owned());
     }
-    Ok(name)
+    let paths = fs::read_dir(tmp_dir.path()).unwrap();
+
+    let mut package_file_names: Vec<String> = Vec::new();
+
+    let re = Regex::new(r"(?<pkg>.+-.+-.+\.pkg\..+)").unwrap();
+
+    for path in paths {
+        let file_name = path.unwrap().file_name();
+        let Some(caps) = re.captures(file_name.to_str().unwrap()) else {
+            continue;
+        };
+        package_file_names.push(caps["pkg"].to_owned());
+    }
+    dbg!(&package_file_names);
+    Ok(package_file_names)
 }
