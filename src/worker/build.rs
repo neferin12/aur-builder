@@ -4,9 +4,9 @@ use git2::Repository;
 use tempdir::TempDir;
 use regex::Regex;
 
-pub async fn build(name: &String) -> Result<Vec<String>, String> {
-    let tmp_dir = TempDir::new(name.as_str()).expect("Failed to create temp dir");
-    dbg!(&tmp_dir);
+pub fn build(name: &String, tmp_dir: &TempDir) -> Result<Vec<String>, String> {
+    
+    dbg!(tmp_dir);
     let mut git_url: String = "https://aur.archlinux.org/".to_owned();
     git_url.push_str(&name);
     git_url.push_str(".git");

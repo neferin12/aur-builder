@@ -7,6 +7,7 @@ use lapin::options::{BasicAckOptions, BasicConsumeOptions, BasicNackOptions};
 use lapin::types::FieldTable;
 use aur_builder_commons::database::Database;
 use futures_util::stream::StreamExt;
+use tempdir::TempDir;
 use tokio::time::sleep;
 use build::build;
 
@@ -38,14 +39,18 @@ async fn main() {
             Err(e) => panic!("Invalid UTF-8 sequence: {}", e),
         };
         dbg!(&name);
-        let res = build(&name).await;
+        let tmp_dir = TempDir::new(name.as_str()).expect("Failed to create temp dir");
+        let res = build(&name, &tmp_dir);
         if res.is_err() {
             delivery.nack(BasicNackOptions::default()).await.expect("nack");
-        } else {
-            delivery
-                .ack(BasicAckOptions::default())
-                .await
-                .expect("ack");
-        };
+        }
+        
+        let pkg_list = res.unwrap();
+        
+
+        delivery
+            .ack(BasicAckOptions::default())
+            .await
+            .expect("ack");
     };
 }
