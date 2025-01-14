@@ -1,0 +1,12 @@
+#! /bin/bash
+
+cd ~/source || exit 1
+
+install-dependencies
+
+timestamp=$(date +%s)
+logfile="/build/$timestamp-build.log"
+
+makepkg -s -c -C --noconfirm --noprogressbar | tee "$logfile"
+cp ./*.pkg.tar.* /results
+cp "$logfile" /results

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <dataSource name="sqlite">
-  <database-model serializer="dbm" dbms="SQLITE" family-id="SQLITE" format-version="4.52">
+  <database-model serializer="dbm" dbms="SQLITE" family-id="SQLITE" format-version="4.53">
     <root id="1">
       <ServerVersion>3.45.1</ServerVersion>
     </root>
@@ -1596,43 +1596,43 @@
       <System>1</System>
     </table>
     <column id="558" parent="555" name="id">
-      <DasType>integer|0s</DasType>
       <NotNull>1</NotNull>
       <Position>1</Position>
+      <StoredType>integer|0s</StoredType>
     </column>
     <column id="559" parent="555" name="name">
-      <DasType>text|0s</DasType>
       <NotNull>1</NotNull>
       <Position>2</Position>
+      <StoredType>text|0s</StoredType>
     </column>
     <column id="560" parent="555" name="version">
-      <DasType>text|0s</DasType>
       <NotNull>1</NotNull>
       <Position>3</Position>
+      <StoredType>text|0s</StoredType>
     </column>
     <column id="561" parent="555" name="maintainer">
-      <DasType>text|0s</DasType>
       <NotNull>1</NotNull>
       <Position>4</Position>
+      <StoredType>text|0s</StoredType>
     </column>
     <column id="562" parent="555" name="last_modified">
-      <DasType>integer|0s</DasType>
       <NotNull>1</NotNull>
       <Position>5</Position>
+      <StoredType>integer|0s</StoredType>
     </column>
     <key id="563" parent="555">
       <ColNames>id</ColNames>
       <Primary>1</Primary>
     </key>
     <column id="564" parent="556" name="version">
-      <DasType>text|0s</DasType>
       <NotNull>1</NotNull>
       <Position>1</Position>
+      <StoredType>text|0s</StoredType>
     </column>
     <column id="565" parent="556" name="applied_at">
-      <DasType>bigint|0s</DasType>
       <NotNull>1</NotNull>
       <Position>2</Position>
+      <StoredType>bigint|0s</StoredType>
     </column>
     <index id="566" parent="556" name="sqlite_autoindex_seaql_migrations_1">
       <ColNames>version</ColNames>
@@ -1645,24 +1645,24 @@
       <UnderlyingIndexName>sqlite_autoindex_seaql_migrations_1</UnderlyingIndexName>
     </key>
     <column id="568" parent="557" name="type">
-      <DasType>TEXT|0s</DasType>
       <Position>1</Position>
+      <StoredType>TEXT|0s</StoredType>
     </column>
     <column id="569" parent="557" name="name">
-      <DasType>TEXT|0s</DasType>
       <Position>2</Position>
+      <StoredType>TEXT|0s</StoredType>
     </column>
     <column id="570" parent="557" name="tbl_name">
-      <DasType>TEXT|0s</DasType>
       <Position>3</Position>
+      <StoredType>TEXT|0s</StoredType>
     </column>
     <column id="571" parent="557" name="rootpage">
-      <DasType>INT|0s</DasType>
       <Position>4</Position>
+      <StoredType>INT|0s</StoredType>
     </column>
     <column id="572" parent="557" name="sql">
-      <DasType>TEXT|0s</DasType>
       <Position>5</Position>
+      <StoredType>TEXT|0s</StoredType>
     </column>
   </database-model>
 </dataSource>
