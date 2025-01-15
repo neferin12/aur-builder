@@ -4,22 +4,17 @@ version = "0.1.2"
 edition = "2021"
 
 [dependencies]
-bollard = "*"
-dotenvy = "0.15.7"
-pretty_env_logger = "*"
-lapin = { version = "2.3.4", features = ["native-tls"]}
-native-tls = "0.2.12"
-reqwest = { version = "0.12", features = ["json", "native-tls"] }
-sea-orm = { version = "0.12.15", features = ["sqlx-postgres", "sqlx-sqlite", "runtime-tokio-native-tls", "macros"]}
-sea-orm-migration = "0.12.15"
-serde_json = "1.0.117"
-tokio = {version = "~1.37", features = ["full"] }
-futures-util = "0.3.30"
-log = "0.4"
-temp-dir = "0.1.14"
-chrono = "0.4.39"
-rand = "0.8.5"
-git2 = "0.20.0"
+bollard = "~0.18.1"
+pretty_env_logger = "~0.5.0"
+lapin = { version = "~2.5.0", features = ["native-tls"]}
+reqwest = { version = "~0.12", features = ["json", "native-tls"] }
+sea-orm = { version = "~1.1.4", features = ["sqlx-postgres", "sqlx-sqlite", "runtime-tokio-native-tls", "macros"]}
+sea-orm-migration = "~1.1.4"
+serde_json = "~1.0.117"
+tokio = {version = "~1.43.0", features = ["full"] }
+futures-util = "~0.3.30"
+log = "~0.4"
+rand = "~0.8.5"
 
 [[bin]]
 name = "server"
