@@ -1,8 +1,6 @@
 use bollard::Docker;
 use bollard::image::CreateImageOptions;
 use futures_util::{StreamExt, TryStreamExt};
-use temp_dir::TempDir;
-use git2::Repository;
 use bollard::container::{Config, CreateContainerOptions, LogOutput, LogsOptions, StartContainerOptions, WaitContainerOptions};
 use bollard::models::HostConfig;
 use rand::RngCore;

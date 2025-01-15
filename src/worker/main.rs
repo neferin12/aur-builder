@@ -1,13 +1,11 @@
 mod build;
 
-use std::error::Error;
-use aur_builder_commons::environment::get_environment_variable;
-use std::time::Duration;
 use lapin::{Connection, ConnectionProperties};
 use lapin::options::{BasicAckOptions, BasicConsumeOptions, BasicNackOptions};
 use lapin::types::FieldTable;
 use futures_util::stream::StreamExt;
 use crate::build::build_package;
+use crate::build::docker::pull_docker_image;
 
 #[macro_use] extern crate log;
 
@@ -15,8 +13,8 @@ use crate::build::build_package;
 async fn main() {
     pretty_env_logger::init();
 
-    // info!("Pulling docker image...");
-    // pull_docker_image().await.unwrap();
+    info!("Pulling docker image...");
+    pull_docker_image().await.unwrap();
     info!("Image pulled successfully!");
 
     info!("Connecting to rabbitmq...");

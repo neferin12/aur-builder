@@ -72,7 +72,7 @@ async fn main() {
         .await.unwrap();
 
     let tx_channel = conn.create_channel().await.unwrap();
-    let queue = tx_channel.queue_declare(
+    tx_channel.queue_declare(
         "pkg_build",
         QueueDeclareOptions::default(),
         FieldTable::default(),
@@ -83,7 +83,7 @@ async fn main() {
         let updated = true;
         if updated {
             println!("{} was updated!", data.name);
-            let d = tx_channel.basic_publish(
+            tx_channel.basic_publish(
                 "",
                 "pkg_build",
                 BasicPublishOptions::default(),

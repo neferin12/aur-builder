@@ -1,5 +1,5 @@
 use sea_orm::{ActiveModelTrait, ActiveValue, DatabaseConnection, DbErr, EntityTrait};
-use sea_orm_migration::{MigratorTrait, SchemaManager};
+use sea_orm_migration::MigratorTrait;
 
 pub mod entities;
 pub mod migrator;
