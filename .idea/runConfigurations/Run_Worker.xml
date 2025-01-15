@@ -1,8 +1,12 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="Run Worker" type="CargoCommandRunConfiguration" factoryName="Cargo Command">
+    <option name="buildProfileId" value="dev" />
     <option name="command" value="run --package aur-builder --bin worker" />
     <option name="workingDirectory" value="file://$PROJECT_DIR$" />
     <envs>
+      <env name="AB_GITEA_REPO" value="https://git.pollinger.dev/api/packages/public/arch/extra" />
+      <env name="AB_GITEA_TOKEN" value="86e4996201368a1279191a5d1d48cc579f7e1310" />
+      <env name="AB_GITEA_USER" value="julian" />
       <env name="RUST_LOG" value="debug" />
     </envs>
     <option name="emulateTerminal" value="true" />

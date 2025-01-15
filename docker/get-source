@@ -1,0 +1,10 @@
+#! /bin/bash
+
+cd ~ || exit 1
+
+if [ -z "$AUR_BUILDER_SOURCE" ]; then
+  echo "ERROR: AUR_BUILDER_SOURCE is not set."
+  exit 1
+fi
+
+git clone "$AUR_BUILDER_SOURCE" source || exit 1

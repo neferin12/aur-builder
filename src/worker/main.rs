@@ -1,4 +1,4 @@
-mod build_package;
+mod build;
 
 use std::error::Error;
 use aur_builder_commons::environment::get_environment_variable;
@@ -7,8 +7,9 @@ use lapin::{Connection, ConnectionProperties};
 use lapin::options::{BasicAckOptions, BasicConsumeOptions, BasicNackOptions};
 use lapin::types::FieldTable;
 use futures_util::stream::StreamExt;
+use crate::build::build_package;
+
 #[macro_use] extern crate log;
-use crate::build_package::{build_package, pull_docker_image};
 
 #[tokio::main]
 async fn main() {

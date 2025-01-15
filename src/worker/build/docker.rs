@@ -1,14 +1,12 @@
-use bollard::container::{Config, LogOutput, LogsOptions, RemoveContainerOptions, WaitContainerOptions};
-use bollard::container::{CreateContainerOptions, StartContainerOptions};
-use bollard::image::CreateImageOptions;
-use bollard::models::HostConfig;
 use bollard::Docker;
-use chrono::prelude::Utc;
+use bollard::image::CreateImageOptions;
 use futures_util::{StreamExt, TryStreamExt};
-use git2::Repository;
-use rand::{Rng, RngCore};
 use temp_dir::TempDir;
-use tokio::task;
+use git2::Repository;
+use bollard::container::{Config, CreateContainerOptions, LogOutput, LogsOptions, StartContainerOptions, WaitContainerOptions};
+use bollard::models::HostConfig;
+use rand::RngCore;
+use aur_builder_commons::environment::get_environment_variable;
 
 const IMAGE: &str = "git.pollinger.dev/public/aur-builder-build-container:latest";
 
@@ -33,49 +31,8 @@ pub async fn pull_docker_image() -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
-pub async fn build_package(name: &String) -> Result<(), Box<dyn std::error::Error>> {
-    let d = TempDir::new()?;
-    info!("Building package {} in {}", name, &d.path().display());
-
-    let random_suffix = rand::thread_rng().next_u32();
-
-    let source_url = format!("https://aur.archlinux.org/{name}.git");
-    let repo = Repository::clone(source_url.as_str(), d.child("source"))?;
-
-    let docker = Docker::connect_with_local_defaults()?;
-    let container_name = format!("build-{}-{}", name, random_suffix);
-    let create_container_options = CreateContainerOptions {
-        name: container_name,
-        ..Default::default()
-    };
-
-    let mount_strings = vec![
-        format!("{}:/build/source:rw",d.child("source").to_str().unwrap()),
-        format!("{}:/results:rw",d.child("target").to_str().unwrap()),
-    ];
-    let create_container_config = Config {
-        image: Some(IMAGE),
-        user: Some("builder"),
-        host_config: Some(HostConfig {
-            // e.g., to remove container automatically upon exit:
-            auto_remove: Some(true),
-            binds: Some(mount_strings),
-            ..Default::default()
-        }),
-        ..Default::default()
-    };
-
-    let container = docker
-        .create_container(Some(create_container_options), create_container_config)
-        .await?;
-
-    docker
-        .start_container(&container.id, None::<StartContainerOptions<String>>)
-        .await?;
-
-    let docker_for_logs = docker.clone();
-    let container_id_for_logs = container.id.clone();
-    let logs_task = task::spawn(async move {
+fn attach_logs(docker_for_logs: Docker, container_id_for_logs: String) {
+    tokio::spawn(async move {
         debug!("Attaching to logs...");
         let mut logs_stream = docker_for_logs.logs(
             &container_id_for_logs,
@@ -107,8 +64,60 @@ pub async fn build_package(name: &String) -> Result<(), Box<dyn std::error::Erro
                 _ => {}
             }
         }
-        debug!("Logs task finished");
     });
+}
+
+
+
+pub async fn build(name: &String, source_url: String) -> Result<(), Box<dyn std::error::Error>> {
+    info!("Building package {}", name);
+
+    let random_suffix = rand::thread_rng().next_u32();
+
+    let docker = Docker::connect_with_local_defaults()?;
+    let container_name = format!("build-{}-{}", name, random_suffix);
+    let create_container_options = CreateContainerOptions {
+        name: container_name,
+        ..Default::default()
+    };
+
+
+    let gitea_url = get_environment_variable("AB_GITEA_REPO");
+    let gitea_user = get_environment_variable("AB_GITEA_USER");
+    let gitea_token = get_environment_variable("AB_GITEA_TOKEN");
+
+
+    let env_source = &*format!("AUR_BUILDER_SOURCE={source_url}");
+    let env_gitea_url = &*format!("AB_GITEA_REPO={}", gitea_url);
+    let env_gitea_user = &*format!("AB_GITEA_USER={}", gitea_user);
+    let env_gitea_token = &*format!("AB_GITEA_TOKEN={}", gitea_token);
+
+    let create_container_config = Config {
+        image: Some(IMAGE),
+        user: Some("builder"),
+        env: Some(vec![
+            env_source,
+            env_gitea_url,
+            env_gitea_user,
+            env_gitea_token,
+        ]),
+        host_config: Some(HostConfig {
+            // e.g., to remove container automatically upon exit:
+            auto_remove: Some(true),
+            ..Default::default()
+        }),
+        ..Default::default()
+    };
+
+    let container = docker
+        .create_container(Some(create_container_options), create_container_config)
+        .await?;
+
+    docker
+        .start_container(&container.id, None::<StartContainerOptions<String>>)
+        .await?;
+
+    attach_logs(docker.clone(), container.id.clone());
 
     let mut wait_stream =
         docker.wait_container(&container.id, None::<WaitContainerOptions<String>>);
@@ -125,5 +134,6 @@ pub async fn build_package(name: &String) -> Result<(), Box<dyn std::error::Erro
         }
     }
 
-    return Ok(());
+    Ok(())
 }
+

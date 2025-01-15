@@ -1,5 +1,12 @@
 #! /bin/bash
 
+if [ -z "$AB_GITEA_USER" ] || [ -z "$AB_GITEA_TOKEN" ] || [ -z "$AB_GITEA_REPO" ]; then
+    echo "Error: AB_GITEA_USER, AB_GITEA_TOKEN, and AB_GITEA_REPO must be set."
+    exit 1
+fi
+
+get-source
+
 cd ~/source || exit 1
 
 install-dependencies
@@ -10,3 +17,9 @@ logfile="/build/$timestamp-build.log"
 makepkg -s -c -C --noconfirm --noprogressbar | tee "$logfile"
 cp ./*.pkg.tar.* /results
 cp "$logfile" /results
+
+for pkg_file in /results/*.pkg.tar.*; do
+    curl --user "$AB_GITEA_USER:$AB_GITEA_TOKEN" \
+         --upload-file "$pkg_file" \
+         "$AB_GITEA_REPO" || exit 2
+done
