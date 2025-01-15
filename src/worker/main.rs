@@ -1,9 +1,10 @@
 mod build_package;
 
+use std::error::Error;
 use aur_builder_commons::environment::get_environment_variable;
 use std::time::Duration;
 use lapin::{Connection, ConnectionProperties};
-use lapin::options::{BasicAckOptions, BasicConsumeOptions};
+use lapin::options::{BasicAckOptions, BasicConsumeOptions, BasicNackOptions};
 use lapin::types::FieldTable;
 use futures_util::stream::StreamExt;
 #[macro_use] extern crate log;
@@ -34,17 +35,22 @@ async fn main() {
     ).await.unwrap();
     while let Some(delivery) = consumer.next().await {
         let delivery = delivery.expect("error in consumer");
-        // dbg!(&delivery);
         let name = match std::str::from_utf8(&*delivery.data) {
             Ok(v) => v.to_string(),
             Err(e) => panic!("Invalid UTF-8 sequence: {}", e),
         };
 
-        build_package(name).await.unwrap();
-
-        delivery
-            .ack(BasicAckOptions::default())
-            .await
-            .expect("ack");
+        match build_package(&name).await {
+            Ok(_) => {
+                delivery
+                    .ack(BasicAckOptions::default())
+                    .await
+                    .expect("ack");
+            }
+            Err(error) => {
+                error!("Error building package '{}':\n{:?}",name, error);
+                delivery.nack(BasicNackOptions::default()).await.expect("nack");
+            }
+        }
     };
 }

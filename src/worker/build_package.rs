@@ -20,7 +20,7 @@ fn get_image_options<'a>() -> Option<CreateImageOptions<'a, &'a str>> {
 }
 
 pub async fn pull_docker_image() -> Result<(), Box<dyn std::error::Error>> {
-    let docker = Docker::connect_with_local_defaults().unwrap();
+    let docker = Docker::connect_with_local_defaults()?;
     let options = get_image_options();
     let pull_stream = docker.create_image(options, None, None);
     pull_stream
@@ -33,7 +33,7 @@ pub async fn pull_docker_image() -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
-pub async fn build_package(name: String) -> Result<(), Box<dyn std::error::Error>> {
+pub async fn build_package(name: &String) -> Result<(), Box<dyn std::error::Error>> {
     let d = TempDir::new()?;
     info!("Building package {} in {}", name, &d.path().display());
 
@@ -42,7 +42,7 @@ pub async fn build_package(name: String) -> Result<(), Box<dyn std::error::Error
     let source_url = format!("https://aur.archlinux.org/{name}.git");
     let repo = Repository::clone(source_url.as_str(), d.child("source"))?;
 
-    let docker = Docker::connect_with_local_defaults().unwrap();
+    let docker = Docker::connect_with_local_defaults()?;
     let container_name = format!("build-{}-{}", name, random_suffix);
     let create_container_options = CreateContainerOptions {
         name: container_name,
@@ -115,12 +115,12 @@ pub async fn build_package(name: String) -> Result<(), Box<dyn std::error::Error
     while let Some(res) = wait_stream.next().await {
         match res {
             Ok(exit) => {
-                println!("Container exited with: {:?}", exit.status_code);
+                info!("Build container exited with: {:?}", exit.status_code);
                 break;
             }
             Err(e) => {
-                eprintln!("Error while waiting: {:?}", e);
-                break;
+                error!("Error while waiting for build container: {:?}", e);
+                return Err(e.into());
             }
         }
     }
