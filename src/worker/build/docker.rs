@@ -8,18 +8,23 @@ use bollard::models::HostConfig;
 use rand::RngCore;
 use aur_builder_commons::environment::get_environment_variable;
 
-const IMAGE: &str = "git.pollinger.dev/public/aur-builder-build-container:latest";
+// const IMAGE: &str = "git.pollinger.dev/public/aur-builder-build-container:latest";
+const VERSION: &str = env!("CARGO_PKG_VERSION");
 
-fn get_image_options<'a>() -> Option<CreateImageOptions<'a, &'a str>> {
-    Some(CreateImageOptions {
-        from_image: IMAGE,
-        ..Default::default()
-    })
+fn get_image_name() -> String {
+    let image = format!("git.pollinger.dev/public/aur-builder-build-container:{}", VERSION);
+
+    return image;
 }
+
 
 pub async fn pull_docker_image() -> Result<(), Box<dyn std::error::Error>> {
     let docker = Docker::connect_with_local_defaults()?;
-    let options = get_image_options();
+    let image = get_image_name();
+    let options = Some(CreateImageOptions {
+        from_image: image.as_str(),
+        ..Default::default()
+    });
     let pull_stream = docker.create_image(options, None, None);
     pull_stream
         .try_for_each(|_chunk| async {
@@ -92,8 +97,10 @@ pub async fn build(name: &String, source_url: String) -> Result<(), Box<dyn std:
     let env_gitea_user = &*format!("AB_GITEA_USER={}", gitea_user);
     let env_gitea_token = &*format!("AB_GITEA_TOKEN={}", gitea_token);
 
+    let image = get_image_name();
+    
     let create_container_config = Config {
-        image: Some(IMAGE),
+        image: Some(image.as_str()),
         user: Some("builder"),
         env: Some(vec![
             env_source,
