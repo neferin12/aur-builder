@@ -1,20 +1,19 @@
-use bollard::Docker;
-use bollard::image::CreateImageOptions;
-use futures_util::{StreamExt, TryStreamExt};
-use bollard::container::{Config, CreateContainerOptions, LogOutput, LogsOptions, StartContainerOptions, WaitContainerOptions};
-use bollard::models::HostConfig;
-use rand::RngCore;
 use aur_builder_commons::environment::get_environment_variable;
+use bollard::container::{
+    Config, CreateContainerOptions, LogOutput, LogsOptions, StartContainerOptions,
+    WaitContainerOptions,
+};
+use bollard::image::CreateImageOptions;
+use bollard::models::HostConfig;
+use bollard::Docker;
+use futures_util::{StreamExt, TryStreamExt};
+use rand::RngCore;
 
-// const IMAGE: &str = "git.pollinger.dev/public/aur-builder-build-container:latest";
 const VERSION: &str = env!("CARGO_PKG_VERSION");
 
 fn get_image_name() -> String {
-    let image = format!("git.pollinger.dev/public/aur-builder-build-container:{}", VERSION);
-
-    return image;
+    format!("ghcr.io/neferin12/aur-builder-build-container:{}", VERSION)
 }
-
 
 pub async fn pull_docker_image() -> Result<(), Box<dyn std::error::Error>> {
     let docker = Docker::connect_with_local_defaults()?;
@@ -70,8 +69,6 @@ fn attach_logs(docker_for_logs: Docker, container_id_for_logs: String) {
     });
 }
 
-
-
 pub async fn build(name: &String, source_url: String) -> Result<(), Box<dyn std::error::Error>> {
     info!("Building package {}", name);
 
@@ -84,11 +81,9 @@ pub async fn build(name: &String, source_url: String) -> Result<(), Box<dyn std:
         ..Default::default()
     };
 
-
     let gitea_url = get_environment_variable("AB_GITEA_REPO");
     let gitea_user = get_environment_variable("AB_GITEA_USER");
     let gitea_token = get_environment_variable("AB_GITEA_TOKEN");
-
 
     let env_source = &*format!("AUR_BUILDER_SOURCE={source_url}");
     let env_gitea_url = &*format!("AB_GITEA_REPO={}", gitea_url);
@@ -96,7 +91,7 @@ pub async fn build(name: &String, source_url: String) -> Result<(), Box<dyn std:
     let env_gitea_token = &*format!("AB_GITEA_TOKEN={}", gitea_token);
 
     let image = get_image_name();
-    
+
     let create_container_config = Config {
         image: Some(image.as_str()),
         user: Some("builder"),
@@ -141,4 +136,3 @@ pub async fn build(name: &String, source_url: String) -> Result<(), Box<dyn std:
 
     Ok(())
 }
-

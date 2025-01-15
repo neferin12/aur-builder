@@ -1,6 +1,6 @@
 FROM archlinux
 
-MAINTAINER neferin12
+LABEL authors="neferin12"
 
 RUN pacman --noconfirm -Syyu
 RUN pacman --noconfirm -Sy archlinux-keyring
