@@ -9,6 +9,8 @@ services:
         - rabbitmq-data:/var/lib/rabbitmq/
     env_file:
       - .env
+    environment:
+      RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS: "-rabbit consumer_timeout 36000000"
   server:
     image: ghcr.io/neferin12/aur-builder-server:latest
     container_name: 'aur-builder-server'
