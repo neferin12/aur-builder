@@ -3,7 +3,7 @@ use lapin::options::{BasicPublishOptions, QueueDeclareOptions};
 use lapin::types::FieldTable;
 use reqwest::Error;
 use aur_builder_commons::database::Database;
-use aur_builder_commons::environment::get_environment_variable;
+use aur_builder_commons::environment::{get_environment_variable, load_dotenv};
 use aur_builder_commons::types::AurRequestResultStruct;
 
 
@@ -47,6 +47,9 @@ async fn get_aur_data(package: &str) -> AurResult {
 
 #[tokio::main]
 async fn main() {
+    load_dotenv().unwrap();
+    pretty_env_logger::init();
+
     let database_url = get_environment_variable("DATABASE_URL");
 
     let db = Database::new(database_url).await.unwrap();

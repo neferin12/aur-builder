@@ -4,6 +4,7 @@ use lapin::{Connection, ConnectionProperties};
 use lapin::options::{BasicAckOptions, BasicConsumeOptions, BasicNackOptions};
 use lapin::types::FieldTable;
 use futures_util::stream::StreamExt;
+use aur_builder_commons::environment::load_dotenv;
 use crate::build::build_package;
 use crate::build::docker::pull_docker_image;
 
@@ -11,6 +12,7 @@ use crate::build::docker::pull_docker_image;
 
 #[tokio::main]
 async fn main() {
+    load_dotenv().unwrap();
     pretty_env_logger::init();
 
     info!("Pulling docker image...");
