@@ -1,12 +1,44 @@
-version: "3.2"
 services:
   rabbitmq:
     image: rabbitmq:3-management-alpine
     container_name: 'rabbitmq'
     ports:
-        - "5672:5672"
+#        - "5672:5672"
         - "15672:15672"
     volumes:
         - rabbitmq-data:/var/lib/rabbitmq/
+    env_file:
+      - .env
+  server:
+    image: ghcr.io/neferin12/aur-builder-server:latest
+    container_name: 'aur-builder-server'
+    build:
+        context: .
+        dockerfile: Dockerfile
+        target: server
+    env_file:
+      - .env
+    volumes:
+      - server-db:/app/db
+    depends_on:
+      - rabbitmq
+    restart: on-failure
+  worker:
+    image: ghcr.io/neferin12/aur-builder-worker:latest
+    deploy:
+        mode: replicated
+        replicas: 1
+    build:
+        context: .
+        dockerfile: Dockerfile
+        target: worker
+    env_file:
+      - .env
+    depends_on:
+      - server
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    restart: on-failure
 volumes:
     rabbitmq-data:
+    server-db:

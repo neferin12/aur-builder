@@ -1,7 +1,10 @@
+use std::time::Duration;
 use lapin::{BasicProperties, Connection, ConnectionProperties};
 use lapin::options::{BasicPublishOptions, QueueDeclareOptions};
 use lapin::types::FieldTable;
+use log::info;
 use reqwest::Error;
+use tokio::time::sleep;
 use aur_builder_commons::database::Database;
 use aur_builder_commons::environment::{get_environment_variable, load_dotenv};
 use aur_builder_commons::types::AurRequestResultStruct;
@@ -81,20 +84,24 @@ async fn main() {
         FieldTable::default(),
     ).await.unwrap();
 
-    for data in package_data {
-        // let updated = db.update_metadata(&data).await;
-        let updated = true;
-        if updated {
-            println!("{} was updated!", data.name);
-            tx_channel.basic_publish(
-                "",
-                "pkg_build",
-                BasicPublishOptions::default(),
-                data.name.as_ref(),
-                BasicProperties::default(),
-            ).await.unwrap().await.unwrap();
-        }
-    }
+   loop {
+       info!("Checking for package updates...");
+       for data in &package_data {
+           let updated = db.update_metadata(&data).await;
+           // let updated = true;
+           if updated {
+               println!("{} was updated!", data.name);
+               tx_channel.basic_publish(
+                   "",
+                   "pkg_build",
+                   BasicPublishOptions::default(),
+                   data.name.as_ref(),
+                   BasicProperties::default(),
+               ).await.unwrap().await.unwrap();
+           }
+       }
+       sleep(Duration::from_secs(60*5)).await;
+   }
 
 
 

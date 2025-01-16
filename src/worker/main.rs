@@ -16,8 +16,11 @@ async fn main() {
     pretty_env_logger::init();
 
     info!("Pulling docker image...");
-    pull_docker_image().await.unwrap();
-    info!("Image pulled successfully!");
+    match pull_docker_image().await {
+        Ok(_) => info!("Image pulled successfully!"),
+        Err(_) => warn!("Builder image could not be pulled")
+    }
+
 
     info!("Connecting to rabbitmq...");
     let q_addr = std::env::var("AMQP_ADDR").unwrap_or_else(|_| "amqp://127.0.0.1:5672/%2f".into());
