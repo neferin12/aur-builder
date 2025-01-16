@@ -27,7 +27,7 @@ services:
     image: ghcr.io/neferin12/aur-builder-worker:latest
     deploy:
         mode: replicated
-        replicas: 1
+        replicas: 2
     build:
         context: .
         dockerfile: Dockerfile
