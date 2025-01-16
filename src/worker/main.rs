@@ -1,7 +1,7 @@
 mod build;
 
 use lapin::{Connection, ConnectionProperties};
-use lapin::options::{BasicAckOptions, BasicConsumeOptions, BasicNackOptions};
+use lapin::options::{BasicAckOptions, BasicConsumeOptions, BasicNackOptions, BasicQosOptions};
 use lapin::types::FieldTable;
 use futures_util::stream::StreamExt;
 use aur_builder_commons::environment::load_dotenv;
@@ -31,6 +31,7 @@ async fn main() {
         .await.unwrap();
 
     let rx_channel = conn.create_channel().await.unwrap();
+    rx_channel.basic_qos(1, BasicQosOptions::default()).await.unwrap();
     let mut consumer = rx_channel.basic_consume(
         "pkg_build",
         "aur-builder-worker",
