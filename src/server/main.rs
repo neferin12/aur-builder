@@ -1,8 +1,9 @@
+use std::process::exit;
 use std::time::Duration;
 use lapin::{BasicProperties, Connection, ConnectionProperties};
 use lapin::options::{BasicPublishOptions, QueueDeclareOptions};
 use lapin::types::FieldTable;
-use log::info;
+use log::{error, info};
 use reqwest::Error;
 use tokio::time::sleep;
 use aur_builder_commons::database::Database;
@@ -55,7 +56,13 @@ async fn main() {
 
     let database_url = get_environment_variable("DATABASE_URL");
 
-    let db = Database::new(database_url).await.unwrap();
+    let db_result = Database::new(database_url).await;
+
+    if db_result.is_err() {
+        error!("Failed to connect to database");
+        exit(1);
+    }
+    let db = db_result.unwrap();
     db.migrate().await;
 
     let packages_string = get_environment_variable("PACKAGES");
@@ -71,11 +78,16 @@ async fn main() {
 
     let q_addr = std::env::var("AMQP_ADDR").unwrap_or_else(|_| "amqp://127.0.0.1:5672/%2f".into());
 
-    let conn = Connection::connect(
+    let conn_result = Connection::connect(
             &q_addr,
             ConnectionProperties::default(),
         )
-        .await.unwrap();
+        .await;
+    if conn_result.is_err() {
+        error!("Failed to connect to AMQP server");
+        exit(1);
+    }
+    let conn = conn_result.unwrap();
 
     let tx_channel = conn.create_channel().await.unwrap();
     tx_channel.queue_declare(
