@@ -1,9 +1,9 @@
 mod build;
 
-use lapin::{Connection, ConnectionProperties};
 use lapin::options::{BasicAckOptions, BasicConsumeOptions, BasicNackOptions, BasicQosOptions};
 use lapin::types::FieldTable;
 use futures_util::stream::StreamExt;
+use aur_builder_commons::{connect_to_rabbitmq};
 use aur_builder_commons::environment::load_dotenv;
 use crate::build::build_package;
 use crate::build::docker::pull_docker_image;
@@ -22,13 +22,7 @@ async fn main() {
     }
 
 
-    info!("Connecting to rabbitmq...");
-    let q_addr = std::env::var("AMQP_ADDR").unwrap_or_else(|_| "amqp://127.0.0.1:5672/%2f".into());
-    let conn = Connection::connect(
-        &q_addr,
-        ConnectionProperties::default(),
-    )
-        .await.unwrap();
+    let conn = connect_to_rabbitmq().await;
 
     let rx_channel = conn.create_channel().await.unwrap();
     rx_channel.basic_qos(1, BasicQosOptions::default()).await.unwrap();

@@ -1,15 +1,15 @@
-use std::process::exit;
-use std::time::Duration;
-use lapin::{BasicProperties, Connection, ConnectionProperties};
-use lapin::options::{BasicPublishOptions, QueueDeclareOptions};
-use lapin::types::FieldTable;
-use log::{error, info};
-use reqwest::Error;
-use tokio::time::sleep;
 use aur_builder_commons::database::Database;
 use aur_builder_commons::environment::{get_environment_variable, load_dotenv};
 use aur_builder_commons::types::AurRequestResultStruct;
-
+use aur_builder_commons::{connect_to_rabbitmq, CONNECTION_RETRY_NUMBER, RETRY_TIMEOUT};
+use lapin::options::{BasicPublishOptions, QueueDeclareOptions};
+use lapin::types::FieldTable;
+use lapin::{BasicProperties};
+use log::{error, info};
+use reqwest::Error;
+use std::process::exit;
+use std::time::Duration;
+use tokio::time::sleep;
 
 pub type AurResult<'a> = Result<AurRequestResultStruct, Error>;
 
@@ -54,15 +54,30 @@ async fn main() {
     load_dotenv().unwrap();
     pretty_env_logger::init();
 
-    let database_url = get_environment_variable("DATABASE_URL");
+    let db;
+    let mut db_retries: u8 = 0;
 
-    let db_result = Database::new(database_url).await;
+    loop {
+        if db_retries > CONNECTION_RETRY_NUMBER {
+            error!("Could not connect to database");
+            exit(4);
+        };
+        let database_url = get_environment_variable("DATABASE_URL");
 
-    if db_result.is_err() {
-        error!("Failed to connect to database");
-        exit(1);
+        let db_result = Database::new(database_url).await;
+
+        if db_result.is_ok() {
+            db = db_result.unwrap();
+            break;
+        }
+        error!(
+            "Failed to connect to database: {} ==> Retrying in {RETRY_TIMEOUT}s...",
+            db_result.err().unwrap().to_string()
+        );
+        db_retries += 1;
+        sleep(Duration::from_secs(RETRY_TIMEOUT as u64)).await;
     }
-    let db = db_result.unwrap();
+
     db.migrate().await;
 
     let packages_string = get_environment_variable("PACKAGES");
@@ -76,46 +91,39 @@ async fn main() {
         package_data.push(data);
     }
 
-    let q_addr = std::env::var("AMQP_ADDR").unwrap_or_else(|_| "amqp://127.0.0.1:5672/%2f".into());
-
-    let conn_result = Connection::connect(
-            &q_addr,
-            ConnectionProperties::default(),
-        )
-        .await;
-    if conn_result.is_err() {
-        error!("Failed to connect to AMQP server");
-        exit(1);
-    }
-    let conn = conn_result.unwrap();
+    let conn = connect_to_rabbitmq().await;
 
     let tx_channel = conn.create_channel().await.unwrap();
-    tx_channel.queue_declare(
-        "pkg_build",
-        QueueDeclareOptions::default(),
-        FieldTable::default(),
-    ).await.unwrap();
+    tx_channel
+        .queue_declare(
+            "pkg_build",
+            QueueDeclareOptions::default(),
+            FieldTable::default(),
+        )
+        .await
+        .unwrap();
 
-   loop {
-       info!("Checking for package updates...");
-       for data in &package_data {
-           let updated = db.update_metadata(&data).await;
-           // let updated = true;
-           if updated {
-               println!("{} was updated!", data.name);
-               tx_channel.basic_publish(
-                   "",
-                   "pkg_build",
-                   BasicPublishOptions::default(),
-                   data.name.as_ref(),
-                   BasicProperties::default(),
-               ).await.unwrap().await.unwrap();
-           }
-       }
-       sleep(Duration::from_secs(60*5)).await;
-   }
-
-
-
-
+    loop {
+        info!("Checking for package updates...");
+        for data in &package_data {
+            let updated = db.update_metadata(&data).await;
+            // let updated = true;
+            if updated {
+                println!("{} was updated!", data.name);
+                tx_channel
+                    .basic_publish(
+                        "",
+                        "pkg_build",
+                        BasicPublishOptions::default(),
+                        data.name.as_ref(),
+                        BasicProperties::default(),
+                    )
+                    .await
+                    .unwrap()
+                    .await
+                    .unwrap();
+            }
+        }
+        sleep(Duration::from_secs(60 * 5)).await;
+    }
 }

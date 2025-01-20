@@ -1,4 +1,5 @@
-use sea_orm::{ActiveModelTrait, ActiveValue, DatabaseConnection, DbErr, EntityTrait};
+use log::LevelFilter;
+use sea_orm::{ActiveModelTrait, ActiveValue, ConnectOptions, DatabaseConnection, DbErr, EntityTrait};
 use sea_orm_migration::MigratorTrait;
 
 pub mod entities;
@@ -33,7 +34,9 @@ impl Database {
     /// let db = Database::new("postgres://localhost/test").await.unwrap();
     /// ```
     pub async fn new(url: String) -> Result<Self, DbErr> {
-        let db = sea_orm::Database::connect(&url).await?;
+        let mut options = ConnectOptions::new(url);
+        options.sqlx_logging_level(LevelFilter::Trace);
+        let db = sea_orm::Database::connect(options).await?;
         Ok(Self { db })
     }
 
