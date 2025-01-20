@@ -1,6 +1,5 @@
-use sea_orm::Schema;
-use sea_orm_migration::{prelude::*, schema::*};
-use database::entities::{prelude::*, *};
+use sea_orm_migration::prelude::*;
+use database::entities::prelude::*;
 use crate::database;
 
 #[derive(DeriveMigrationName)]

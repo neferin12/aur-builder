@@ -1,4 +1,3 @@
-use std::fmt::format;
 use aur_builder_commons::environment::get_environment_variable;
 use bollard::container::{
     Config, CreateContainerOptions, LogOutput, LogsOptions, StartContainerOptions,
@@ -10,7 +9,6 @@ use bollard::Docker;
 use bollard::errors::Error;
 use bytes::Bytes;
 use futures_util::{StreamExt, TryStreamExt};
-use rand::RngCore;
 use aur_builder_commons::get_rand_string;
 use aur_builder_commons::types::BuildResultTransmissionFormat;
 

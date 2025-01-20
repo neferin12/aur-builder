@@ -8,7 +8,6 @@ use futures_util::stream::StreamExt;
 use lapin::BasicProperties;
 use lapin::options::{BasicAckOptions, BasicConsumeOptions, BasicNackOptions, BasicPublishOptions, BasicQosOptions, QueueDeclareOptions};
 use lapin::types::FieldTable;
-use serde::Serialize;
 
 #[macro_use]
 extern crate log;
