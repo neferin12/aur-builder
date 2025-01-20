@@ -1,5 +1,5 @@
 use aur_builder_commons::database::Database;
-use aur_builder_commons::environment::{get_environment_variable, load_dotenv};
+use aur_builder_commons::environment::{get_environment_variable, load_dotenv,VERSION};
 use aur_builder_commons::types::AurRequestResultStruct;
 use aur_builder_commons::{connect_to_rabbitmq, CONNECTION_RETRY_NUMBER, RETRY_TIMEOUT};
 use lapin::options::{BasicPublishOptions, QueueDeclareOptions};
@@ -49,10 +49,14 @@ async fn get_aur_data(package: &str) -> AurResult {
     return Ok(results);
 }
 
+
+
 #[tokio::main]
 async fn main() {
     load_dotenv().unwrap();
     pretty_env_logger::init();
+
+    info!("Starting Aur-Builder Server v{VERSION}");
 
     let db;
     let mut db_retries: u8 = 0;

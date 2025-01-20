@@ -21,7 +21,7 @@ services:
     env_file:
       - .env
     volumes:
-      - server-db:/app/db
+      - ./db:/app/db
     depends_on:
       - rabbitmq
     restart: on-failure

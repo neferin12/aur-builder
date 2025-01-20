@@ -4,7 +4,7 @@ use lapin::options::{BasicAckOptions, BasicConsumeOptions, BasicNackOptions, Bas
 use lapin::types::FieldTable;
 use futures_util::stream::StreamExt;
 use aur_builder_commons::{connect_to_rabbitmq};
-use aur_builder_commons::environment::load_dotenv;
+use aur_builder_commons::environment::{load_dotenv, VERSION};
 use crate::build::build_package;
 use crate::build::docker::pull_docker_image;
 
@@ -14,6 +14,8 @@ use crate::build::docker::pull_docker_image;
 async fn main() {
     load_dotenv().unwrap();
     pretty_env_logger::init();
+    
+    info!("Starting Aur-Builder Worker v{VERSION}");
 
     info!("Pulling docker image...");
     match pull_docker_image().await {

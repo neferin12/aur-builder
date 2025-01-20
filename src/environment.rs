@@ -14,3 +14,5 @@ pub fn load_dotenv() -> dotenvy::Result<()> {
         Err(e) => Err(e),
     }
 }
+
+pub const VERSION: &str = env!("CARGO_PKG_VERSION");
