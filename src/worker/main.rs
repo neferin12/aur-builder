@@ -1,39 +1,66 @@
 mod build;
 
-use lapin::options::{BasicAckOptions, BasicConsumeOptions, BasicNackOptions, BasicQosOptions};
-use lapin::types::FieldTable;
-use futures_util::stream::StreamExt;
-use aur_builder_commons::{connect_to_rabbitmq};
-use aur_builder_commons::environment::{load_dotenv, VERSION};
 use crate::build::build_package;
 use crate::build::docker::pull_docker_image;
+use aur_builder_commons::environment::{load_dotenv, VERSION};
+use aur_builder_commons::{connect_to_rabbitmq, get_rand_string};
+use futures_util::stream::StreamExt;
+use lapin::BasicProperties;
+use lapin::options::{BasicAckOptions, BasicConsumeOptions, BasicNackOptions, BasicPublishOptions, BasicQosOptions, QueueDeclareOptions};
+use lapin::types::FieldTable;
+use serde::Serialize;
 
-#[macro_use] extern crate log;
+#[macro_use]
+extern crate log;
 
 #[tokio::main]
 async fn main() {
     load_dotenv().unwrap();
     pretty_env_logger::init();
-    
+
     info!("Starting Aur-Builder Worker v{VERSION}");
 
     info!("Pulling docker image...");
     match pull_docker_image().await {
         Ok(_) => info!("Image pulled successfully!"),
-        Err(_) => warn!("Builder image could not be pulled")
+        Err(_) => warn!("Builder image could not be pulled"),
     }
-
 
     let conn = connect_to_rabbitmq().await;
 
     let rx_channel = conn.create_channel().await.unwrap();
-    rx_channel.basic_qos(1, BasicQosOptions::default()).await.unwrap();
-    let mut consumer = rx_channel.basic_consume(
-        "pkg_build",
-        "aur-builder-worker",
-        BasicConsumeOptions::default(),
-        FieldTable::default(),
-    ).await.unwrap();
+    rx_channel
+        .basic_qos(1, BasicQosOptions::default())
+        .await
+        .unwrap();
+    rx_channel
+        .queue_declare(
+            "pkg_build",
+            QueueDeclareOptions::default(),
+            FieldTable::default(),
+        )
+        .await
+        .unwrap();
+    let mut consumer = rx_channel
+        .basic_consume(
+            "pkg_build",
+            format!("aur-builder-worker-{}", get_rand_string()).as_str(),
+            BasicConsumeOptions::default(),
+            FieldTable::default(),
+        )
+        .await
+        .unwrap();
+
+    let tx_results = conn.create_channel().await.unwrap();
+    tx_results
+        .queue_declare(
+            "build_results",
+            QueueDeclareOptions::default(),
+            FieldTable::default(),
+        )
+        .await
+        .unwrap();
+
     while let Some(delivery) = consumer.next().await {
         let delivery = delivery.expect("error in consumer");
         let name = match std::str::from_utf8(&*delivery.data) {
@@ -42,16 +69,23 @@ async fn main() {
         };
 
         match build_package(&name).await {
-            Ok(_) => {
-                delivery
-                    .ack(BasicAckOptions::default())
-                    .await
-                    .expect("ack");
+            Ok(results) => {
+                delivery.ack(BasicAckOptions::default()).await.expect("ack");
+                tx_results.basic_publish(
+                    "",
+                    "build_results",
+                    BasicPublishOptions::default(),
+                    serde_json::to_string(&results).unwrap().as_ref(),
+                    BasicProperties::default(),
+                ).await.unwrap();
             }
             Err(error) => {
-                error!("Error building package '{}':\n{:?}",name, error);
-                delivery.nack(BasicNackOptions::default()).await.expect("nack");
+                error!("Error building package '{}':\n{:?}", name, error);
+                delivery
+                    .nack(BasicNackOptions::default())
+                    .await
+                    .expect("nack");
             }
         }
-    };
+    }
 }

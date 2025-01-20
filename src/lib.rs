@@ -2,6 +2,7 @@ use lapin::{Connection, ConnectionProperties};
 use log::{error, info};
 use std::process::exit;
 use std::time::Duration;
+use rand::RngCore;
 use tokio::time::sleep;
 
 pub mod database;
@@ -41,4 +42,8 @@ pub async fn connect_to_rabbitmq() -> Connection {
     info!("Successfully connected to rabbitmq");
     
     conn
+}
+
+pub fn get_rand_string() -> String {
+    rand::thread_rng().next_u32().to_string()
 }

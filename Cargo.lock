@@ -396,9 +396,10 @@ checksum = "1505bd5d3d116872e7271a6d4e16d81d0c8570876c8de68093a09ac269d8aac0"
 
 [[package]]
 name = "aur-builder"
-version = "0.1.6"
+version = "0.1.7"
 dependencies = [
  "bollard",
+ "bytes",
  "dotenvy",
  "futures-util",
  "lapin",
@@ -408,6 +409,7 @@ dependencies = [
  "reqwest",
  "sea-orm",
  "sea-orm-migration",
+ "serde",
  "serde_json",
  "tokio",
 ]

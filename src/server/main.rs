@@ -1,17 +1,18 @@
 use aur_builder_commons::database::Database;
-use aur_builder_commons::environment::{get_environment_variable, load_dotenv,VERSION};
-use aur_builder_commons::types::AurRequestResultStruct;
+use aur_builder_commons::environment::{get_environment_variable, load_dotenv, VERSION};
+use aur_builder_commons::types::{AurRequestResult, BuildResultTransmissionFormat};
 use aur_builder_commons::{connect_to_rabbitmq, CONNECTION_RETRY_NUMBER, RETRY_TIMEOUT};
-use lapin::options::{BasicPublishOptions, QueueDeclareOptions};
+use futures_util::{StreamExt, TryStreamExt};
+use lapin::options::{BasicAckOptions, BasicConsumeOptions, BasicPublishOptions, QueueDeclareOptions};
 use lapin::types::FieldTable;
-use lapin::{BasicProperties};
-use log::{error, info};
+use lapin::BasicProperties;
+use log::{debug, error, info};
 use reqwest::Error;
 use std::process::exit;
 use std::time::Duration;
 use tokio::time::sleep;
 
-pub type AurResult<'a> = Result<AurRequestResultStruct, Error>;
+pub type AurResult<'a> = Result<AurRequestResult, Error>;
 
 /// This asynchronous function fetches data from the Arch User Repository (AUR) for a given package.
 ///
@@ -39,7 +40,7 @@ async fn get_aur_data(package: &str) -> AurResult {
         return Err(resp.err().unwrap());
     };
     let data: serde_json::Value = resp.unwrap().json().await.unwrap();
-    let results: AurRequestResultStruct = AurRequestResultStruct {
+    let results: AurRequestResult = AurRequestResult {
         id: data["results"][0]["ID"].as_i64().unwrap(),
         name: String::from(data["results"][0]["Name"].as_str().unwrap()),
         version: String::from(data["results"][0]["Version"].as_str().unwrap()),
@@ -48,8 +49,6 @@ async fn get_aur_data(package: &str) -> AurResult {
     };
     return Ok(results);
 }
-
-
 
 #[tokio::main]
 async fn main() {
@@ -107,13 +106,48 @@ async fn main() {
         .await
         .unwrap();
 
+    let results_channel = conn.create_channel().await.unwrap();
+    results_channel
+        .queue_declare(
+            "build_results",
+            QueueDeclareOptions::default(),
+            FieldTable::default(),
+        )
+        .await
+        .unwrap();
+
+    let mut results_consumer = results_channel
+        .basic_consume(
+            "build_results",
+            "aur-builder-server",
+            BasicConsumeOptions::default(),
+            FieldTable::default(),
+        )
+        .await
+        .unwrap();
+
+    let locale_db = db.clone();
+    tokio::spawn(async move{
+        while let Some(delivery) = results_consumer.next().await {
+            let delivery = delivery.expect("error in consumer");
+            let data_str = match std::str::from_utf8(&*delivery.data) {
+                Ok(v) => v.to_string(),
+                Err(e) => panic!("Invalid UTF-8 sequence: {}", e),
+            };
+            let data: BuildResultTransmissionFormat = serde_json::from_str(&*data_str).unwrap();
+            locale_db.save_build_results(&data).await.unwrap();
+
+            delivery.ack(BasicAckOptions::default()).await.unwrap();
+        }
+    });
+
     loop {
         info!("Checking for package updates...");
         for data in &package_data {
             let updated = db.update_metadata(&data).await;
             // let updated = true;
             if updated {
-                println!("{} was updated!", data.name);
+                info!("{} was updated!", data.name);
                 tx_channel
                     .basic_publish(
                         "",

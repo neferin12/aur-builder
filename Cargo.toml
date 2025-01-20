@@ -1,6 +1,6 @@
 [package]
 name = "aur-builder"
-version = "0.1.6"
+version = "0.1.7"
 edition = "2021"
 
 [dependencies]
@@ -16,6 +16,8 @@ futures-util = "~0.3.30"
 log = "~0.4"
 rand = "~0.8.5"
 dotenvy = "0.15.7"
+bytes = "1.9.0"
+serde = { version = "1.0.217", features = ["derive"] }
 
 [[bin]]
 name = "server"

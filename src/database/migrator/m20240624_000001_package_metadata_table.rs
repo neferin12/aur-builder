@@ -10,7 +10,6 @@ impl MigrationName for Migration {
 
 #[async_trait::async_trait]
 impl MigrationTrait for Migration {
-    // Define how to apply this migration: Create the Bakery table.
     async fn up(&self, manager: &SchemaManager) -> Result<(), DbErr> {
         manager
             .create_table(
@@ -31,7 +30,7 @@ impl MigrationTrait for Migration {
             .await
     }
 
-    // Define how to rollback this migration: Drop the Bakery table.
+    // Define how to rollback this migration
     async fn down(&self, manager: &SchemaManager) -> Result<(), DbErr> {
         manager
             .drop_table(Table::drop().table(PackageMetadata::Table).to_owned())

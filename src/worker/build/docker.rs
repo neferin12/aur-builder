@@ -1,3 +1,4 @@
+use std::fmt::format;
 use aur_builder_commons::environment::get_environment_variable;
 use bollard::container::{
     Config, CreateContainerOptions, LogOutput, LogsOptions, StartContainerOptions,
@@ -6,8 +7,12 @@ use bollard::container::{
 use bollard::image::CreateImageOptions;
 use bollard::models::HostConfig;
 use bollard::Docker;
+use bollard::errors::Error;
+use bytes::Bytes;
 use futures_util::{StreamExt, TryStreamExt};
 use rand::RngCore;
+use aur_builder_commons::get_rand_string;
+use aur_builder_commons::types::BuildResultTransmissionFormat;
 
 const VERSION: &str = env!("CARGO_PKG_VERSION");
 
@@ -33,6 +38,10 @@ pub async fn pull_docker_image() -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
+fn log_message_to_string(prefix: &str, message: Bytes) -> String {
+    format!("{prefix}: {}", String::from_utf8_lossy(&message))
+}
+
 fn attach_logs(docker_for_logs: Docker, container_id_for_logs: String) {
     tokio::spawn(async move {
         debug!("Attaching to logs...");
@@ -50,14 +59,10 @@ fn attach_logs(docker_for_logs: Docker, container_id_for_logs: String) {
         while let Some(log_result) = logs_stream.next().await {
             match log_result {
                 Ok(LogOutput::StdOut { message }) => {
-                    debug!("stdout: {}", String::from_utf8_lossy(&message));
+                    debug!("{}", log_message_to_string("stdout", message));
                 }
                 Ok(LogOutput::StdErr { message }) => {
-                    debug!("stderr: {}", String::from_utf8_lossy(&message));
-                }
-                Ok(LogOutput::Console { message }) => {
-                    // For TTY-attached containers
-                    debug!("console: {}", String::from_utf8_lossy(&message));
+                    debug!("{}", log_message_to_string("stderr", message));
                 }
                 Err(e) => {
                     error!("Error reading log stream: {}", e);
@@ -69,13 +74,11 @@ fn attach_logs(docker_for_logs: Docker, container_id_for_logs: String) {
     });
 }
 
-pub async fn build(name: &String, source_url: String) -> Result<(), Box<dyn std::error::Error>> {
+pub async fn build(name: &String, source_url: String) -> Result<BuildResultTransmissionFormat, Box<dyn std::error::Error>> {
     info!("Building package {}", name);
 
-    let random_suffix = rand::thread_rng().next_u32();
-
     let docker = Docker::connect_with_local_defaults()?;
-    let container_name = format!("build-{}-{}", name, random_suffix);
+    let container_name = format!("build-{}-{}", name, get_rand_string());
     let create_container_options = CreateContainerOptions {
         name: container_name,
         ..Default::default()
@@ -122,17 +125,60 @@ pub async fn build(name: &String, source_url: String) -> Result<(), Box<dyn std:
     let mut wait_stream =
         docker.wait_container(&container.id, None::<WaitContainerOptions<String>>);
     while let Some(res) = wait_stream.next().await {
+        let mut logs = docker.logs(&container.id, Some(LogsOptions::<String> {
+            stdout: true,
+            stderr: true,
+            // tail: "all",  // optional
+            ..Default::default()
+        }));
+        let mut logs_vec = Vec::new();
+
+        while let Some(log_result) = logs.next().await {
+            match log_result {
+                Ok(LogOutput::StdOut { message }) => {
+                    logs_vec.push(log_message_to_string("stdout", message));
+                }
+                Ok(LogOutput::StdErr { message }) => {
+                    logs_vec.push(log_message_to_string("stderr", message));
+                }
+                Err(e) => {
+                    error!("Error reading log stream: {}", e);
+                    break;
+                }
+                _ => {}
+            }
+        }
+
+        let mut results = BuildResultTransmissionFormat {
+            name: name.to_string(),
+            status_code: -5,
+            log_lines: logs_vec,
+            success: true
+        };
+
         match res {
             Ok(exit) => {
                 info!("Build container exited with: {:?}", exit.status_code);
-                break;
+
+                results.status_code = exit.status_code;
+
+                return Ok(results);
             }
             Err(e) => {
-                error!("Error while waiting for build container: {:?}", e);
-                return Err(e.into());
+                return match e {
+                    Error::DockerContainerWaitError { code, .. } => {
+                        results.status_code = code;
+                        results.success = false;
+                        Ok(results)
+                    },
+                    _ => Err(e.into())
+                }
+                // error!("Error while waiting for build container: {:?}", e);
+                // return Err(results);
+
             }
         }
     }
 
-    Ok(())
+    Err("Unexpected end of wait stream".into())
 }

@@ -1,5 +1,6 @@
 use log::LevelFilter;
-use sea_orm::{ActiveModelTrait, ActiveValue, ConnectOptions, DatabaseConnection, DbErr, EntityTrait};
+use rand::RngCore;
+use sea_orm::{ActiveModelTrait, ActiveValue, ColumnTrait, ConnectOptions, DatabaseConnection, DbErr, EntityTrait, QueryFilter};
 use sea_orm_migration::MigratorTrait;
 
 pub mod entities;
@@ -7,11 +8,12 @@ pub mod migrator;
 
 use migrator::Migrator;
 use entities::{prelude::*, *};
-use crate::types::AurRequestResultStruct;
+use crate::types::{AurRequestResult, BuildResultTransmissionFormat};
 
 /// The `Database` struct represents a database connection.
 ///
 /// It contains methods to create a new database connection, apply migrations, and update metadata.
+#[derive(Debug, Clone)]
 pub struct Database {
     db: DatabaseConnection,
 }
@@ -50,7 +52,6 @@ impl Database {
     pub async fn migrate(&self) {
         println!("Applying migrations...");
         Migrator::up(&self.db, None).await.unwrap();
-
     }
 
     /// This asynchronous function updates the metadata of a package in the database.
@@ -68,12 +69,12 @@ impl Database {
     /// ```
     /// let updated = db.update_metadata(&data).await;
     /// ```
-    pub async fn update_metadata(&self, data: &AurRequestResultStruct) -> bool {
+    pub async fn update_metadata(&self, data: &AurRequestResult) -> bool {
         let mut new_timestamp = false;
 
         let existing = PackageMetadata::find_by_id(data.id).one(&self.db).await.unwrap();
 
-         let db_data = package_metadata::ActiveModel {
+        let db_data = package_metadata::ActiveModel {
             id: ActiveValue::Set(data.id.to_owned()),
             name: ActiveValue::Set(data.name.to_owned()),
             version: ActiveValue::Set(data.version.to_owned()),
@@ -92,7 +93,23 @@ impl Database {
         };
 
 
-
         new_timestamp
+    }
+
+    pub async fn save_build_results(&self, data: &BuildResultTransmissionFormat) -> Result<(), Box<dyn std::error::Error>> {
+        let package = PackageMetadata::find()
+            .filter(package_metadata::Column::Name.eq(data.name.clone()))
+            .one(&self.db)
+            .await?.unwrap();
+        let db_data = build_results::ActiveModel {
+            id: ActiveValue::Set(rand::thread_rng().next_u32() as i32),
+            package_id: ActiveValue::Set(package.id as i32),
+            exit_code: ActiveValue::Set(data.status_code as i32),
+            build_log: ActiveValue::Set(Some(data.log_lines.join(""))),
+            success: ActiveValue::Set(data.success),
+        };
+        db_data.insert(&self.db).await?;
+
+        Ok(())
     }
 }
