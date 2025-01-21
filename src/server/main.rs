@@ -1,14 +1,17 @@
-use aur_builder_commons::database::Database;
+use aur_builder_commons::database::connect_to_db;
 use aur_builder_commons::environment::{get_environment_variable, load_dotenv, VERSION};
-use aur_builder_commons::types::{AurRequestResult, BuildResultTransmissionFormat};
-use aur_builder_commons::{connect_to_rabbitmq, CONNECTION_RETRY_NUMBER, RETRY_TIMEOUT};
+use aur_builder_commons::types::{
+    AurRequestResult, BuildResultTransmissionFormat, BuildTaskTransmissionFormat,
+};
+use aur_builder_commons::connect_to_rabbitmq;
 use futures_util::StreamExt;
-use lapin::options::{BasicAckOptions, BasicConsumeOptions, BasicPublishOptions, QueueDeclareOptions};
+use lapin::options::{
+    BasicAckOptions, BasicConsumeOptions, BasicPublishOptions, QueueDeclareOptions,
+};
 use lapin::types::FieldTable;
 use lapin::BasicProperties;
-use log::{error, info};
+use log::info;
 use reqwest::Error;
-use std::process::exit;
 use std::time::Duration;
 use tokio::time::sleep;
 
@@ -57,30 +60,7 @@ async fn main() {
 
     info!("Starting Aur-Builder Server v{VERSION}");
 
-    let db;
-    let mut db_retries: u8 = 0;
-
-    loop {
-        if db_retries > CONNECTION_RETRY_NUMBER {
-            error!("Could not connect to database");
-            exit(4);
-        };
-        let database_url = get_environment_variable("DATABASE_URL");
-
-        let db_result = Database::new(database_url).await;
-
-        if db_result.is_ok() {
-            db = db_result.unwrap();
-            break;
-        }
-        error!(
-            "Failed to connect to database: {} ==> Retrying in {RETRY_TIMEOUT}s...",
-            db_result.err().unwrap().to_string()
-        );
-        db_retries += 1;
-        sleep(Duration::from_secs(RETRY_TIMEOUT as u64)).await;
-    }
-
+    let db = connect_to_db().await;
     db.migrate().await;
 
     let packages_string = get_environment_variable("PACKAGES");
@@ -127,7 +107,7 @@ async fn main() {
         .unwrap();
 
     let locale_db = db.clone();
-    tokio::spawn(async move{
+    tokio::spawn(async move {
         while let Some(delivery) = results_consumer.next().await {
             let delivery = delivery.expect("error in consumer");
             let data_str = match std::str::from_utf8(&*delivery.data) {
@@ -148,12 +128,17 @@ async fn main() {
             // let updated = true;
             if updated {
                 info!("{} was updated!", data.name);
+                let task = BuildTaskTransmissionFormat {
+                    id: data.id.clone(),
+                    name: data.name.clone(),
+                    version: data.version.clone(),
+                };
                 tx_channel
                     .basic_publish(
                         "",
                         "pkg_build",
                         BasicPublishOptions::default(),
-                        data.name.as_ref(),
+                        serde_json::to_string(&task).unwrap().as_ref(),
                         BasicProperties::default(),
                     )
                     .await

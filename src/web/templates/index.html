@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block title %}Packages{% endblock title %}
+
+{% block content %}
+<h2>Tracked Packages</h2>
+<div class="table-responsive">
+    <table class="table table-striped align-middle">
+        <thead>
+        <tr>
+            <th scope="col">Name</th>
+            <th scope="col">Version</th>
+            <th scope="col">Maintainer</th>
+            <th scope="col">Last Modified</th>
+            <th scope="col">Build Results</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for package in packages | sort(attribute="name") %}
+        <tr>
+            <td>{{package.name}}</td>
+            <td>{{package.version}}</td>
+            <td>{{package.maintainer}}</td>
+            <td>{{package.last_modified | date(format="%Y-%m-%d %H:%M")}}</td>
+            <td><a href="/build-results/{{package.id}}">Builds</a></td>
+        </tr>
+        {% endfor %}
+
+        </tbody>
+    </table>
+</div>
+{% endblock content %}

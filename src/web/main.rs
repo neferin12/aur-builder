@@ -1,0 +1,74 @@
+use aur_builder_commons::database::{connect_to_db, Database};
+use aur_builder_commons::environment::{load_dotenv, VERSION};
+use axum::routing::get;
+use axum::{Extension, Router};
+use log::{error, info};
+use std::process::exit;
+use axum::extract::Path;
+use axum::handler::Handler;
+use axum::response::Html;
+use reqwest::StatusCode;
+use tera::{Context, Tera};
+use aur_builder_commons::database::entities::package_metadata;
+
+#[tokio::main]
+async fn main() {
+    load_dotenv().unwrap();
+    pretty_env_logger::init();
+
+    info!("Starting Aur-Builder Web v{VERSION}");
+
+    let db = connect_to_db().await;
+    let tera = match Tera::new("src/web/templates/**/*.html") {
+        Ok(t) => t,
+        Err(e) => {
+            error!("Parsing error(s): {}", e);
+            exit(1);
+        }
+    };
+
+    // build our application with a route
+    let app = Router::new()
+        // `GET /` goes to `root`
+        .route("/", get(render_packages_function))
+        .route("/build-results/{pid}", get(render_build_results_function))
+        .layer(Extension(tera))
+        .layer(Extension(db));
+
+    // run our app with hyper, listening globally on port 3000
+    let listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await.unwrap();
+    axum::serve(listener, app).await.unwrap();
+}
+
+async fn render_packages_function(
+    Extension(tera): Extension<Tera>,
+    Extension(db): Extension<Database>
+) -> Html<String> {
+    let mut context = Context::new();
+    let packages = db.get_packages().await.unwrap();
+
+    context.insert("packages", &packages);
+
+    Html(tera.render("index.html", &context).unwrap())
+}
+
+async fn render_build_results_function(
+    Extension(tera): Extension<Tera>,
+    Extension(db): Extension<Database>,
+    Path(pid): Path<i64>
+) -> Result<Html<String>, StatusCode> {
+    let mut context = Context::new();
+
+    let package: package_metadata::Model = match db.get_package(pid).await.unwrap() {
+        None => {
+            return Err(StatusCode::NOT_FOUND);
+        }
+        Some(p) => {p}
+    };
+    context.insert("package", &package);
+
+    let build_results = db.get_build_results(package.id).await.unwrap();
+    context.insert("build_results", &build_results);
+
+    Ok(Html(tera.render("build-results.html", &context).unwrap()))
+}

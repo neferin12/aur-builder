@@ -18,6 +18,9 @@ rand = "~0.8.5"
 dotenvy = "0.15.7"
 bytes = "1.9.0"
 serde = { version = "1.0.217", features = ["derive"] }
+tera = "1"
+axum = { version = "~0.8.1", features = ["http2"] }
+lazy_static = "1.5.0"
 
 [[bin]]
 name = "server"
@@ -26,6 +29,10 @@ path = "src/server/main.rs"
 [[bin]]
 name = "worker"
 path = "src/worker/main.rs"
+
+[[bin]]
+name = "web"
+path = "src/web/main.rs"
 
 [lib]
 name = "aur_builder_commons"

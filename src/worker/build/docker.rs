@@ -9,8 +9,9 @@ use bollard::Docker;
 use bollard::errors::Error;
 use bytes::Bytes;
 use futures_util::{StreamExt, TryStreamExt};
+use sea_orm::sqlx::types::chrono::Utc;
 use aur_builder_commons::get_rand_string;
-use aur_builder_commons::types::BuildResultTransmissionFormat;
+use aur_builder_commons::types::{BuildResultTransmissionFormat, BuildTaskTransmissionFormat, Timestamps};
 
 const VERSION: &str = env!("CARGO_PKG_VERSION");
 
@@ -72,11 +73,12 @@ fn attach_logs(docker_for_logs: Docker, container_id_for_logs: String) {
     });
 }
 
-pub async fn build(name: &String, source_url: String) -> Result<BuildResultTransmissionFormat, Box<dyn std::error::Error>> {
-    info!("Building package {}", name);
+pub async fn build(task: &BuildTaskTransmissionFormat, source_url: String) -> Result<BuildResultTransmissionFormat, Box<dyn std::error::Error>> {
+    info!("Building package {}", task.name);
+    let build_start_time = Utc::now().naive_utc();
 
     let docker = Docker::connect_with_local_defaults()?;
-    let container_name = format!("build-{}-{}", name, get_rand_string());
+    let container_name = format!("build-{}-{}", task.name, get_rand_string());
     let create_container_options = CreateContainerOptions {
         name: container_name,
         ..Default::default()
@@ -147,23 +149,30 @@ pub async fn build(name: &String, source_url: String) -> Result<BuildResultTrans
             }
         }
 
+        let build_end_time = Utc::now().naive_utc();
+
         let mut results = BuildResultTransmissionFormat {
-            name: name.to_string(),
+            task: task.to_owned(),
             status_code: -5,
             log_lines: logs_vec,
-            success: true
+            success: true,
+            timestamps: Timestamps {
+                start: build_start_time,
+                end: build_end_time,
+            }
         };
 
-        match res {
+
+        return match res {
             Ok(exit) => {
                 info!("Build container exited with: {:?}", exit.status_code);
 
                 results.status_code = exit.status_code;
 
-                return Ok(results);
+                Ok(results)
             }
             Err(e) => {
-                return match e {
+                match e {
                     Error::DockerContainerWaitError { code, .. } => {
                         results.status_code = code;
                         results.success = false;

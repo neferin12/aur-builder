@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block title %}Build Results for {{package.name}}{% endblock title %}
+
+{% block content %}
+<h2>Build Results for Package {{package.name}}</h2>
+<div class="table-responsive">
+    <table class="table table-striped align-middle">
+        <thead>
+        <tr>
+            <th scope="col">Success</th>
+            <th scope="col">Version</th>
+            <th scope="col">Exit Code</th>
+            <th scope="col">Start</th>
+            <th scope="col">End</th>
+            <th scope="col">Logs</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for build_result in build_results %}
+        <tr>
+            <td>
+                <p class="m-0">
+                    {{build_result.success
+                    | default(value="unknown")
+                    | as_str
+                    | replace(from="false", to="❌")
+                    | replace(from="true", to="✅")
+                    }}
+                </p>
+            </td>
+            <td>{{build_result.version | default(value="-")}}</td>
+            <td>{{build_result.exit_code | default(value="-")}}</td>
+            <td>{{build_result.started_at | default(value=0) | date(format="%Y-%m-%d %H:%M")}}</td>
+            <td>{{build_result.finished_at | default(value=0) | date(format="%Y-%m-%d %H:%M")}}</td>
+            <td>
+                <button class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#build-{{build_result.id}}">
+                    Logs
+                </button>
+            </td>
+        </tr>
+        {% endfor %}
+
+        </tbody>
+    </table>
+</div>
+
+<div id="modals">
+    {% for build_result in build_results %}
+    <div id="build-{{build_result.id}}" class="modal">
+        <div class="modal-dialog modal-fullscreen modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Build logs for {{package.name}} ({{build_result.version |
+                        default(value="-")}}) on {{build_result.started_at | default(value=0) | date(format="%Y-%m-%d
+                        %H:%M")}}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body bg-dark text-light">
+                    <pre class="jetbrains-mono">{{build_result.build_log | default(value="No logs available")}}</pre>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock content %}
