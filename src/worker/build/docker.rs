@@ -106,7 +106,7 @@ pub async fn build(task: &BuildTaskTransmissionFormat, source_url: String) -> Re
         ]),
         host_config: Some(HostConfig {
             // e.g., to remove container automatically upon exit:
-            auto_remove: Some(true),
+            auto_remove: Some(false),
             ..Default::default()
         }),
         ..Default::default()
@@ -149,6 +149,8 @@ pub async fn build(task: &BuildTaskTransmissionFormat, source_url: String) -> Re
             }
         }
 
+        docker.remove_container(&container.id, Default::default()).await?;
+        
         let build_end_time = Utc::now().naive_utc();
 
         let mut results = BuildResultTransmissionFormat {
@@ -168,7 +170,7 @@ pub async fn build(task: &BuildTaskTransmissionFormat, source_url: String) -> Re
                 info!("Build container exited with: {:?}", exit.status_code);
 
                 results.status_code = exit.status_code;
-
+                
                 Ok(results)
             }
             Err(e) => {
