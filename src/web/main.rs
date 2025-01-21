@@ -5,7 +5,6 @@ use axum::{Extension, Router};
 use log::{error, info};
 use std::process::exit;
 use axum::extract::Path;
-use axum::handler::Handler;
 use axum::response::Html;
 use reqwest::StatusCode;
 use tera::{Context, Tera};

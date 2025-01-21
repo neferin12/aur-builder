@@ -24,7 +24,7 @@ services:
       - ./db:/app/db
     depends_on:
       - rabbitmq
-    restart: on-failure
+    restart: always
   worker:
     image: ghcr.io/neferin12/aur-builder-worker:latest
     deploy:
@@ -40,7 +40,19 @@ services:
       - rabbitmq
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-    restart: on-failure
+    restart: always
+  web:
+    image: ghcr.io/neferin12/aur-builder-web:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: web
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    restart: always
+    volumes:
+      - ./db:/app/db
 volumes:
     rabbitmq-data:
-    server-db:

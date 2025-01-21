@@ -21,6 +21,12 @@ COPY --from=builder /app/target/x86_64-unknown-linux-musl/release/server /usr/lo
 
 CMD ["/usr/local/bin/server"]
 
+FROM alpine AS web
+WORKDIR /app
+COPY --from=builder /app/target/x86_64-unknown-linux-musl/release/web /usr/local/bin/web
+
+CMD ["/usr/local/bin/web"]
+
 FROM docker AS worker
 WORKDIR /app
 COPY --from=builder /app/target/x86_64-unknown-linux-musl/release/worker /usr/local/bin/worker
