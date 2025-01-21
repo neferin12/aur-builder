@@ -3,7 +3,10 @@
 {% block title %}Build Results for {{package.name}}{% endblock title %}
 
 {% block content %}
-<h2>Build Results for Package {{package.name}}</h2>
+<h2>Build Results For Package "<span class="jetbrains-mono">{{package.name}}</span>"</h2>
+<form action="/force-rebuild/{{package.id}}" method="post">
+    <button type="submit" class="btn btn-danger">Force rebuild</button>
+</form>
 <div class="table-responsive">
     <table class="table table-striped align-middle">
         <thead>

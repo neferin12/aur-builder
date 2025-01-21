@@ -1,6 +1,6 @@
 use aur_builder_commons::database::{connect_to_db, Database};
 use aur_builder_commons::environment::{load_dotenv, VERSION};
-use axum::routing::get;
+use axum::routing::{get, post};
 use axum::{Extension, Router};
 use log::{error, info};
 use std::process::exit;
@@ -31,6 +31,7 @@ async fn main() {
         // `GET /` goes to `root`
         .route("/", get(render_packages_function))
         .route("/build-results/{pid}", get(render_build_results_function))
+        .route("/force-rebuild/{pid}", post(init_force_rebuild))
         .layer(Extension(tera))
         .layer(Extension(db));
 
@@ -70,4 +71,24 @@ async fn render_build_results_function(
     context.insert("build_results", &build_results);
 
     Ok(Html(tera.render("build-results.html", &context).unwrap()))
+}
+
+async fn init_force_rebuild(
+    Extension(tera): Extension<Tera>,
+    Extension(db): Extension<Database>,
+    Path(pid): Path<i64>
+) -> Result<Html<String>, StatusCode> {
+    let mut context = Context::new();
+
+    let package: package_metadata::Model = match db.get_package(pid).await.unwrap() {
+        None => {
+            return Err(StatusCode::NOT_FOUND);
+        }
+        Some(p) => {p}
+    };
+    context.insert("package", &package);
+
+    db.reset_package_last_modified(package.id).await;
+
+    Ok(Html(tera.render("force-rebuild.html", &context).unwrap()))
 }

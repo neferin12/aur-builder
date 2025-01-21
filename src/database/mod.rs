@@ -112,6 +112,13 @@ impl Database {
     pub async fn get_package(&self, id: i64) -> Result<Option<package_metadata::Model>, DbErr> {
         PackageMetadata::find_by_id(id).one(&self.db).await
     }
+    
+    pub async fn reset_package_last_modified(&self, id: i64) {
+        let p = PackageMetadata::find_by_id(id).one(&self.db).await.unwrap().unwrap();
+        let mut am = package_metadata::ActiveModel::from(p);
+        am.last_modified = ActiveValue::Set(0);
+        am.update(&self.db).await.unwrap();
+    }
 
     pub async fn get_build_results(
         &self,

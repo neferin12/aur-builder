@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block title %}Force Rebuild{% endblock title %}
+
+{% block content %}
+<h2>Forced Rebuild For Package "<span class="jetbrains-mono">{{package.name}}</span>"</h2>
+<p>Forced rebuild has been initiated, it can take up to 10 minutes to start.</p>
+<div class="btn-group" role="group" aria-label="Basic example">
+    <a href="/" class="btn btn-primary">Return to Home</a>
+    <a href="/build-results/{{package.id}}" class="btn btn-secondary">
+        Return to Build Results for "<span class="jetbrains-mono">{{package.name}}</span>"
+    </a>
+</div>
+
+{% endblock content %}
