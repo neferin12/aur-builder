@@ -107,6 +107,8 @@ pub async fn build(task: &BuildTaskTransmissionFormat, source_url: String) -> Re
         host_config: Some(HostConfig {
             // e.g., to remove container automatically upon exit:
             auto_remove: Some(false),
+            cpu_period: Some(100000),
+            cpu_quota: Some(100000),
             ..Default::default()
         }),
         ..Default::default()
