@@ -102,7 +102,7 @@ impl Database {
             .one(&self.db)
             .await?.unwrap();
         let db_data = build_results::ActiveModel {
-            id: ActiveValue::Set(rand::thread_rng().next_u32() as i32),
+            id: ActiveValue::NotSet,
             package_id: ActiveValue::Set(package.id as i32),
             exit_code: ActiveValue::Set(data.status_code as i32),
             build_log: ActiveValue::Set(Some(data.log_lines.join(""))),
