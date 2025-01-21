@@ -404,7 +404,6 @@ dependencies = [
  "dotenvy",
  "futures-util",
  "lapin",
- "lazy_static",
  "log",
  "pretty_env_logger",
  "rand",
