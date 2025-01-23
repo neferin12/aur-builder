@@ -1,9 +1,9 @@
+use aur_builder_commons::connect_to_rabbitmq;
 use aur_builder_commons::database::connect_to_db;
 use aur_builder_commons::environment::{get_environment_variable, load_dotenv, VERSION};
 use aur_builder_commons::types::{
     AurRequestResult, BuildResultTransmissionFormat, BuildTaskTransmissionFormat,
 };
-use aur_builder_commons::connect_to_rabbitmq;
 use futures_util::StreamExt;
 use lapin::options::{
     BasicAckOptions, BasicConsumeOptions, BasicPublishOptions, QueueDeclareOptions,
@@ -43,14 +43,14 @@ async fn get_aur_data(package: &str) -> AurResult {
         return Err(resp.err().unwrap());
     };
     let data: serde_json::Value = resp.unwrap().json().await.unwrap();
+    let name = String::from(data["results"][0]["Name"].as_str().unwrap());
     let results: AurRequestResult = AurRequestResult {
-        id: data["results"][0]["ID"].as_i64().unwrap(),
-        name: String::from(data["results"][0]["Name"].as_str().unwrap()),
+        name: name.clone(),
         version: String::from(data["results"][0]["Version"].as_str().unwrap()),
         maintainer: String::from(data["results"][0]["Maintainer"].as_str().unwrap()),
         last_modified: data["results"][0]["LastModified"].as_i64().unwrap(),
     };
-    return Ok(results);
+    Ok(results)
 }
 
 #[tokio::main]
@@ -128,9 +128,10 @@ async fn main() {
             // let updated = true;
             if updated {
                 info!("{} was updated!", data.name);
+                let package = db.get_package_by_name(&data.name).await.unwrap().unwrap();
                 let task = BuildTaskTransmissionFormat {
-                    id: data.id.clone(),
-                    name: data.name.clone(),
+                    id: package.id.clone(),
+                    name: package.name.clone(),
                     version: data.version.clone(),
                 };
                 tx_channel

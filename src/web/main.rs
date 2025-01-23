@@ -55,7 +55,7 @@ async fn render_packages_function(
 async fn render_build_results_function(
     Extension(tera): Extension<Tera>,
     Extension(db): Extension<Database>,
-    Path(pid): Path<i64>
+    Path(pid): Path<i32>
 ) -> Result<Html<String>, StatusCode> {
     let mut context = Context::new();
 
@@ -76,7 +76,7 @@ async fn render_build_results_function(
 async fn init_force_rebuild(
     Extension(tera): Extension<Tera>,
     Extension(db): Extension<Database>,
-    Path(pid): Path<i64>
+    Path(pid): Path<i32>
 ) -> Result<Html<String>, StatusCode> {
     let mut context = Context::new();
 

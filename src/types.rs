@@ -3,7 +3,6 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Debug)]
 pub struct AurRequestResult {
-    pub id: i64,
     pub name: String,
     pub version: String,
     pub maintainer: String,
@@ -27,7 +26,7 @@ pub struct Timestamps {
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct BuildTaskTransmissionFormat {
-    pub id: i64,
+    pub id: i32,
     pub name: String,
     pub version: String
 }

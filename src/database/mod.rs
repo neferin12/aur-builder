@@ -79,13 +79,12 @@ impl Database {
     pub async fn update_metadata(&self, data: &AurRequestResult) -> bool {
         let mut new_timestamp = false;
 
-        let existing = PackageMetadata::find_by_id(data.id)
-            .one(&self.db)
-            .await
-            .unwrap();
+        let existing =
+            self.get_package_by_name(&data.name)
+                .await.unwrap();
 
         let db_data = package_metadata::ActiveModel {
-            id: ActiveValue::Set(data.id.to_owned()),
+            id: ActiveValue::NotSet,
             name: ActiveValue::Set(data.name.to_owned()),
             version: ActiveValue::Set(data.version.to_owned()),
             maintainer: ActiveValue::Set(data.maintainer.to_owned()),
@@ -109,11 +108,18 @@ impl Database {
         PackageMetadata::find().all(&self.db).await
     }
     
-    pub async fn get_package(&self, id: i64) -> Result<Option<package_metadata::Model>, DbErr> {
+    pub async fn get_package(&self, id: i32) -> Result<Option<package_metadata::Model>, DbErr> {
         PackageMetadata::find_by_id(id).one(&self.db).await
     }
+
+    pub async fn get_package_by_name(&self, name: &String) -> Result<Option<package_metadata::Model>, DbErr> {
+        PackageMetadata::find()
+            .filter(package_metadata::Column::Name.eq(name))
+            .one(&self.db)
+            .await
+    }
     
-    pub async fn reset_package_last_modified(&self, id: i64) {
+    pub async fn reset_package_last_modified(&self, id: i32) {
         let p = PackageMetadata::find_by_id(id).one(&self.db).await.unwrap().unwrap();
         let mut am = package_metadata::ActiveModel::from(p);
         am.last_modified = ActiveValue::Set(0);
@@ -122,7 +128,7 @@ impl Database {
 
     pub async fn get_build_results(
         &self,
-        package_id: i64,
+        package_id: i32,
     ) -> Result<Vec<build_results::Model>, Box<dyn std::error::Error>> {
         let results = BuildResults::find()
             .filter(build_results::Column::PackageId.eq(package_id))
@@ -144,7 +150,7 @@ impl Database {
             .unwrap();
         let db_data = build_results::ActiveModel {
             id: ActiveValue::NotSet,
-            package_id: ActiveValue::Set(package.id),
+            package_id: ActiveValue::Set(package.id as i64),
             exit_code: ActiveValue::Set(data.status_code as i32),
             build_log: ActiveValue::Set(Some(data.log_lines.join(""))),
             success: ActiveValue::Set(data.success),

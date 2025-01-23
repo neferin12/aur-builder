@@ -17,9 +17,10 @@ impl MigrationTrait for Migration {
                     .table(PackageMetadata::Table)
                     .col(
                         ColumnDef::new(PackageMetadata::Id)
-                            .big_integer()
+                            .big_unsigned()
                             .not_null()
-                            .primary_key(),
+                            .primary_key()
+                            .auto_increment(),
                     )
                     .col(ColumnDef::new(PackageMetadata::Name).string().not_null())
                     .col(ColumnDef::new(PackageMetadata::Version).string().not_null())
