@@ -21,7 +21,7 @@ cp "$logfile" /results
 for pkg_file in /results/*.pkg.tar.*; do
     http_status=$(curl --write-out "%{http_code}" --silent --output /dev/null --user "$AB_GITEA_USER:$AB_GITEA_TOKEN" --upload-file "$pkg_file" "$AB_GITEA_REPO")
     if [ "$http_status" -ne 201 ]; then
-        echo "Error: Received HTTP $http_status status code from server."
+        >&2 echo "Error: Received HTTP $http_status status code from server."
         exit 2
     else
         echo "INFO: Successfully uploaded $pkg_file to $AB_GITEA_REPO."
