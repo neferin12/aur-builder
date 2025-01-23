@@ -60,7 +60,19 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body bg-dark text-light">
-                    <pre class="jetbrains-mono">{{build_result.build_log | default(value="No logs available")}}</pre>
+                    <div class="jetbrains-mono logviewer">
+                        {% for line in
+                            build_result.build_log
+                                | default(value="No logs available")
+                                | split(pat="\n")
+                        %}
+                            {% if line is matching("^stderr:") %}
+                                <pre class="stderr text-danger">{{line | replace(from="stderr: ", to="")}}</pre>
+                            {% else %}
+                                <pre class="stdout">{{line | replace(from="stdout: ", to="")}}</pre>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
                 </div>
             </div>
         </div>

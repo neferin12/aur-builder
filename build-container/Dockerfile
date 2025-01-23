@@ -31,6 +31,7 @@ USER builder
 
 WORKDIR /build
 
+RUN git config --global init.defaultBranch main
 RUN mkdir -p /build/{.config/pacman,.gnupg,out}
 RUN echo 'keyserver-options auto-key-retrieve' > /build/.gnupg/gpg.conf
 
