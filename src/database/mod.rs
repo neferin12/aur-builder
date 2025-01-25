@@ -83,7 +83,7 @@ impl Database {
             self.get_package_by_name(&data.name)
                 .await.unwrap();
 
-        let db_data = package_metadata::ActiveModel {
+        let mut db_data = package_metadata::ActiveModel {
             id: ActiveValue::NotSet,
             name: ActiveValue::Set(data.name.to_owned()),
             version: ActiveValue::Set(data.version.to_owned()),
@@ -92,6 +92,7 @@ impl Database {
         };
 
         if let Some(m) = existing {
+            db_data.id = ActiveValue::Set(m.id);
             if m.last_modified < data.last_modified {
                 let _ = db_data.update(&self.db).await;
                 new_timestamp = true;
