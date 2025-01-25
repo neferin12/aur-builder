@@ -6,6 +6,7 @@ use log::{error, info};
 use std::process::exit;
 use axum::extract::Path;
 use axum::response::Html;
+use cached::proc_macro::{once};
 use reqwest::StatusCode;
 use tera::{Context, Tera};
 use aur_builder_commons::database::entities::package_metadata;
@@ -31,6 +32,7 @@ async fn main() {
         // `GET /` goes to `root`
         .route("/", get(render_packages_function))
         .route("/build-results/{pid}", get(render_build_results_function))
+        .route("/build-log/{pid}", get(render_build_log_function))
         .route("/force-rebuild/{pid}", post(init_force_rebuild))
         .layer(Extension(tera))
         .layer(Extension(db));
@@ -71,6 +73,21 @@ async fn render_build_results_function(
     context.insert("build_results", &build_results);
 
     Ok(Html(tera.render("build-results.html", &context).unwrap()))
+}
+
+#[once]
+async fn render_build_log_function(
+    Extension(tera): Extension<Tera>,
+    Extension(db): Extension<Database>,
+    Path(pid): Path<i32>
+) -> Result<Html<String>, StatusCode> {
+    let mut context = Context::new();
+    
+
+    let build_result = db.get_build_result(pid).await.unwrap();
+    context.insert("build_result", &build_result);
+
+    Ok(Html(tera.render("build-log.html", &context).unwrap()))
 }
 
 async fn init_force_rebuild(

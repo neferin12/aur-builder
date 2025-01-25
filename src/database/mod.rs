@@ -139,6 +139,10 @@ impl Database {
 
         Ok(results)
     }
+    
+    pub async fn get_build_result(&self, build_result_id: i32) -> Result<Option<build_results::Model>, DbErr> {
+        BuildResults::find_by_id(build_result_id).one(&self.db).await
+    }
 
     pub async fn save_build_results(
         &self,

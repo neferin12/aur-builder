@@ -59,20 +59,8 @@
                         %H:%M")}}</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body bg-dark text-light">
-                    <div class="jetbrains-mono logviewer">
-                        {% for line in
-                            build_result.build_log
-                                | default(value="No logs available")
-                                | split(pat="\n")
-                        %}
-                            {% if line is matching("^stderr:") %}
-                                <pre class="stderr text-danger">{{line | replace(from="stderr: ", to="")}}</pre>
-                            {% else %}
-                                <pre class="stdout">{{line | replace(from="stdout: ", to="")}}</pre>
-                            {% endif %}
-                        {% endfor %}
-                    </div>
+                <div class="modal-body bg-dark text-light p-0">
+                    <iframe src="/build-log/{{build_result.id}}" class="w-100" style="height: 99%"></iframe>
                 </div>
             </div>
         </div>
