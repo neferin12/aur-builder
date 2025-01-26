@@ -16,7 +16,10 @@
 <body>
 <nav class="navbar navbar-dark bg-dark sticky-top">
     <div class="container-fluid">
-        <a class="navbar-brand" href="/">AUR Builder</a>
+        <a class="navbar-brand" href="/">
+            AUR Builder
+            <span class="text-muted">v{{version}}</span>
+        </a>
     </div>
 </nav>
 <div id="content">{% block content %}{% endblock content %}</div>
