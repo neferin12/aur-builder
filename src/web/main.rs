@@ -6,7 +6,7 @@ use log::{error, info};
 use std::process::exit;
 use axum::extract::Path;
 use axum::response::Html;
-use cached::proc_macro::{once};
+use cached::proc_macro::{cached};
 use reqwest::StatusCode;
 use tera::{Context, Tera};
 use aur_builder_commons::database::entities::package_metadata;
@@ -49,6 +49,8 @@ async fn render_packages_function(
     let mut context = Context::new();
     let packages = db.get_packages().await.unwrap();
 
+    context.insert("version", VERSION);
+
     context.insert("packages", &packages);
 
     Html(tera.render("index.html", &context).unwrap())
@@ -67,6 +69,8 @@ async fn render_build_results_function(
         }
         Some(p) => {p}
     };
+    context.insert("version", VERSION);
+
     context.insert("package", &package);
 
     let build_results = db.get_build_results(package.id).await.unwrap();
@@ -75,7 +79,11 @@ async fn render_build_results_function(
     Ok(Html(tera.render("build-results.html", &context).unwrap()))
 }
 
-#[once]
+#[cached(
+    key="String",
+    convert=r#"{ format!("logs-{}",pid) }"#,
+    result=true
+)]
 async fn render_build_log_function(
     Extension(tera): Extension<Tera>,
     Extension(db): Extension<Database>,
@@ -103,6 +111,8 @@ async fn init_force_rebuild(
         }
         Some(p) => {p}
     };
+    context.insert("version", VERSION);
+    
     context.insert("package", &package);
 
     db.reset_package_last_modified(package.id).await;
