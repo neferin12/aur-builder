@@ -1,0 +1,19 @@
+{
+  "name": "bootstrap",
+  "version": "1.0.0",
+  "scripts": {
+    "build": "sass --style=compressed custom-bootstrap.scss dist/bootstrap.css"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/neferin12/aur-builder.git"
+  },
+  "private": true,
+  "dependencies": {
+    "bootstrap": "^5.3.3",
+    "bootswatch": "^5.3.3"
+  },
+  "devDependencies": {
+    "sass": "^1.83.4"
+  }
+}

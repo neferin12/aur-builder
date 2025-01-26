@@ -1,0 +1,21 @@
+#content {
+    padding: 20px;
+    max-width: 1400px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.jetbrains-mono, pre {
+    font-family: "JetBrains Mono", serif;
+    font-optical-sizing: auto;
+    font-weight: 400;
+    font-style: normal;
+}
+
+.logviewer > pre {
+    margin: 0;
+}
+
+.log {
+    overflow: visible;
+}

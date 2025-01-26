@@ -1,6 +1,6 @@
 [package]
 name = "aur-builder"
-version = "0.3.3"
+version = "0.3.4"
 edition = "2021"
 
 [dependencies]
@@ -21,6 +21,10 @@ serde = { version = "1.0.217", features = ["derive"] }
 tera = "1"
 axum = { version = "~0.8.1", features = ["http2"] }
 cached = { version="0.54.0", features = ["async"] }
+tower-http = { version="0.6.2", features = ["fs"] }
+
+[build-dependencies]
+npm_rs = "1.0.0"
 
 [[bin]]
 name = "server"
