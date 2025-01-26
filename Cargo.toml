@@ -23,9 +23,6 @@ axum = { version = "~0.8.1", features = ["http2"] }
 cached = { version="0.54.0", features = ["async"] }
 tower-http = { version="0.6.2", features = ["fs"] }
 
-[build-dependencies]
-npm_rs = "1.0.0"
-
 [[bin]]
 name = "server"
 path = "src/server/main.rs"
