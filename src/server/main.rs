@@ -65,14 +65,7 @@ async fn main() {
 
     let packages_string = get_environment_variable("PACKAGES");
 
-    let packages = packages_string.split(",").collect::<Vec<&str>>();
-
-    let mut package_data = Vec::new();
-
-    for pkg in packages {
-        let data = get_aur_data(pkg).await.unwrap();
-        package_data.push(data);
-    }
+    let packages = &packages_string.split(",").collect::<Vec<&str>>();
 
     let conn = connect_to_rabbitmq().await;
 
@@ -123,6 +116,12 @@ async fn main() {
 
     loop {
         info!("Checking for package updates...");
+        let mut package_data = Vec::new();
+
+        for pkg in packages {
+            let data = get_aur_data(pkg).await.unwrap();
+            package_data.push(data);
+        }
         for data in &package_data {
             let updated = db.update_metadata(&data).await;
             // let updated = true;
