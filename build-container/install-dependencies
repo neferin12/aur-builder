@@ -2,6 +2,9 @@
 
 cd ~/source || exit 1
 # Install all dependencies
+echo "INFO: updating packages..."
+yay --noconfirm --removemake -Syu
+
 echo "INFO: installing all missing dependencies..."
 makepkg --printsrcinfo > SINFO
 while read -r -u 9 key value;
