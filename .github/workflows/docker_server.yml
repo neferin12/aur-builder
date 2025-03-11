@@ -8,7 +8,7 @@ name: Build Server Container
 on:
   push:
     # Publish semver tags as releases.
-    tags: [ 'server@*.*.*' ]
+    tags: [ 'v*.*.*' ]
   pull_request:
     branches: [ "main" ]
 

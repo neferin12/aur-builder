@@ -8,7 +8,7 @@ name: Build Builder Container
 on:
   push:
     # Publish semver tags as releases.
-    tags: [ 'worker@*.*.*' ]
+    tags: [ 'v*.*.*' ]
   pull_request:
     branches: [ "main" ]
   schedule:
