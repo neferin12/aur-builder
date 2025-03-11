@@ -7,53 +7,7 @@
     <cargoProject FILE="$PROJECT_DIR$/Cargo.toml" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="30df73c6-6061-4a44-ad67-d8c0fc6fb8e8" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/aur-builder.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/aur-builder.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources.local.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources/ca208d21-460a-4087-933b-0a14c7b95fd5.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources/ca208d21-460a-4087-933b-0a14c7b95fd5/storage_v2/_src_/schema/main.uQUzAA.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/git_toolbox_blame.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/git_toolbox_prj.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/jsLibraryMappings.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/jsonSchemas.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/runConfigurations/Run_Server.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/runConfigurations/Run_Worker.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/runConfigurations/docker_compose_yaml__Compose_Deployment.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Cargo.lock" beforeDir="false" afterPath="$PROJECT_DIR$/Cargo.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Cargo.toml" beforeDir="false" afterPath="$PROJECT_DIR$/Cargo.toml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/database/entities/build_results.rs" beforeDir="false" afterPath="$PROJECT_DIR$/database/src/entities/build_results.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/database/entities/mod.rs" beforeDir="false" afterPath="$PROJECT_DIR$/database/src/entities/mod.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/database/entities/package_metadata.rs" beforeDir="false" afterPath="$PROJECT_DIR$/database/src/entities/package_metadata.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/database/entities/prelude.rs" beforeDir="false" afterPath="$PROJECT_DIR$/database/src/entities/prelude.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/database/migrator/m20240624_000001_package_metadata_table.rs" beforeDir="false" afterPath="$PROJECT_DIR$/database/src/migrator/m20240624_000001_package_metadata_table.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/database/migrator/m20250120_205654_build_results.rs" beforeDir="false" afterPath="$PROJECT_DIR$/database/src/migrator/m20250120_205654_build_results.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/database/migrator/m20250120_223506_build_results_add_success.rs" beforeDir="false" afterPath="$PROJECT_DIR$/database/src/migrator/m20250120_223506_build_results_add_success.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/database/migrator/m20250121_131141_build_results_add_finished_at.rs" beforeDir="false" afterPath="$PROJECT_DIR$/database/src/migrator/m20250121_131141_build_results_add_finished_at.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/database/migrator/m20250121_160432_build_results_add_started_at_and_version.rs" beforeDir="false" afterPath="$PROJECT_DIR$/database/src/migrator/m20250121_160432_build_results_add_started_at_and_version.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/database/migrator/mod.rs" beforeDir="false" afterPath="$PROJECT_DIR$/database/src/migrator/mod.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/database/mod.rs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/environment.rs" beforeDir="false" afterPath="$PROJECT_DIR$/common/src/environment.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/lib.rs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/server/main.rs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/types.rs" beforeDir="false" afterPath="$PROJECT_DIR$/common/src/types.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/web/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/web/assets/bootstrap.css" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/assets/bootstrap.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/web/assets/style.css" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/assets/style.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/web/bootstrap/custom-bootstrap.scss" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/bootstrap/custom-bootstrap.scss" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/web/bootstrap/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/bootstrap/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/web/bootstrap/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/bootstrap/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/web/main.rs" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/main.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/web/templates/base.html" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/templates/base.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/web/templates/build-log.html" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/templates/build-log.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/web/templates/build-results.html" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/templates/build-results.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/web/templates/force-rebuild.html" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/templates/force-rebuild.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/web/templates/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/templates/index.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/worker/build/docker.rs" beforeDir="false" afterPath="$PROJECT_DIR$/worker/src/build/docker.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/worker/build/mod.rs" beforeDir="false" afterPath="$PROJECT_DIR$/worker/src/build/mod.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/worker/main.rs" beforeDir="false" afterPath="$PROJECT_DIR$/worker/src/main.rs" afterDir="false" />
-    </list>
+    <list default="true" id="30df73c6-6061-4a44-ad67-d8c0fc6fb8e8" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -156,7 +110,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1719243613538</updated>
-      <workItem from="1741708581079" duration="2169000" />
+      <workItem from="1741708581079" duration="2500000" />
     </task>
     <servers />
   </component>
