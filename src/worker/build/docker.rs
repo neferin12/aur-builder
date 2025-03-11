@@ -88,7 +88,7 @@ pub async fn build(task: &BuildTaskTransmissionFormat, source_url: String) -> Re
     let gitea_user = get_environment_variable("AB_GITEA_USER");
     let gitea_token = get_environment_variable("AB_GITEA_TOKEN");
 
-    let env_source = &*format!("AUR_BUILDER_SOURCE={source_url}");
+    let env_source = &*format!("AB_SOURCE={source_url}");
     let env_gitea_url = &*format!("AB_GITEA_REPO={}", gitea_url);
     let env_gitea_user = &*format!("AB_GITEA_USER={}", gitea_user);
     let env_gitea_token = &*format!("AB_GITEA_TOKEN={}", gitea_token);

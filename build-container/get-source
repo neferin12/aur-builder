@@ -1,10 +1,10 @@
 #! /bin/bash
 
-cd ~ || exit 1
+cd ~ || exit 100
 
-if [ -z "$AUR_BUILDER_SOURCE" ]; then
-  echo "ERROR: AUR_BUILDER_SOURCE is not set."
-  exit 1
+if [ -z "$AB_SOURCE" ]; then
+  echo "ERROR: AB_SOURCE is not set."
+  exit 101
 fi
 
-git clone "$AUR_BUILDER_SOURCE" source || exit 1
+git clone "$AB_SOURCE" source || exit 102

@@ -2,27 +2,27 @@
 
 if [ -z "$AB_GITEA_USER" ] || [ -z "$AB_GITEA_TOKEN" ] || [ -z "$AB_GITEA_REPO" ]; then
     echo "Error: AB_GITEA_USER, AB_GITEA_TOKEN, and AB_GITEA_REPO must be set."
-    exit 1
+    exit 101
 fi
 
 get-source
 
-cd ~/source || exit 1
+cd ~/source || exit 100
 
 install-dependencies
 
 timestamp=$(date +%s)
 logfile="/build/$timestamp-build.log"
 
-makepkg -s -c -C --noconfirm --noprogressbar | tee "$logfile"
-cp ./*.pkg.tar.* /results
-cp "$logfile" /results
+makepkg -s -c -C --noconfirm --noprogressbar | tee "$logfile" || exit 105
+cp ./*.pkg.tar.* /results || exit 106
+cp "$logfile" /results || exit 106
 
 for pkg_file in /results/*.pkg.tar.*; do
     http_status=$(curl --write-out "%{http_code}" --silent --output /dev/null --user "$AB_GITEA_USER:$AB_GITEA_TOKEN" --upload-file "$pkg_file" "$AB_GITEA_REPO")
     if [ "$http_status" -ne 201 ]; then
         >&2 echo "Error: Received HTTP $http_status status code from server."
-        exit 2
+        exit 107
     else
         echo "INFO: Successfully uploaded $pkg_file to $AB_GITEA_REPO."
     fi

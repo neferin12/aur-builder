@@ -1,9 +1,9 @@
 #! /bin/bash
 
-cd ~/source || exit 1
+cd ~/source || exit 100
 # Install all dependencies
 echo "INFO: updating packages..."
-yay --noconfirm --removemake -Syu
+yay --noconfirm --removemake -Syu || exit 103
 
 echo "INFO: installing all missing dependencies..."
 makepkg --printsrcinfo > SINFO
@@ -13,6 +13,6 @@ do
     then
         DEP=$(echo "$value" | cut -d ' ' -f2 | cut -d '>' -f1)
         echo "installing $DEP..."
-        yay --noconfirm --removemake -S "$DEP"
+        yay --noconfirm --removemake -S "$DEP" || exit 104
     fi
 done 9< "SINFO"
