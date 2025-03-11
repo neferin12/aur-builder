@@ -8,7 +8,7 @@ name: Build Web Container
 on:
   push:
     # Publish semver tags as releases.
-    tags: [ 'v*.*.*' ]
+    tags: [ 'web@*.*.*' ]
   pull_request:
     branches: [ "main" ]
 
