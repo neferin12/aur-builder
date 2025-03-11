@@ -852,7 +852,7 @@ checksum = "5b63caa9aa9397e2d9480a9b13673856c78d8ac123288526c37d7839f2a86990"
 
 [[package]]
 name = "common"
-version = "0.3.9"
+version = "0.3.10"
 dependencies = [
  "dotenvy",
  "lapin",
@@ -1011,7 +1011,7 @@ checksum = "575f75dfd25738df5b91b8e43e14d44bda14637a58fae779fd2b064f8bf3e010"
 
 [[package]]
 name = "database"
-version = "0.3.9"
+version = "0.3.10"
 dependencies = [
  "common",
  "log",
@@ -3544,7 +3544,7 @@ dependencies = [
 
 [[package]]
 name = "server"
-version = "0.3.9"
+version = "0.3.10"
 dependencies = [
  "common",
  "database",
@@ -4639,7 +4639,7 @@ dependencies = [
 
 [[package]]
 name = "web"
-version = "0.3.9"
+version = "0.3.10"
 dependencies = [
  "axum",
  "cached",
@@ -4927,7 +4927,7 @@ dependencies = [
 
 [[package]]
 name = "worker"
-version = "0.3.9"
+version = "0.3.10"
 dependencies = [
  "bollard",
  "bytes",
