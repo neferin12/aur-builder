@@ -8,8 +8,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="30df73c6-6061-4a44-ad67-d8c0fc6fb8e8" name="Changes" comment="ci">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/release.sh" beforeDir="false" afterPath="$PROJECT_DIR$/release.sh" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/Dockerfile" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -114,7 +113,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1719243613538</updated>
-      <workItem from="1741708581079" duration="3803000" />
+      <workItem from="1741708581079" duration="3990000" />
     </task>
     <task id="LOCAL-00001" summary="ci">
       <option name="closed" value="true" />
