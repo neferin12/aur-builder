@@ -23,10 +23,8 @@
     </cargoProject>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="30df73c6-6061-4a44-ad67-d8c0fc6fb8e8" name="Changes" comment="fix docker build">
-      <change beforePath="$PROJECT_DIR$/.github/workflows/docker_server.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.github/workflows/docker.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.github/workflows/docker_web.yml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.github/workflows/docker_worker.yml" beforeDir="false" />
+    <list default="true" id="30df73c6-6061-4a44-ad67-d8c0fc6fb8e8" name="Changes" comment="improve docker build">
+      <change beforePath="$PROJECT_DIR$/.github/workflows/docker.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.github/workflows/docker.yml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -135,7 +133,7 @@
       <option name="presentableId" value="Default" />
       <updated>1719243613538</updated>
       <workItem from="1741708581079" duration="4146000" />
-      <workItem from="1742139950507" duration="1120000" />
+      <workItem from="1742139950507" duration="1891000" />
     </task>
     <task id="LOCAL-00001" summary="ci">
       <option name="closed" value="true" />
@@ -153,7 +151,15 @@
       <option name="project" value="LOCAL" />
       <updated>1741713159455</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="improve docker build">
+      <option name="closed" value="true" />
+      <created>1742141112655</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1742141112655</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -173,6 +179,7 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="ci" />
     <MESSAGE value="fix docker build" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix docker build" />
+    <MESSAGE value="improve docker build" />
+    <option name="LAST_COMMIT_MESSAGE" value="improve docker build" />
   </component>
 </project>
