@@ -13,7 +13,7 @@ pub mod migrator;
 
 use entities::*;
 use common::environment::get_environment_variable;
-use common::types::{AurRequestResult, BuildResultTransmissionFormat};
+use common::types::{BuildResultTransmissionFormat, PackageSearchResult};
 use common::{CONNECTION_RETRY_NUMBER, RETRY_TIMEOUT};
 use entities::prelude::*;
 use migrator::Migrator;
@@ -77,7 +77,7 @@ impl Database {
     /// ```
     /// let updated = db.update_metadata(&data).await;
     /// ```
-    pub async fn update_metadata(&self, data: &AurRequestResult) -> bool {
+    pub async fn update_metadata(&self, data: &PackageSearchResult) -> bool {
         let mut new_timestamp = false;
 
         let existing =
@@ -90,6 +90,8 @@ impl Database {
             version: ActiveValue::Set(data.version.to_owned()),
             maintainer: ActiveValue::Set(data.maintainer.to_owned()),
             last_modified: ActiveValue::Set(data.last_modified.to_owned()),
+            source: ActiveValue::Set(data.source.to_owned()),
+            subfolder: ActiveValue::Set(data.subfolder.to_owned()),
         };
 
         if let Some(m) = existing {

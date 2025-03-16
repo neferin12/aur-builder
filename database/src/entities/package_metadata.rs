@@ -12,6 +12,8 @@ pub struct Model {
     pub version: String,
     pub maintainer: String,
     pub last_modified: i64,
+    pub source: Option<String>,
+    pub subfolder: Option<String>,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]

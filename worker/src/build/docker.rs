@@ -73,7 +73,7 @@ fn attach_logs(docker_for_logs: Docker, container_id_for_logs: String) {
     });
 }
 
-pub async fn build(task: &BuildTaskTransmissionFormat, source_url: String) -> Result<BuildResultTransmissionFormat, Box<dyn std::error::Error>> {
+pub async fn build(task: &BuildTaskTransmissionFormat, source_url: String, subfolder: &Option<String>) -> Result<BuildResultTransmissionFormat, Box<dyn std::error::Error>> {
     info!("Building package {}", task.name);
     let build_start_time = Utc::now().naive_utc();
 
@@ -89,6 +89,7 @@ pub async fn build(task: &BuildTaskTransmissionFormat, source_url: String) -> Re
     let gitea_token = get_environment_variable("AB_GITEA_TOKEN");
 
     let env_source = &*format!("AB_SOURCE={source_url}");
+    let env_subfolder = &*format!("AB_SUBFOLDER={}", subfolder.clone().unwrap_or("".to_string()));
     let env_gitea_url = &*format!("AB_GITEA_REPO={}", gitea_url);
     let env_gitea_user = &*format!("AB_GITEA_USER={}", gitea_user);
     let env_gitea_token = &*format!("AB_GITEA_TOKEN={}", gitea_token);
@@ -103,6 +104,7 @@ pub async fn build(task: &BuildTaskTransmissionFormat, source_url: String) -> Re
             env_gitea_url,
             env_gitea_user,
             env_gitea_token,
+            env_subfolder
         ]),
         host_config: Some(HostConfig {
             // e.g., to remove container automatically upon exit:

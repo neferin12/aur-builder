@@ -9,6 +9,11 @@ get-source
 
 cd ~/source || exit 100
 
+if [[ -n "$AB_SUBFOLDER" ]]; then
+    cd "$AB_SUBFOLDER" || exit 100
+fi
+
+
 install-dependencies
 
 timestamp=$(date +%s)

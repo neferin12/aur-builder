@@ -1,6 +1,11 @@
 #! /bin/bash
 
 cd ~/source || exit 100
+
+if [[ -n "$AB_SUBFOLDER" ]]; then
+    cd "$AB_SUBFOLDER" || exit 100
+fi
+
 # Install all dependencies
 echo "INFO: updating packages..."
 yay --noconfirm --removemake -Syu || exit 103
