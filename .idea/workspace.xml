@@ -4,11 +4,30 @@
     <option name="autoReloadType" value="ALL" />
   </component>
   <component name="CargoProjects">
-    <cargoProject FILE="$PROJECT_DIR$/Cargo.toml" />
+    <cargoProject FILE="$PROJECT_DIR$/Cargo.toml">
+      <package file="$PROJECT_DIR$/common">
+        <enabledFeature name="default" />
+      </package>
+      <package file="$PROJECT_DIR$/database">
+        <enabledFeature name="default" />
+      </package>
+      <package file="$PROJECT_DIR$/server">
+        <enabledFeature name="default" />
+      </package>
+      <package file="$PROJECT_DIR$/web">
+        <enabledFeature name="default" />
+      </package>
+      <package file="$PROJECT_DIR$/worker">
+        <enabledFeature name="default" />
+      </package>
+    </cargoProject>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="30df73c6-6061-4a44-ad67-d8c0fc6fb8e8" name="Changes" comment="ci">
-      <change beforePath="$PROJECT_DIR$/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/Dockerfile" afterDir="false" />
+    <list default="true" id="30df73c6-6061-4a44-ad67-d8c0fc6fb8e8" name="Changes" comment="fix docker build">
+      <change beforePath="$PROJECT_DIR$/.github/workflows/docker_server.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.github/workflows/docker.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.github/workflows/docker_web.yml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.github/workflows/docker_worker.yml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -44,7 +63,7 @@
     "SHELLCHECK.PATH": "/home/julian/.local/share/JetBrains/RustRover2025.1/Shell Script/shellcheck",
     "dart.analysis.tool.window.visible": "false",
     "git-widget-placeholder": "main",
-    "last_opened_file_path": "/home/julian/projects/privat/aur-builder/database/src",
+    "last_opened_file_path": "/home/julian/projects/privat/aur-builder/.github/workflows",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -53,11 +72,13 @@
     "org.rust.cargo.project.model.PROJECT_DISCOVERY": "true",
     "org.rust.cargo.project.model.impl.CargoExternalSystemProjectAware.subscribe.first.balloon": "",
     "org.rust.first.attach.projects": "true",
+    "settings.editor.selected.configurable": "preferences.lookFeel",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/.github/workflows" />
       <recent name="$PROJECT_DIR$/database/src" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
@@ -113,7 +134,8 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1719243613538</updated>
-      <workItem from="1741708581079" duration="3990000" />
+      <workItem from="1741708581079" duration="4146000" />
+      <workItem from="1742139950507" duration="1120000" />
     </task>
     <task id="LOCAL-00001" summary="ci">
       <option name="closed" value="true" />
@@ -123,7 +145,15 @@
       <option name="project" value="LOCAL" />
       <updated>1741711680129</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="fix docker build">
+      <option name="closed" value="true" />
+      <created>1741713159453</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1741713159455</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -142,6 +172,7 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="ci" />
-    <option name="LAST_COMMIT_MESSAGE" value="ci" />
+    <MESSAGE value="fix docker build" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix docker build" />
   </component>
 </project>
