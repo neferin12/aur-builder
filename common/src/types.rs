@@ -9,6 +9,8 @@ pub struct PackageSearchResult {
     pub last_modified: i64,
     pub source: Option<String>,
     pub subfolder: Option<String>,
+    pub options: Option<String>,
+    pub environment: Option<Environment>
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -33,7 +35,11 @@ pub struct BuildTaskTransmissionFormat {
     pub version: String,
     pub source: Option<String>,
     pub subfolder: Option<String>,
+    pub options: Option<String>,
+    pub env: Option<Environment>
 }
+
+type Environment = Vec<EnvironmentVariable>;
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct EnvironmentVariable {
@@ -44,12 +50,14 @@ pub struct EnvironmentVariable {
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct AurPackageSettings {
     pub name: String,
-    pub env: Option<Vec<EnvironmentVariable>>,
+    pub env: Option<Environment>,
+    pub options: Option<String>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct GitPackageSettings {
     pub source: String,
     pub subfolder: Option<String>,
-    pub env: Option<Vec<EnvironmentVariable>>,
+    pub env: Option<Environment>,
+    pub options: Option<String>,
 }

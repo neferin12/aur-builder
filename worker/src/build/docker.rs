@@ -1,17 +1,17 @@
-use common::environment::get_environment_variable;
+use bollard::Docker;
 use bollard::container::{
     Config, CreateContainerOptions, LogOutput, LogsOptions, StartContainerOptions,
     WaitContainerOptions,
 };
+use bollard::errors::Error;
 use bollard::image::CreateImageOptions;
 use bollard::models::HostConfig;
-use bollard::Docker;
-use bollard::errors::Error;
 use bytes::Bytes;
-use futures_util::{StreamExt, TryStreamExt};
-use sea_orm::sqlx::types::chrono::Utc;
+use common::environment::get_environment_variable;
 use common::get_rand_string;
 use common::types::{BuildResultTransmissionFormat, BuildTaskTransmissionFormat, Timestamps};
+use futures_util::{StreamExt, TryStreamExt};
+use sea_orm::sqlx::types::chrono::Utc;
 
 const VERSION: &str = env!("CARGO_PKG_VERSION");
 
@@ -73,7 +73,11 @@ fn attach_logs(docker_for_logs: Docker, container_id_for_logs: String) {
     });
 }
 
-pub async fn build(task: &BuildTaskTransmissionFormat, source_url: String, subfolder: &Option<String>) -> Result<BuildResultTransmissionFormat, Box<dyn std::error::Error>> {
+pub async fn build(
+    task: &BuildTaskTransmissionFormat,
+    source_url: String,
+    subfolder: &Option<String>,
+) -> Result<BuildResultTransmissionFormat, Box<dyn std::error::Error>> {
     info!("Building package {}", task.name);
     let build_start_time = Utc::now().naive_utc();
 
@@ -88,24 +92,33 @@ pub async fn build(task: &BuildTaskTransmissionFormat, source_url: String, subfo
     let gitea_user = get_environment_variable("AB_GITEA_USER");
     let gitea_token = get_environment_variable("AB_GITEA_TOKEN");
 
-    let env_source = &*format!("AB_SOURCE={source_url}");
-    let env_subfolder = &*format!("AB_SUBFOLDER={}", subfolder.clone().unwrap_or("".to_string()));
-    let env_gitea_url = &*format!("AB_GITEA_REPO={}", gitea_url);
-    let env_gitea_user = &*format!("AB_GITEA_USER={}", gitea_user);
-    let env_gitea_token = &*format!("AB_GITEA_TOKEN={}", gitea_token);
+    let mut env: Vec<String> = vec![
+        format!("AB_SOURCE={source_url}"),
+        format!(
+            "AB_SUBFOLDER={}",
+            subfolder.clone().unwrap_or("".to_string())
+        ),
+        format!("AB_GITEA_REPO={}", gitea_url),
+        format!("AB_GITEA_USER={}", gitea_user),
+        format!("AB_GITEA_TOKEN={}", gitea_token),
+        format!(
+            "AB_OPTIONS={}",
+            task.clone().options.unwrap_or("".to_string())
+        ),
+    ];
+
+    if let Some(task_env) = task.env.clone() {
+        for env_var in task_env {
+            env.push(format!("{}={}", env_var.name, env_var.value));
+        }
+    }
 
     let image = get_image_name();
 
     let create_container_config = Config {
-        image: Some(image.as_str()),
-        user: Some("builder"),
-        env: Some(vec![
-            env_source,
-            env_gitea_url,
-            env_gitea_user,
-            env_gitea_token,
-            env_subfolder
-        ]),
+        image: Some(image),
+        user: Some("builder".to_string()),
+        env: Some(env),
         host_config: Some(HostConfig {
             // e.g., to remove container automatically upon exit:
             auto_remove: Some(false),
@@ -129,12 +142,15 @@ pub async fn build(task: &BuildTaskTransmissionFormat, source_url: String, subfo
     let mut wait_stream =
         docker.wait_container(&container.id, None::<WaitContainerOptions<String>>);
     while let Some(res) = wait_stream.next().await {
-        let mut logs = docker.logs(&container.id, Some(LogsOptions::<String> {
-            stdout: true,
-            stderr: true,
-            // tail: "all",  // optional
-            ..Default::default()
-        }));
+        let mut logs = docker.logs(
+            &container.id,
+            Some(LogsOptions::<String> {
+                stdout: true,
+                stderr: true,
+                // tail: "all",  // optional
+                ..Default::default()
+            }),
+        );
         let mut logs_vec = Vec::new();
 
         while let Some(log_result) = logs.next().await {
@@ -153,8 +169,10 @@ pub async fn build(task: &BuildTaskTransmissionFormat, source_url: String, subfo
             }
         }
 
-        docker.remove_container(&container.id, Default::default()).await?;
-        
+        docker
+            .remove_container(&container.id, Default::default())
+            .await?;
+
         let build_end_time = Utc::now().naive_utc();
 
         let mut results = BuildResultTransmissionFormat {
@@ -165,16 +183,15 @@ pub async fn build(task: &BuildTaskTransmissionFormat, source_url: String, subfo
             timestamps: Timestamps {
                 start: build_start_time,
                 end: build_end_time,
-            }
+            },
         };
-
 
         return match res {
             Ok(exit) => {
                 info!("Build container exited with: {:?}", exit.status_code);
 
                 results.status_code = exit.status_code;
-                
+
                 Ok(results)
             }
             Err(e) => {
@@ -183,14 +200,13 @@ pub async fn build(task: &BuildTaskTransmissionFormat, source_url: String, subfo
                         results.status_code = code;
                         results.success = false;
                         Ok(results)
-                    },
-                    _ => Err(e.into())
+                    }
+                    _ => Err(e.into()),
                 }
                 // error!("Error while waiting for build container: {:?}", e);
                 // return Err(results);
-
             }
-        }
+        };
     }
 
     Err("Unexpected end of wait stream".into())

@@ -40,5 +40,7 @@ pub async fn get_git_data(pkg: &GitPackageSettings) -> Result<PackageSearchResul
         last_modified: epoch_seconds,
         source: Some(pkg.source.clone()),
         subfolder: pkg.subfolder.clone(),
+        options: pkg.options.clone(),
+        environment: pkg.env.clone()
     })
 }

@@ -12,7 +12,7 @@ services:
     environment:
       RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS: "-rabbit consumer_timeout 36000000"
   server:
-    image: ghcr.io/neferin12/aur-builder-server:latest
+    image: ghcr.io/neferin12/aur-builder-server:1
     container_name: 'aur-builder-server'
     build:
         context: .
@@ -20,13 +20,16 @@ services:
         target: server
     env_file:
       - .env
+    environment:
+      AB_CONFIG_PATH: /config.yaml
     volumes:
       - ./db:/app/db
+      - ./config.yaml:/config.yaml
     depends_on:
       - rabbitmq
     restart: always
   worker:
-    image: ghcr.io/neferin12/aur-builder-worker:latest
+    image: ghcr.io/neferin12/aur-builder-worker:1
     deploy:
         mode: replicated
         replicas: 2
@@ -42,7 +45,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     restart: always
   web:
-    image: ghcr.io/neferin12/aur-builder-web:latest
+    image: ghcr.io/neferin12/aur-builder-web:1
     build:
       context: .
       dockerfile: Dockerfile

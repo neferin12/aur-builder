@@ -19,7 +19,7 @@ install-dependencies
 timestamp=$(date +%s)
 logfile="/build/$timestamp-build.log"
 
-makepkg -s -c -C --noconfirm --noprogressbar | tee "$logfile" || exit 105
+makepkg -s -c -C --noconfirm --noprogressbar $AB_OPTIONS | tee "$logfile" || exit 105
 cp ./*.pkg.tar.* /results || exit 106
 cp "$logfile" /results || exit 106
 

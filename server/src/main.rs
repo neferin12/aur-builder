@@ -50,7 +50,7 @@ async fn main() {
 
         for pkg in &config.aur_packages {
             debug!("Getting data for aur package {:?}", pkg);
-            let data = aur::get_aur_data(pkg.name.as_str()).await.unwrap();
+            let data = aur::get_aur_data(pkg).await.unwrap();
             package_data.push(data);
         }
 
@@ -72,6 +72,8 @@ async fn main() {
                     version: data.version.clone(),
                     source: package.source.clone(),
                     subfolder: package.subfolder.clone(),
+                    options: data.options.clone(),
+                    env: data.environment.clone()
                 };
                 tx_channel
                     .basic_publish(
