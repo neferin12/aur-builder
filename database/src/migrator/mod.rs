@@ -5,6 +5,7 @@ mod m20250121_131141_build_results_add_finished_at;
 mod m20250121_160432_build_results_add_started_at_and_version;
 mod m20250316_173233_source;
 mod m20250316_182755_subfolder;
+mod m20250319_110511_switch_start_and_end_timestamps;
 
 use sea_orm_migration::prelude::*;
 
@@ -21,6 +22,7 @@ impl MigratorTrait for Migrator {
             Box::new(m20250121_160432_build_results_add_started_at_and_version::Migration),
             Box::new(m20250316_173233_source::Migration),
             Box::new(m20250316_182755_subfolder::Migration),
+            Box::new(m20250319_110511_switch_start_and_end_timestamps::Migration),
         ]
     }
 }

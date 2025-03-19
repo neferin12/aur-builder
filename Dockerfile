@@ -24,8 +24,8 @@ CMD ["/usr/local/bin/server"]
 FROM alpine AS web
 WORKDIR /app
 COPY --from=builder /app/target/x86_64-unknown-linux-musl/release/web /usr/local/bin/web
-COPY web/src/templates /app/src/web/templates
-COPY web/src/assets /app/src/web/assets
+COPY web/src/templates /app/web/src/templates
+COPY web/src/assets /app/web/src/assets
 
 CMD ["/usr/local/bin/web"]
 

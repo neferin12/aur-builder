@@ -13,8 +13,8 @@ pub struct Model {
     #[sea_orm(column_type = "Text", nullable)]
     pub build_log: Option<String>,
     pub success: bool,
-    pub finished_at: Option<DateTime>,
     pub started_at: Option<DateTime>,
+    pub finished_at: Option<DateTime>,
     pub version: Option<String>,
 }
 

@@ -19,7 +19,7 @@ async fn main() {
     info!("Starting Aur-Builder Web v{VERSION}");
 
     let db = connect_to_db().await;
-    let tera = match Tera::new("src/web/templates/**/*.html") {
+    let tera = match Tera::new("web/src/templates/**/*.html") {
         Ok(t) => t,
         Err(e) => {
             error!("Parsing error(s): {}", e);
@@ -34,7 +34,7 @@ async fn main() {
         .route("/build-results/{pid}", get(render_build_results_function))
         .route("/build-log/{pid}", get(render_build_log_function))
         .route("/force-rebuild/{pid}", post(init_force_rebuild))
-        .nest_service("/assets", tower_http::services::ServeDir::new("src/web/assets"))
+        .nest_service("/assets", tower_http::services::ServeDir::new("web/src/assets"))
         .layer(Extension(tera))
         .layer(Extension(db));
     

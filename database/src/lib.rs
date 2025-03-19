@@ -136,7 +136,7 @@ impl Database {
     ) -> Result<Vec<build_results::Model>, Box<dyn std::error::Error>> {
         let results = BuildResults::find()
             .filter(build_results::Column::PackageId.eq(package_id))
-            .order_by_desc(build_results::Column::FinishedAt)
+            .order_by_desc(build_results::Column::StartedAt)
             .all(&self.db)
             .await?;
 
@@ -162,8 +162,8 @@ impl Database {
             exit_code: ActiveValue::Set(data.status_code as i32),
             build_log: ActiveValue::Set(Some(data.log_lines.join(""))),
             success: ActiveValue::Set(data.success),
-            finished_at: ActiveValue::Set(Some(data.timestamps.start)),
-            started_at: ActiveValue::Set(Some(data.timestamps.end)),
+            finished_at: ActiveValue::Set(Some(data.timestamps.end)),
+            started_at: ActiveValue::Set(Some(data.timestamps.start)),
             version: ActiveValue::Set(Some(data.task.version.clone())),
         };
         db_data.insert(&self.db).await?;
