@@ -8,6 +8,7 @@ use futures_util::stream::StreamExt;
 use lapin::BasicProperties;
 use lapin::options::{BasicAckOptions, BasicConsumeOptions, BasicNackOptions, BasicPublishOptions, BasicQosOptions, QueueDeclareOptions};
 use lapin::types::FieldTable;
+use simple_logger::SimpleLogger;
 use common::types::BuildTaskTransmissionFormat;
 
 #[macro_use]
@@ -16,7 +17,7 @@ extern crate log;
 #[tokio::main]
 async fn main() {
     load_dotenv().unwrap();
-    pretty_env_logger::init();
+    simple_logger::init_with_env().unwrap();
 
     info!("Starting Aur-Builder Worker v{VERSION}");
 

@@ -16,6 +16,7 @@ use lapin::{BasicProperties, Channel};
 use log::{debug, error, info};
 use reqwest::Error;
 use std::time::Duration;
+use simple_logger::SimpleLogger;
 use tokio::time::sleep;
 use crate::config_handler::Config;
 
@@ -24,7 +25,7 @@ use package_checkers::{*};
 #[tokio::main]
 async fn main() {
     load_dotenv().unwrap();
-    pretty_env_logger::init();
+    simple_logger::init_with_env().unwrap();
 
     let config_path = get_environment_variable("AB_CONFIG_PATH");
     let config = match Config::new(Some(config_path)) {
@@ -50,14 +51,29 @@ async fn main() {
 
         for pkg in &config.aur_packages {
             debug!("Getting data for aur package {:?}", pkg);
-            let data = aur::get_aur_data(pkg).await.unwrap();
-            package_data.push(data);
+            let aur_result = aur::get_aur_data(pkg).await;
+            match aur_result {
+                Ok(aur) => {
+                    package_data.push(aur);
+                }
+                Err(e) => {
+                    error!("Failed to get data for aur package \"{}\": {}", pkg.name, e);
+                }
+            }
+
         }
 
         for pkg in &config.git_packages {
             debug!("Getting data for git package {:?}", pkg);
-            let data = git::get_git_data(pkg).await.unwrap();
-            package_data.push(data);
+            let git_result = git::get_git_data(pkg).await;
+            match git_result {
+                Ok(git_data) => {
+                    package_data.push(git_data);
+                }
+                Err(e) => {
+                    error!("Failed to get data for git package \"{}\": {}", pkg.source, e);
+                }
+            }
         }
 
         for data in &package_data {

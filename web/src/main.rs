@@ -8,13 +8,14 @@ use axum::extract::Path;
 use axum::response::Html;
 use cached::proc_macro::{cached};
 use reqwest::StatusCode;
+use simple_logger::SimpleLogger;
 use tera::{Context, Tera};
 use database::entities::package_metadata;
 
 #[tokio::main]
 async fn main() {
     load_dotenv().unwrap();
-    pretty_env_logger::init();
+    simple_logger::init_with_env().unwrap();
 
     info!("Starting Aur-Builder Web v{VERSION}");
 
