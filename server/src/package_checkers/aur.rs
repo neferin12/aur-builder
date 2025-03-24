@@ -49,7 +49,7 @@ pub async fn get_aur_data(package: &AurPackageSettings) -> Result<PackageSearchR
     let package_info = resp.results.get(0).ok_or_else(|| MissingFieldError::new("results".to_string()))?;
 
     let result = PackageSearchResult {
-        name: package.name.clone(),
+        name: package_info.name.clone(),
         version: package_info.version.clone(),
         maintainer: package_info.maintainer.clone().unwrap_or_default(),
         last_modified: package_info.last_modified,

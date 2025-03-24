@@ -1,4 +1,4 @@
-use sea_orm_migration::{prelude::*, schema::*};
+use sea_orm_migration::prelude::*;
 use crate::entities::prelude::PackageMetadata;
 
 #[derive(DeriveMigrationName)]

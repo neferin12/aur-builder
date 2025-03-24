@@ -1,10 +1,7 @@
-use std::arch::x86_64::_mm256_cvtps_ph;
 use std::error::Error;
 use common::types::{GitPackageSettings, PackageSearchResult};
 use git2::Repository;
-use log::error;
 use std::path::PathBuf;
-use std::process::exit;
 use srcinfo::Srcinfo;
 use tempdir::TempDir;
 

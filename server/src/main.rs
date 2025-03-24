@@ -3,20 +3,13 @@ mod setup_rabbit_mq;
 mod package_checkers;
 
 use std::process::exit;
-use common::connect_to_rabbitmq;
-use database::{connect_to_db, Database};
+use database::connect_to_db;
 use common::environment::{get_environment_variable, load_dotenv, VERSION};
-use common::types::{BuildResultTransmissionFormat, BuildTaskTransmissionFormat, PackageSearchResult};
-use futures_util::StreamExt;
-use lapin::options::{
-    BasicAckOptions, BasicConsumeOptions, BasicPublishOptions, QueueDeclareOptions,
-};
-use lapin::types::FieldTable;
-use lapin::{BasicProperties, Channel};
+use common::types::BuildTaskTransmissionFormat;
+use lapin::options::BasicPublishOptions;
+use lapin::BasicProperties;
 use log::{debug, error, info};
-use reqwest::Error;
 use std::time::Duration;
-use simple_logger::SimpleLogger;
 use tokio::time::sleep;
 use crate::config_handler::Config;
 

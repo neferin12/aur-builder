@@ -24,17 +24,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="30df73c6-6061-4a44-ad67-d8c0fc6fb8e8" name="Changes" comment="make settings configurable via yaml">
-      <change afterPath="$PROJECT_DIR$/common/src/errors.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Cargo.lock" beforeDir="false" afterPath="$PROJECT_DIR$/Cargo.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/src/lib.rs" beforeDir="false" afterPath="$PROJECT_DIR$/common/src/lib.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/Cargo.toml" beforeDir="false" afterPath="$PROJECT_DIR$/server/Cargo.toml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/database/src/migrator/m20250316_173233_source.rs" beforeDir="false" afterPath="$PROJECT_DIR$/database/src/migrator/m20250316_173233_source.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/database/src/migrator/m20250316_182755_subfolder.rs" beforeDir="false" afterPath="$PROJECT_DIR$/database/src/migrator/m20250316_182755_subfolder.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/database/src/migrator/m20250319_110511_switch_start_and_end_timestamps.rs" beforeDir="false" afterPath="$PROJECT_DIR$/database/src/migrator/m20250319_110511_switch_start_and_end_timestamps.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server/src/main.rs" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server/src/package_checkers/aur.rs" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/package_checkers/aur.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server/src/package_checkers/git.rs" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/package_checkers/git.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/Cargo.toml" beforeDir="false" afterPath="$PROJECT_DIR$/web/Cargo.toml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/web/src/main.rs" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/main.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/worker/Cargo.toml" beforeDir="false" afterPath="$PROJECT_DIR$/worker/Cargo.toml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/worker/src/main.rs" beforeDir="false" afterPath="$PROJECT_DIR$/worker/src/main.rs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -232,7 +228,7 @@
       <workItem from="1742218324965" duration="4232000" />
       <workItem from="1742251752703" duration="689000" />
       <workItem from="1742382120018" duration="2054000" />
-      <workItem from="1742809711176" duration="2463000" />
+      <workItem from="1742809711176" duration="2721000" />
     </task>
     <task id="LOCAL-00001" summary="ci">
       <option name="closed" value="true" />

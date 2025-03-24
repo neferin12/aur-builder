@@ -1,5 +1,5 @@
 use crate::entities::prelude::BuildResults;
-use sea_orm_migration::{prelude::*, schema::*};
+use sea_orm_migration::prelude::*;
 
 #[derive(DeriveMigrationName)]
 pub struct Migration;

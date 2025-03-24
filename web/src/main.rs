@@ -8,7 +8,6 @@ use axum::extract::Path;
 use axum::response::Html;
 use cached::proc_macro::{cached};
 use reqwest::StatusCode;
-use simple_logger::SimpleLogger;
 use tera::{Context, Tera};
 use database::entities::package_metadata;
 
