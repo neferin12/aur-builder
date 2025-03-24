@@ -8,6 +8,7 @@ use futures_util::stream::StreamExt;
 use lapin::BasicProperties;
 use lapin::options::{BasicAckOptions, BasicConsumeOptions, BasicNackOptions, BasicPublishOptions, BasicQosOptions, QueueDeclareOptions};
 use lapin::types::FieldTable;
+use common::errors::get_error_descriptions;
 use common::types::BuildTaskTransmissionFormat;
 
 #[macro_use]
@@ -72,6 +73,9 @@ async fn main() {
         match build_package(&build_task).await {
             Ok(results) => {
                 delivery.ack(BasicAckOptions::default()).await.expect("ack");
+                if !results.success {
+                    warn!("Failed to build package '{}': {}", results.task.name, get_error_descriptions(results.status_code));
+                }
                 tx_results.basic_publish(
                     "",
                     "build_results",
@@ -81,7 +85,7 @@ async fn main() {
                 ).await.unwrap();
             }
             Err(error) => {
-                error!("Error building package '{}':\n{:?}", build_task.name, error);
+                error!("System error while building package '{}':\n{:?}", build_task.name, error);
                 delivery
                     .nack(BasicNackOptions::default())
                     .await

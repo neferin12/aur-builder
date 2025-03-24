@@ -1,15 +1,22 @@
-use database::{connect_to_db, Database};
-use common::environment::{load_dotenv, VERSION};
-use axum::routing::{get, post};
-use axum::{Extension, Router};
-use log::{error, info};
-use std::process::exit;
 use axum::extract::Path;
 use axum::response::Html;
-use cached::proc_macro::{cached};
-use reqwest::StatusCode;
-use tera::{Context, Tera};
+use axum::routing::{get, post};
+use axum::{Extension, Router};
+use cached::proc_macro::cached;
+use common::environment::{VERSION, load_dotenv};
+use common::errors::get_error_descriptions;
 use database::entities::package_metadata;
+use database::{Database, connect_to_db};
+use log::{error, info};
+use reqwest::StatusCode;
+use std::collections::HashMap;
+use std::process::exit;
+use tera::{Context, Tera, Value, to_value};
+
+fn error_desc_filter(error: &Value, _: &HashMap<String, Value>) -> Result<Value, tera::Error> {
+    let code = error.as_i64().unwrap_or(-1);
+    Ok(to_value(get_error_descriptions(code))?)
+}
 
 #[tokio::main]
 async fn main() {
@@ -19,13 +26,14 @@ async fn main() {
     info!("Starting Aur-Builder Web v{VERSION}");
 
     let db = connect_to_db().await;
-    let tera = match Tera::new("web/src/templates/**/*.html") {
+    let mut tera = match Tera::new("web/src/templates/**/*.html") {
         Ok(t) => t,
         Err(e) => {
             error!("Parsing error(s): {}", e);
             exit(1);
         }
     };
+    tera.register_filter("err_desc", error_desc_filter);
 
     // build our application with a route
     let app = Router::new()
@@ -34,10 +42,12 @@ async fn main() {
         .route("/build-results/{pid}", get(render_build_results_function))
         .route("/build-log/{pid}", get(render_build_log_function))
         .route("/force-rebuild/{pid}", post(init_force_rebuild))
-        .nest_service("/assets", tower_http::services::ServeDir::new("web/src/assets"))
+        .nest_service(
+            "/assets",
+            tower_http::services::ServeDir::new("web/src/assets"),
+        )
         .layer(Extension(tera))
         .layer(Extension(db));
-    
 
     // run our app with hyper, listening globally on port 3000
     let listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await.unwrap();
@@ -46,7 +56,7 @@ async fn main() {
 
 async fn render_packages_function(
     Extension(tera): Extension<Tera>,
-    Extension(db): Extension<Database>
+    Extension(db): Extension<Database>,
 ) -> Html<String> {
     let mut context = Context::new();
     let packages = db.get_packages().await.unwrap();
@@ -61,7 +71,7 @@ async fn render_packages_function(
 async fn render_build_results_function(
     Extension(tera): Extension<Tera>,
     Extension(db): Extension<Database>,
-    Path(pid): Path<i32>
+    Path(pid): Path<i32>,
 ) -> Result<Html<String>, StatusCode> {
     let mut context = Context::new();
 
@@ -69,7 +79,7 @@ async fn render_build_results_function(
         None => {
             return Err(StatusCode::NOT_FOUND);
         }
-        Some(p) => {p}
+        Some(p) => p,
     };
     context.insert("version", VERSION);
 
@@ -82,17 +92,16 @@ async fn render_build_results_function(
 }
 
 #[cached(
-    key="String",
-    convert=r#"{ format!("logs-{}",pid) }"#,
-    result=true
+    key = "String",
+    convert = r#"{ format!("logs-{}",pid) }"#,
+    result = true
 )]
 async fn render_build_log_function(
     Extension(tera): Extension<Tera>,
     Extension(db): Extension<Database>,
-    Path(pid): Path<i32>
+    Path(pid): Path<i32>,
 ) -> Result<Html<String>, StatusCode> {
     let mut context = Context::new();
-    
 
     let build_result = db.get_build_result(pid).await.unwrap();
     context.insert("build_result", &build_result);
@@ -103,7 +112,7 @@ async fn render_build_log_function(
 async fn init_force_rebuild(
     Extension(tera): Extension<Tera>,
     Extension(db): Extension<Database>,
-    Path(pid): Path<i32>
+    Path(pid): Path<i32>,
 ) -> Result<Html<String>, StatusCode> {
     let mut context = Context::new();
 
@@ -111,10 +120,10 @@ async fn init_force_rebuild(
         None => {
             return Err(StatusCode::NOT_FOUND);
         }
-        Some(p) => {p}
+        Some(p) => p,
     };
     context.insert("version", VERSION);
-    
+
     context.insert("package", &package);
 
     db.reset_package_last_modified(package.id).await;

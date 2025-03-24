@@ -1,0 +1,10 @@
+{
+  "100": "Unable to change dir",
+  "101": "Environment Variable missing",
+  "102": "Git clone failed",
+  "103": "Failed to run `yay -Syu`",
+  "104": "Failed to install dependency",
+  "105": "Failed to build package",
+  "106": "Failed to copy result files",
+  "107": "Failed to upload pkg file"
+}
