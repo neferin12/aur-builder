@@ -876,7 +876,7 @@ dependencies = [
 
 [[package]]
 name = "common"
-version = "1.0.3"
+version = "1.0.4"
 dependencies = [
  "dotenvy",
  "lapin",
@@ -1091,7 +1091,7 @@ checksum = "575f75dfd25738df5b91b8e43e14d44bda14637a58fae779fd2b064f8bf3e010"
 
 [[package]]
 name = "database"
-version = "1.0.3"
+version = "1.0.4"
 dependencies = [
  "common",
  "log",
@@ -3771,7 +3771,7 @@ dependencies = [
 
 [[package]]
 name = "server"
-version = "1.0.3"
+version = "1.0.4"
 dependencies = [
  "common",
  "config",
@@ -4930,7 +4930,7 @@ dependencies = [
 
 [[package]]
 name = "web"
-version = "1.0.3"
+version = "1.0.4"
 dependencies = [
  "axum",
  "cached",
@@ -5218,7 +5218,7 @@ dependencies = [
 
 [[package]]
 name = "worker"
-version = "1.0.3"
+version = "1.0.4"
 dependencies = [
  "bollard",
  "bytes",
