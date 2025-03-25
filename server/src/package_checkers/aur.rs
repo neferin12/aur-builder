@@ -1,7 +1,7 @@
 use std::error::Error;
 use serde::Deserialize;
 use common::types::{AurPackageSettings, PackageSearchResult};
-use common::errors::MissingFieldError;
+use common::errors::{AurRequestError, MissingFieldError};
 
 #[derive(Deserialize)]
 pub struct AurResponse {
@@ -44,9 +44,13 @@ pub struct AurPackageInfo {
 /// ```
 pub async fn get_aur_data(package: &AurPackageSettings) -> Result<PackageSearchResult, Box<dyn Error>> {
     let url = format!("https://aur.archlinux.org/rpc/v5/info?arg[]={}", package.name);
-    let resp = reqwest::get(&url).await?.json::<AurResponse>().await?;
+    let resp = reqwest::get(&url).await?;
+    if !resp.status().is_success() {
+        return Err(AurRequestError::new(package.name.clone(), resp.status().as_u16()).into())
+    }
+    let resp_json = resp.json::<AurResponse>().await?;
 
-    let package_info = resp.results.get(0).ok_or_else(|| MissingFieldError::new("results".to_string()))?;
+    let package_info = resp_json.results.get(0).ok_or_else(|| MissingFieldError::new("results".to_string()))?;
 
     let result = PackageSearchResult {
         name: package_info.name.clone(),

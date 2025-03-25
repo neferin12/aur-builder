@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 use std::error::Error;
 use std::fmt;
-use std::fmt::Formatter;
+use std::fmt::{Display, Formatter};
 use lazy_static::lazy_static;
 use serde_json::Value;
 
@@ -43,8 +43,28 @@ impl MissingFieldError {
 
 impl Error for MissingFieldError {}
 
-impl fmt::Display for MissingFieldError {
+impl Display for MissingFieldError {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         write!(f, "Field '{}' is missing", self.field_name)
     }
 }
+
+#[derive(Debug)]
+pub struct AurRequestError {
+    package: String,
+    status_code: u16
+}
+
+impl AurRequestError {
+    pub fn new(package: String, status_code: u16) -> AurRequestError {
+        AurRequestError { package, status_code }
+    }
+}
+
+impl Display for AurRequestError {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        write!(f, "Aur request for '{}' failed with code {}", self.package, self.status_code )
+    }
+}
+
+impl Error for AurRequestError {}
