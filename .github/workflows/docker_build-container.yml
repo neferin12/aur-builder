@@ -14,6 +14,11 @@ on:
   schedule:
     - cron: '0 0 */2 * *'
 
+permissions:
+  contents: read
+  packages: write
+  id-token: write # needed for signing the images with GitHub OIDC Token
+
 env:
   # Use docker.io for Docker Hub if empty
   REGISTRY: ghcr.io
@@ -41,8 +46,8 @@ jobs:
       - name: Install cosign
         if: github.event_name != 'pull_request'
         uses: sigstore/cosign-installer@v3
-        with:
-          cosign-release: 'v2.1.1'
+      - name: Check cosign install
+        run: cosign version
 
       # Set up BuildKit Docker container builder to be able to build
       # multi-platform images and export cache
@@ -60,18 +65,29 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Log into registry harbor.pollinger.dev
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v3
+        with:
+          registry: harbor.pollinger.dev
+          username: ${{ secrets.HARBOR_USER }}
+          password: ${{ secrets.HARBOR_PASS }}
+
       # Extract metadata (tags, labels) for Docker
       # https://github.com/docker/metadata-action
       - name: Extract Docker metadata
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          images: |
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+            harbor.pollinger.dev/julian/aur-builder-build-container
           tags: |
             type=ref,event=branch
             type=ref,event=pr
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
+            type=semver,pattern={{major}}
 
       # Build and push Docker image with Buildx (don't push on PR)
       # https://github.com/docker/build-push-action
@@ -81,22 +97,16 @@ jobs:
         with:
           context: build-container
           push: ${{ github.event_name != 'pull_request' }}
+          sbom: true
+          provenance: mode=max
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-          # Sign the resulting Docker image digest except on PRs.
-          # This will only write to the public Rekor transparency log when the Docker
-          # repository is public to avoid leaking data.  If you would like to publish
-          # transparency data even for private images, pass --force to cosign below.
-          # https://github.com/sigstore/cosign
-          #- name: Sign the published Docker image
-          #  if: ${{ github.event_name != 'pull_request' }}
-          #  env:
-          # https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions#using-an-intermediate-environment-variable
-        #    TAGS: ${{ steps.meta.outputs.tags }}
-        #    DIGEST: ${{ steps.build-and-push.outputs.digest }}
-        # This step uses the identity token to provision an ephemeral certificate
-        # against the sigstore community Fulcio instance.
-      #  run: echo "${TAGS}" | xargs -I {} cosign sign --yes {}@${DIGEST}
+      - name: Sign the published server image
+        if: ${{ github.event_name != 'pull_request' }}
+        env:
+          TAGS: ${{ steps.meta.outputs.tags }}
+          DIGEST: ${{ steps.build-and-push.outputs.digest }}
+        run: echo "${TAGS}" | xargs -I {} cosign sign --yes {}@${DIGEST}
