@@ -81,7 +81,7 @@ jobs:
         with:
           images: |
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-            harbor.pollinger.dev/julian/aur-builder-build-container
+            harbor.pollinger.dev/julian/aur-builder/build-container
           tags: |
             type=ref,event=branch
             type=ref,event=pr
