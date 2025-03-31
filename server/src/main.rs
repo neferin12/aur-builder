@@ -1,4 +1,3 @@
-mod config_handler;
 mod setup_rabbit_mq;
 mod package_checkers;
 
@@ -11,17 +10,17 @@ use lapin::BasicProperties;
 use log::{debug, error, info};
 use std::time::Duration;
 use tokio::time::sleep;
-use crate::config_handler::Config;
+use common::config::ServerConfig;
 
 use package_checkers::{*};
 
 #[tokio::main]
 async fn main() {
-    load_dotenv().unwrap();
+    load_dotenv().ok();
     simple_logger::init_with_env().unwrap();
 
     let config_path = get_environment_variable("AB_CONFIG_PATH");
-    let config = match Config::new(Some(config_path)) {
+    let config = match ServerConfig::new(Some(config_path)) {
         Ok(c) => c,
         Err(e) => {
             error!("Failed to load config: {}", e);
@@ -36,7 +35,8 @@ async fn main() {
     debug!("aur packages: {:?}", &config.aur_packages);
     debug!("git packages: {:?}", &config.git_packages);
 
-    let tx_channel = setup_rabbit_mq::setup_rabbitmq(&db).await;
+    let channels = setup_rabbit_mq::setup_rabbitmq(&db).await;
+    let build_tx = channels.build_tx;
 
     loop {
         info!("Checking for package updates...");
@@ -84,7 +84,7 @@ async fn main() {
                     options: data.options.clone(),
                     env: data.environment.clone()
                 };
-                tx_channel
+                build_tx
                     .basic_publish(
                         "",
                         "pkg_build",

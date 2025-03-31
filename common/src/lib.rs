@@ -9,6 +9,7 @@ use tokio::time::sleep;
 
 pub mod environment;
 pub mod errors;
+pub mod config;
 
 /// The maximum number of retry attempts for establishing a database/rabbitmq connection.
 pub const CONNECTION_RETRY_NUMBER: u8 = 10;

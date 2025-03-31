@@ -4,29 +4,27 @@
     <option name="autoReloadType" value="ALL" />
   </component>
   <component name="CargoProjects">
-    <cargoProject FILE="$PROJECT_DIR$/Cargo.toml">
-      <package file="$PROJECT_DIR$/common">
-        <enabledFeature name="default" />
-      </package>
-      <package file="$PROJECT_DIR$/database">
-        <enabledFeature name="default" />
-      </package>
-      <package file="$PROJECT_DIR$/server">
-        <enabledFeature name="default" />
-      </package>
-      <package file="$PROJECT_DIR$/web">
-        <enabledFeature name="default" />
-      </package>
-      <package file="$PROJECT_DIR$/worker">
-        <enabledFeature name="default" />
-      </package>
-    </cargoProject>
+    <cargoProject FILE="$PROJECT_DIR$/Cargo.toml" />
   </component>
   <component name="ChangeListManager">
     <list default="true" id="30df73c6-6061-4a44-ad67-d8c0fc6fb8e8" name="Changes" comment="fix: better error handling in aur connector">
-      <change beforePath="$PROJECT_DIR$/.github/workflows/docker.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.github/workflows/docker.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.github/workflows/docker_build-container.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.github/workflows/docker_build-container.yml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/common/src/config.rs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/notifier/src/templates/build_notification.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/aur-builder.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/aur-builder.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources.local.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources.local.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Cargo.lock" beforeDir="false" afterPath="$PROJECT_DIR$/Cargo.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Cargo.toml" beforeDir="false" afterPath="$PROJECT_DIR$/Cargo.toml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/Dockerfile" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/Cargo.toml" beforeDir="false" afterPath="$PROJECT_DIR$/common/Cargo.toml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/src/error_codes.json" beforeDir="false" afterPath="$PROJECT_DIR$/common/src/error_codes.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/src/lib.rs" beforeDir="false" afterPath="$PROJECT_DIR$/common/src/lib.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/Cargo.toml" beforeDir="false" afterPath="$PROJECT_DIR$/server/Cargo.toml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/config_handler.rs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/main.rs" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/setup_rabbit_mq.rs" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/setup_rabbit_mq.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/main.rs" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/main.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/worker/src/main.rs" beforeDir="false" afterPath="$PROJECT_DIR$/worker/src/main.rs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -88,50 +86,75 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;Cargo.Run server.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Run web.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Run worker.executor&quot;: &quot;Run&quot;,
-    &quot;Docker.docker-compose.yaml.rabbitmq: Compose Deployment.executor&quot;: &quot;Run&quot;,
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.rust.reset.selective.auto.import&quot;: &quot;true&quot;,
-    &quot;SHELLCHECK.PATH&quot;: &quot;/home/julian/.local/share/JetBrains/RustRover2025.1/Shell Script/shellcheck&quot;,
-    &quot;dart.analysis.tool.window.visible&quot;: &quot;false&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/home/julian/projects/privat/aur-builder/.github/workflows&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;org.rust.cargo.project.model.PROJECT_DISCOVERY&quot;: &quot;true&quot;,
-    &quot;org.rust.cargo.project.model.impl.CargoExternalSystemProjectAware.subscribe.first.balloon&quot;: &quot;&quot;,
-    &quot;org.rust.first.attach.projects&quot;: &quot;true&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.lookFeel&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Cargo.Build `Run notifier`.executor": "Run",
+    "Cargo.Build `Run server`.executor": "Run",
+    "Cargo.Run notifier.executor": "Run",
+    "Cargo.Run server.executor": "Run",
+    "Cargo.Run web.executor": "Run",
+    "Cargo.Run worker.executor": "Run",
+    "Docker.docker-compose.yaml.rabbitmq: Compose Deployment.executor": "Run",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.rust.reset.selective.auto.import": "true",
+    "SHELLCHECK.PATH": "/home/julian/.local/share/JetBrains/RustRover2025.1/Shell Script/shellcheck",
+    "dart.analysis.tool.window.visible": "false",
+    "git-widget-placeholder": "main",
+    "last_opened_file_path": "/home/julian/projects/privat/aur-builder/notifier",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "org.rust.cargo.project.model.PROJECT_DISCOVERY": "true",
+    "org.rust.cargo.project.model.impl.CargoExternalSystemProjectAware.subscribe.first.balloon": "",
+    "org.rust.first.attach.projects": "true",
+    "settings.editor.selected.configurable": "preferences.pluginManager",
+    "vue.rearranger.settings.migration": "true"
   },
-  &quot;keyToStringList&quot;: {
-    &quot;DatabaseDriversLRU&quot;: [
-      &quot;sqlite&quot;
+  "keyToStringList": {
+    "DatabaseDriversLRU": [
+      "sqlite"
     ]
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/notifier" />
       <recent name="$PROJECT_DIR$/.github/workflows" />
       <recent name="$PROJECT_DIR$/database/src" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/notifier/src" />
       <recent name="$PROJECT_DIR$/server/src/package_checkers" />
       <recent name="$PROJECT_DIR$/web/src" />
       <recent name="$PROJECT_DIR$/worker/src" />
       <recent name="$PROJECT_DIR$/common/src" />
     </key>
   </component>
-  <component name="RunManager" selected="Docker.docker-compose.yaml.rabbitmq: Compose Deployment">
+  <component name="RsExternalLinterProjectSettings">
+    <option name="runOnTheFly" value="true" />
+  </component>
+  <component name="RunManager" selected="Cargo.Run notifier">
+    <configuration name="Run notifier" type="CargoCommandRunConfiguration" factoryName="Cargo Command">
+      <option name="command" value="run --package notifier --bin notifier" />
+      <option name="workingDirectory" value="file://$PROJECT_DIR$" />
+      <envs />
+      <option name="emulateTerminal" value="true" />
+      <option name="channel" value="DEFAULT" />
+      <option name="requiredFeatures" value="true" />
+      <option name="allFeatures" value="false" />
+      <option name="withSudo" value="false" />
+      <option name="buildTarget" value="REMOTE" />
+      <option name="backtrace" value="SHORT" />
+      <option name="isRedirectInput" value="false" />
+      <option name="redirectInputPath" value="" />
+      <method v="2">
+        <option name="CARGO.BUILD_TASK_PROVIDER" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="Run server" type="CargoCommandRunConfiguration" factoryName="Cargo Command">
       <option name="buildProfileId" value="dev" />
       <option name="command" value="run --package server --bin server" />
@@ -224,9 +247,9 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Cargo.Run worker" />
         <item itemvalue="Docker.docker-compose.yaml.rabbitmq: Compose Deployment" />
         <item itemvalue="Cargo.Run web" />
-        <item itemvalue="Cargo.Run worker" />
         <item itemvalue="Cargo.Run worker" />
         <item itemvalue="Docker.docker-compose.yaml.rabbitmq: Compose Deployment" />
       </list>
@@ -235,6 +258,7 @@
   <component name="RustProjectSettings">
     <option name="toolchainHomeDirectory" value="/usr/bin" />
   </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
       <changelist id="30df73c6-6061-4a44-ad67-d8c0fc6fb8e8" name="Changes" comment="" />
@@ -251,6 +275,9 @@
       <workItem from="1742813592950" duration="184000" />
       <workItem from="1742813816622" duration="4044000" />
       <workItem from="1742898223962" duration="977000" />
+      <workItem from="1743426891681" duration="11000" />
+      <workItem from="1743426921945" duration="3840000" />
+      <workItem from="1743430768332" duration="4798000" />
     </task>
     <task id="LOCAL-00001" summary="ci">
       <option name="closed" value="true" />
@@ -342,7 +369,8 @@
     <MESSAGE value="make settings configurable via yaml" />
     <MESSAGE value="show error code meaning for builds in tooltip and log" />
     <MESSAGE value="fix: better error handling in aur connector" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix: better error handling in aur connector" />
+    <MESSAGE value="improve error handling" />
+    <option name="LAST_COMMIT_MESSAGE" value="improve error handling" />
   </component>
   <component name="XDebuggerManager">
     <watches-manager>

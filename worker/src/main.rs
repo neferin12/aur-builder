@@ -16,7 +16,7 @@ extern crate log;
 
 #[tokio::main]
 async fn main() {
-    load_dotenv().unwrap();
+    load_dotenv().ok();
     simple_logger::init_with_env().unwrap();
 
     info!("Starting Aur-Builder Worker v{VERSION}");

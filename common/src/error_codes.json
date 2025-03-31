@@ -1,4 +1,5 @@
 {
+  "0": "Success",
   "100": "Unable to change dir",
   "101": "Environment Variable missing",
   "102": "Git clone failed",

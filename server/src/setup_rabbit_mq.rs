@@ -1,18 +1,32 @@
-use database::Database;
-use lapin::Channel;
 use common::connect_to_rabbitmq;
-use lapin::options::{BasicAckOptions, BasicConsumeOptions, QueueDeclareOptions};
-use lapin::types::FieldTable;
 use common::types::BuildResultTransmissionFormat;
+use database::Database;
 use futures_util::StreamExt;
+use lapin::{BasicProperties, Channel};
+use lapin::options::{BasicAckOptions, BasicConsumeOptions, BasicPublishOptions, QueueDeclareOptions};
+use lapin::types::FieldTable;
 
-pub async fn setup_rabbitmq(db: &Database) -> Channel {
+pub struct RabbitChannels {
+    pub build_tx: Channel
+}
+
+pub async fn setup_rabbitmq(db: &Database) -> RabbitChannels {
     let conn = connect_to_rabbitmq().await;
 
-    let tx_channel = conn.create_channel().await.unwrap();
-    tx_channel
+    let build_tx = conn.create_channel().await.unwrap();
+    build_tx
         .queue_declare(
             "pkg_build",
+            QueueDeclareOptions::default(),
+            FieldTable::default(),
+        )
+        .await
+        .unwrap();
+
+    let notify_tx = conn.create_channel().await.unwrap();
+    notify_tx
+        .queue_declare(
+            "notifications",
             QueueDeclareOptions::default(),
             FieldTable::default(),
         )
@@ -49,9 +63,19 @@ pub async fn setup_rabbitmq(db: &Database) -> Channel {
             };
             let data: BuildResultTransmissionFormat = serde_json::from_str(&*data_str).unwrap();
             locale_db.save_build_results(&data).await.unwrap();
+            notify_tx.basic_publish(
+                "",
+                "notifications",
+                BasicPublishOptions::default(),
+                serde_json::to_string(&data).unwrap().as_ref(),
+                BasicProperties::default(),
+            ).await.unwrap();
 
             delivery.ack(BasicAckOptions::default()).await.unwrap();
         }
     });
-    tx_channel
+
+    RabbitChannels {
+        build_tx
+    }
 }

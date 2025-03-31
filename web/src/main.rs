@@ -20,7 +20,7 @@ fn error_desc_filter(error: &Value, _: &HashMap<String, Value>) -> Result<Value,
 
 #[tokio::main]
 async fn main() {
-    load_dotenv().unwrap();
+    load_dotenv().ok();
     simple_logger::init_with_env().unwrap();
 
     info!("Starting Aur-Builder Web v{VERSION}");
