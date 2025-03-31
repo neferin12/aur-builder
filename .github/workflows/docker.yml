@@ -73,7 +73,7 @@ jobs:
         with:
           images: |
             ghcr.io/neferin12/aur-builder-server
-            harbor.pollinger.dev/julian/aur-builder-server
+            harbor.pollinger.dev/julian/aur-builder/server
           tags: |
             type=ref,event=branch
             type=ref,event=pr
@@ -89,7 +89,7 @@ jobs:
         with:
           images: |
             ghcr.io/neferin12/aur-builder-web
-            harbor.pollinger.dev/julian/aur-builder-web
+            harbor.pollinger.dev/julian/aur-builder/web
           tags: |
             type=ref,event=branch
             type=ref,event=pr
@@ -105,7 +105,7 @@ jobs:
         with:
           images: |
             ghcr.io/neferin12/aur-builder-worker
-            harbor.pollinger.dev/julian/aur-builder-worker
+            harbor.pollinger.dev/julian/aur-builder/worker
           tags: |
             type=ref,event=branch
             type=ref,event=pr
@@ -121,7 +121,7 @@ jobs:
         with:
           images: |
             ghcr.io/neferin12/aur-builder-notifier
-            harbor.pollinger.dev/julian/aur-builder-notifier
+            harbor.pollinger.dev/julian/aur-builder/notifier
           tags: |
             type=ref,event=branch
             type=ref,event=pr
