@@ -8,7 +8,6 @@ use bollard::image::CreateImageOptions;
 use bollard::models::HostConfig;
 use bytes::Bytes;
 use common::config::{Configurable, WorkerConfig};
-use common::environment::get_environment_variable;
 use common::get_rand_string;
 use common::types::{BuildResultTransmissionFormat, BuildTaskTransmissionFormat, Timestamps};
 use futures_util::{StreamExt, TryStreamExt};

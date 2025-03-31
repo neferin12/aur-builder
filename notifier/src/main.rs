@@ -4,9 +4,8 @@ use common::errors::get_error_descriptions;
 use common::types::BuildResultTransmissionFormat;
 use common::{connect_to_rabbitmq, get_rand_string};
 use futures_util::stream::StreamExt;
-use lapin::message::Delivery;
 use lapin::options::{
-    BasicAckOptions, BasicConsumeOptions, BasicNackOptions, BasicPublishOptions, BasicQosOptions,
+    BasicAckOptions, BasicConsumeOptions, BasicNackOptions, BasicQosOptions,
     QueueDeclareOptions,
 };
 use lapin::types::FieldTable;
@@ -14,8 +13,6 @@ use lettre::message::header::ContentType;
 use lettre::transport::smtp::authentication::Credentials;
 use lettre::{Message, SmtpTransport, Transport};
 use log::{error, info};
-use std::any::Any;
-use std::env;
 use std::error::Error;
 use std::process::exit;
 use tera::{Context, Tera};
