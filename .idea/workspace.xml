@@ -26,9 +26,10 @@
     </cargoProject>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="30df73c6-6061-4a44-ad67-d8c0fc6fb8e8" name="Changes" comment="fix: improve notifier styling">
-      <change beforePath="$PROJECT_DIR$/.github/workflows/docker_build-container.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.github/workflows/docker_build-container.yml" afterDir="false" />
+    <list default="true" id="30df73c6-6061-4a44-ad67-d8c0fc6fb8e8" name="Changes" comment="ci: rename harbor image for builder container">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/src/config.rs" beforeDir="false" afterPath="$PROJECT_DIR$/common/src/config.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/main.rs" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main.rs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -366,7 +367,15 @@
       <option name="project" value="LOCAL" />
       <updated>1743459884813</updated>
     </task>
-    <option name="localTasksCounter" value="11" />
+    <task id="LOCAL-00011" summary="ci: rename harbor image for builder container">
+      <option name="closed" value="true" />
+      <created>1743464197833</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1743464197833</updated>
+    </task>
+    <option name="localTasksCounter" value="12" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -394,7 +403,8 @@
     <MESSAGE value="fix: better error handling in aur connector" />
     <MESSAGE value="improve error handling" />
     <MESSAGE value="fix: improve notifier styling" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix: improve notifier styling" />
+    <MESSAGE value="ci: rename harbor image for builder container" />
+    <option name="LAST_COMMIT_MESSAGE" value="ci: rename harbor image for builder container" />
   </component>
   <component name="XDebuggerManager">
     <watches-manager>

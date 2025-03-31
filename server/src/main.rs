@@ -98,7 +98,7 @@ async fn main() {
                     .unwrap();
             }
         }
-        sleep(Duration::from_secs(60 * 5)).await;
+        sleep(Duration::from_secs(config.sleepduration.unwrap_or(60*5))).await;
     }
 }
 

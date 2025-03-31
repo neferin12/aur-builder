@@ -27,6 +27,7 @@ pub trait Configurable: DeserializeOwned {
 pub struct ServerConfig {
     pub aur_packages: Vec<AurPackageSettings>,
     pub git_packages: Vec<GitPackageSettings>,
+    pub sleepduration: Option<u64>
 }
 
 impl Configurable for ServerConfig {}
