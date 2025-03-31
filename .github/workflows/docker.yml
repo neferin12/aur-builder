@@ -113,6 +113,22 @@ jobs:
             type=semver,pattern={{major}}.{{minor}}
             type=semver,pattern={{major}}
 
+      # Extract metadata (tags, labels) for Docker
+      # https://github.com/docker/metadata-action
+      - name: Extract Docker metadata for notifier
+        id: meta-notifier
+        uses: docker/metadata-action@v5
+        with:
+          images: |
+            ghcr.io/neferin12/aur-builder-notifier
+            harbor.pollinger.dev/julian/aur-builder-notifier
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=semver,pattern={{major}}
+
       # Build and push Docker image with Buildx (don't push on PR)
       # https://github.com/docker/build-push-action
       - name: Build and push server image
@@ -157,6 +173,20 @@ jobs:
           cache-to: type=gha,mode=max
           target: worker
 
+      - name: Build and push notifier image
+        id: build-and-push-notifier
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: ${{ github.event_name != 'pull_request' }}
+          sbom: true
+          provenance: mode=max
+          tags: ${{ steps.meta-notifier.outputs.tags }}
+          labels: ${{ steps.meta-notifier.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          target: notifier
+
           # Sign the resulting Docker image digest except on PRs.
           # This will only write to the public Rekor transparency log when the Docker
           # repository is public to avoid leaking data.  If you would like to publish
@@ -181,4 +211,11 @@ jobs:
         env:
           TAGS: ${{ steps.meta-worker.outputs.tags }}
           DIGEST: ${{ steps.build-and-push-worker.outputs.digest }}
+        run: echo "${TAGS}" | xargs -I {} cosign sign --yes {}@${DIGEST}
+
+      - name: Sign the published notifier image
+        if: ${{ github.event_name != 'pull_request' }}
+        env:
+          TAGS: ${{ steps.meta-notifier.outputs.tags }}
+          DIGEST: ${{ steps.build-and-push-notifier.outputs.digest }}
         run: echo "${TAGS}" | xargs -I {} cosign sign --yes {}@${DIGEST}
