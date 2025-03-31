@@ -57,5 +57,14 @@ services:
     restart: always
     volumes:
       - ./db:/app/db
+  notifier:
+    image: ghcr.io/neferin12/aur-builder-notifier:1
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: notifier
+    env_file:
+      - .env
+    restart: always
 volumes:
     rabbitmq-data:

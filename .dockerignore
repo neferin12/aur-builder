@@ -1,3 +1,14 @@
 .github
 build-container
 target
+.env
+.env.example
+.git
+.gitignore
+.idea
+config.yaml
+docker-compose.yaml
+Dockerfile
+release.sh
+sqlite.db
+target
