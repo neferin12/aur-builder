@@ -7,16 +7,25 @@ use bollard::errors::Error;
 use bollard::image::CreateImageOptions;
 use bollard::models::HostConfig;
 use bytes::Bytes;
+use common::config::{Configurable, WorkerConfig};
 use common::environment::get_environment_variable;
 use common::get_rand_string;
 use common::types::{BuildResultTransmissionFormat, BuildTaskTransmissionFormat, Timestamps};
 use futures_util::{StreamExt, TryStreamExt};
 use sea_orm::sqlx::types::chrono::Utc;
+use std::env;
 
 const VERSION: &str = env!("CARGO_PKG_VERSION");
 
 fn get_image_name() -> String {
-    format!("ghcr.io/neferin12/aur-builder-build-container:{}", VERSION)
+    let config = WorkerConfig::new(env::var("AB_CONFIG_PATH").ok()).unwrap();
+    format!(
+        "{}:{}",
+        config
+            .builder
+            .unwrap_or("ghcr.io/neferin12/aur-builder-build-container".to_string()),
+        VERSION
+    )
 }
 
 pub async fn pull_docker_image() -> Result<(), Box<dyn std::error::Error>> {
@@ -79,6 +88,7 @@ pub async fn build(
     subfolder: &Option<String>,
 ) -> Result<BuildResultTransmissionFormat, Box<dyn std::error::Error>> {
     info!("Building package {}", task.name);
+    let config = WorkerConfig::new(env::var("AB_CONFIG_PATH").ok()).unwrap();
     let build_start_time = Utc::now().naive_utc();
 
     let docker = Docker::connect_with_local_defaults()?;
@@ -88,19 +98,15 @@ pub async fn build(
         ..Default::default()
     };
 
-    let gitea_url = get_environment_variable("AB_GITEA_REPO");
-    let gitea_user = get_environment_variable("AB_GITEA_USER");
-    let gitea_token = get_environment_variable("AB_GITEA_TOKEN");
-
     let mut env: Vec<String> = vec![
         format!("AB_SOURCE={source_url}"),
         format!(
             "AB_SUBFOLDER={}",
             subfolder.clone().unwrap_or("".to_string())
         ),
-        format!("AB_GITEA_REPO={}", gitea_url),
-        format!("AB_GITEA_USER={}", gitea_user),
-        format!("AB_GITEA_TOKEN={}", gitea_token),
+        format!("AB_GITEA_REPO={}", config.gitea.repo),
+        format!("AB_GITEA_USER={}", config.gitea.user),
+        format!("AB_GITEA_TOKEN={}", config.gitea.token),
         format!(
             "AB_OPTIONS={}",
             task.clone().options.unwrap_or("".to_string())

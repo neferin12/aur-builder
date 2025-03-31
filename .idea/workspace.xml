@@ -4,27 +4,30 @@
     <option name="autoReloadType" value="ALL" />
   </component>
   <component name="CargoProjects">
-    <cargoProject FILE="$PROJECT_DIR$/Cargo.toml" />
+    <cargoProject FILE="$PROJECT_DIR$/Cargo.toml">
+      <package file="$PROJECT_DIR$/common">
+        <enabledFeature name="default" />
+      </package>
+      <package file="$PROJECT_DIR$/database">
+        <enabledFeature name="default" />
+      </package>
+      <package file="$PROJECT_DIR$/notifier">
+        <enabledFeature name="default" />
+      </package>
+      <package file="$PROJECT_DIR$/server">
+        <enabledFeature name="default" />
+      </package>
+      <package file="$PROJECT_DIR$/web">
+        <enabledFeature name="default" />
+      </package>
+      <package file="$PROJECT_DIR$/worker">
+        <enabledFeature name="default" />
+      </package>
+    </cargoProject>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="30df73c6-6061-4a44-ad67-d8c0fc6fb8e8" name="Changes" comment="fix: better error handling in aur connector">
-      <change afterPath="$PROJECT_DIR$/common/src/config.rs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/notifier/src/templates/build_notification.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/aur-builder.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/aur-builder.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources.local.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources.local.xml" afterDir="false" />
+    <list default="true" id="30df73c6-6061-4a44-ad67-d8c0fc6fb8e8" name="Changes" comment="fix: improve notifier styling">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Cargo.lock" beforeDir="false" afterPath="$PROJECT_DIR$/Cargo.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Cargo.toml" beforeDir="false" afterPath="$PROJECT_DIR$/Cargo.toml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/Dockerfile" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/Cargo.toml" beforeDir="false" afterPath="$PROJECT_DIR$/common/Cargo.toml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/src/error_codes.json" beforeDir="false" afterPath="$PROJECT_DIR$/common/src/error_codes.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/src/lib.rs" beforeDir="false" afterPath="$PROJECT_DIR$/common/src/lib.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/Cargo.toml" beforeDir="false" afterPath="$PROJECT_DIR$/server/Cargo.toml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/src/config_handler.rs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/src/main.rs" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/src/setup_rabbit_mq.rs" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/setup_rabbit_mq.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/main.rs" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/main.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/worker/src/main.rs" beforeDir="false" afterPath="$PROJECT_DIR$/worker/src/main.rs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -46,6 +49,7 @@
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="UPDATE_TYPE" value="REBASE" />
   </component>
   <component name="GitHubPullRequestSearchHistory">{
   &quot;lastFilter&quot;: {
@@ -102,7 +106,7 @@
     "SHELLCHECK.PATH": "/home/julian/.local/share/JetBrains/RustRover2025.1/Shell Script/shellcheck",
     "dart.analysis.tool.window.visible": "false",
     "git-widget-placeholder": "main",
-    "last_opened_file_path": "/home/julian/projects/privat/aur-builder/notifier",
+    "last_opened_file_path": "/home/julian/projects/privat/aur-builder/web/src/assets",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -122,23 +126,25 @@
 }]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/web/src/assets" />
       <recent name="$PROJECT_DIR$/notifier" />
       <recent name="$PROJECT_DIR$/.github/workflows" />
       <recent name="$PROJECT_DIR$/database/src" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/web/src/assets" />
       <recent name="$PROJECT_DIR$/notifier/src" />
       <recent name="$PROJECT_DIR$/server/src/package_checkers" />
       <recent name="$PROJECT_DIR$/web/src" />
       <recent name="$PROJECT_DIR$/worker/src" />
-      <recent name="$PROJECT_DIR$/common/src" />
     </key>
   </component>
   <component name="RsExternalLinterProjectSettings">
     <option name="runOnTheFly" value="true" />
   </component>
-  <component name="RunManager" selected="Cargo.Run notifier">
+  <component name="RunManager" selected="Cargo.Run web">
     <configuration name="Run notifier" type="CargoCommandRunConfiguration" factoryName="Cargo Command">
+      <option name="buildProfileId" value="dev" />
       <option name="command" value="run --package notifier --bin notifier" />
       <option name="workingDirectory" value="file://$PROJECT_DIR$" />
       <envs />
@@ -247,9 +253,9 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Cargo.Run web" />
         <item itemvalue="Cargo.Run worker" />
         <item itemvalue="Docker.docker-compose.yaml.rabbitmq: Compose Deployment" />
-        <item itemvalue="Cargo.Run web" />
         <item itemvalue="Cargo.Run worker" />
         <item itemvalue="Docker.docker-compose.yaml.rabbitmq: Compose Deployment" />
       </list>
@@ -343,7 +349,15 @@
       <option name="project" value="LOCAL" />
       <updated>1742898954621</updated>
     </task>
-    <option name="localTasksCounter" value="9" />
+    <task id="LOCAL-00009" summary="fix: improve notifier styling">
+      <option name="closed" value="true" />
+      <created>1743459615408</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1743459615408</updated>
+    </task>
+    <option name="localTasksCounter" value="10" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -370,7 +384,8 @@
     <MESSAGE value="show error code meaning for builds in tooltip and log" />
     <MESSAGE value="fix: better error handling in aur connector" />
     <MESSAGE value="improve error handling" />
-    <option name="LAST_COMMIT_MESSAGE" value="improve error handling" />
+    <MESSAGE value="fix: improve notifier styling" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix: improve notifier styling" />
   </component>
   <component name="XDebuggerManager">
     <watches-manager>

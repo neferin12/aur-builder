@@ -1,4 +1,4 @@
-use common::config::NotifierConfig;
+use common::config::{Configurable, NotifierConfig};
 use common::environment::{VERSION, load_dotenv};
 use common::errors::get_error_descriptions;
 use common::types::BuildResultTransmissionFormat;
@@ -88,12 +88,16 @@ async fn receive_delivery(
     let mut context = Context::new();
 
     context.insert("build_result", &build_result);
+    context.insert("maillogo", &config.maillogo);
     context.insert(
         "error_description",
         &get_error_descriptions(build_result.status_code),
     );
 
-    let mail_content = tera.render("build_notification.html", &context).unwrap();
+    let mail_content =
+        css_inline::inline(
+            tera.render("build_notification.html", &context).unwrap().as_str()
+        )?;
 
     let subject: String;
 

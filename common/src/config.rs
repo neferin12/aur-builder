@@ -2,6 +2,7 @@ use crate::types::{AurPackageSettings, GitPackageSettings};
 use config;
 use config::{Config, ConfigError};
 use serde::{Deserialize, Serialize};
+use serde::de::DeserializeOwned;
 
 fn get_unserialized_settings(file: Option<String>) -> Result<Config, ConfigError> {
     let mut settings_builder =
@@ -13,20 +14,22 @@ fn get_unserialized_settings(file: Option<String>) -> Result<Config, ConfigError
     Ok(settings)
 }
 
+pub trait Configurable: DeserializeOwned {
+    fn new(file: Option<String>) -> Result<Self, ConfigError> {
+        // The default trait method
+        let settings = get_unserialized_settings(file)?;
+        let settings_deserialized: Self = settings.try_deserialize()?;
+        Ok(settings_deserialized)
+    }
+}
+
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct ServerConfig {
     pub aur_packages: Vec<AurPackageSettings>,
     pub git_packages: Vec<GitPackageSettings>,
 }
 
-impl ServerConfig {
-    pub fn new(file: Option<String>) -> Result<ServerConfig, ConfigError> {
-        let settings_deserialized: ServerConfig =
-            get_unserialized_settings(file)?.try_deserialize()?;
-
-        Ok(settings_deserialized)
-    }
-}
+impl Configurable for ServerConfig {}
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct SmtpSettings {
@@ -40,13 +43,23 @@ pub struct SmtpSettings {
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct NotifierConfig {
     pub smtp: SmtpSettings,
+    pub maillogo: String,
 }
 
-impl NotifierConfig {
-    pub fn new(file: Option<String>) -> Result<NotifierConfig, ConfigError> {
-        let settings_deserialized: NotifierConfig =
-            get_unserialized_settings(file)?.try_deserialize()?;
+impl Configurable for NotifierConfig {}
 
-        Ok(settings_deserialized)
-    }
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct GiteaSettings {
+    pub repo: String,
+    pub user: String,
+    pub token: String,
 }
+
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct WorkerConfig {
+    pub builder:  Option<String>,
+    pub gitea: GiteaSettings,
+}
+
+impl Configurable for WorkerConfig {}

@@ -10,7 +10,7 @@ use lapin::BasicProperties;
 use log::{debug, error, info};
 use std::time::Duration;
 use tokio::time::sleep;
-use common::config::ServerConfig;
+use common::config::{Configurable, ServerConfig};
 
 use package_checkers::{*};
 
