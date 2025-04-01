@@ -42,8 +42,19 @@
         align-items: center;
         justify-content: center;
     }
+
+    #logo > h1 {
+        /*margin-left: 20px;*/
+    }
+
     #logo > img {
         margin-right: 20px;
+        max-width: 70px;
+        max-height: 70px;
+    }
+
+    img:after, img:before {
+        display: none;
     }
 </style>
 <body>
@@ -51,7 +62,8 @@
     <div id="content">
 
         <div id="logo">
-            <img width="70px" height="70px" src="{{maillogo}}" alt="Logo">
+            <img src="{{maillogo}}" alt="">
+<!--            <img src="https://aur-builder.build.pollinger.dev/assets/logo.png" alt="Logo">-->
             <h1>Aur Builder</h1>
         </div>
 

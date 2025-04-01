@@ -26,10 +26,9 @@
     </cargoProject>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="30df73c6-6061-4a44-ad67-d8c0fc6fb8e8" name="Changes" comment="ci: rename harbor image for builder container">
+    <list default="true" id="30df73c6-6061-4a44-ad67-d8c0fc6fb8e8" name="Changes" comment="fix: make sleep duration configurable">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/src/config.rs" beforeDir="false" afterPath="$PROJECT_DIR$/common/src/config.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/src/main.rs" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/notifier/src/templates/build_notification.html" beforeDir="false" afterPath="$PROJECT_DIR$/notifier/src/templates/build_notification.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -92,40 +91,40 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Cargo.Build `Run notifier`.executor": "Run",
-    "Cargo.Build `Run server`.executor": "Run",
-    "Cargo.Run notifier.executor": "Run",
-    "Cargo.Run server.executor": "Run",
-    "Cargo.Run web.executor": "Run",
-    "Cargo.Run worker.executor": "Run",
-    "Docker.docker-compose.yaml.rabbitmq: Compose Deployment.executor": "Run",
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "RunOnceActivity.rust.reset.selective.auto.import": "true",
-    "SHELLCHECK.PATH": "/home/julian/.local/share/JetBrains/RustRover2025.1/Shell Script/shellcheck",
-    "dart.analysis.tool.window.visible": "false",
-    "git-widget-placeholder": "main",
-    "last_opened_file_path": "/home/julian/projects/privat/aur-builder/web/src/assets",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "org.rust.cargo.project.model.PROJECT_DISCOVERY": "true",
-    "org.rust.cargo.project.model.impl.CargoExternalSystemProjectAware.subscribe.first.balloon": "",
-    "org.rust.first.attach.projects": "true",
-    "settings.editor.selected.configurable": "preferences.pluginManager",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Cargo.Build `Run notifier`.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Build `Run server`.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Run notifier.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Run server.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Run web.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Run worker.executor&quot;: &quot;Run&quot;,
+    &quot;Docker.docker-compose.yaml.rabbitmq: Compose Deployment.executor&quot;: &quot;Run&quot;,
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.rust.reset.selective.auto.import&quot;: &quot;true&quot;,
+    &quot;SHELLCHECK.PATH&quot;: &quot;/home/julian/.local/share/JetBrains/RustRover2025.1/Shell Script/shellcheck&quot;,
+    &quot;dart.analysis.tool.window.visible&quot;: &quot;false&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/home/julian/projects/privat/aur-builder/web/src/assets&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;org.rust.cargo.project.model.PROJECT_DISCOVERY&quot;: &quot;true&quot;,
+    &quot;org.rust.cargo.project.model.impl.CargoExternalSystemProjectAware.subscribe.first.balloon&quot;: &quot;&quot;,
+    &quot;org.rust.first.attach.projects&quot;: &quot;true&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   },
-  "keyToStringList": {
-    "DatabaseDriversLRU": [
-      "sqlite"
+  &quot;keyToStringList&quot;: {
+    &quot;DatabaseDriversLRU&quot;: [
+      &quot;sqlite&quot;
     ]
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/web/src/assets" />
@@ -286,6 +285,7 @@
       <workItem from="1743426891681" duration="11000" />
       <workItem from="1743426921945" duration="3840000" />
       <workItem from="1743430768332" duration="4798000" />
+      <workItem from="1743509501729" duration="677000" />
     </task>
     <task id="LOCAL-00001" summary="ci">
       <option name="closed" value="true" />
@@ -375,7 +375,15 @@
       <option name="project" value="LOCAL" />
       <updated>1743464197833</updated>
     </task>
-    <option name="localTasksCounter" value="12" />
+    <task id="LOCAL-00012" summary="fix: make sleep duration configurable">
+      <option name="closed" value="true" />
+      <created>1743464693861</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1743464693861</updated>
+    </task>
+    <option name="localTasksCounter" value="13" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -404,7 +412,8 @@
     <MESSAGE value="improve error handling" />
     <MESSAGE value="fix: improve notifier styling" />
     <MESSAGE value="ci: rename harbor image for builder container" />
-    <option name="LAST_COMMIT_MESSAGE" value="ci: rename harbor image for builder container" />
+    <MESSAGE value="fix: make sleep duration configurable" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix: make sleep duration configurable" />
   </component>
   <component name="XDebuggerManager">
     <watches-manager>
