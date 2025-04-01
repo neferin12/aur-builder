@@ -141,8 +141,8 @@ jobs:
           provenance: mode=max
           tags: ${{ steps.meta-server.outputs.tags }}
           labels: ${{ steps.meta-server.outputs.labels }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-from: type=registry,ref=harbor.pollinger.dev/build-cache/aur-builder
+          cache-to: mode=max,image-manifest=true,oci-mediatypes=true,type=registry,ref=harbor.pollinger.dev/build-cache/aur-builder
           target: server
 
       - name: Build and push web image
@@ -155,8 +155,8 @@ jobs:
           provenance: mode=max
           tags: ${{ steps.meta-web.outputs.tags }}
           labels: ${{ steps.meta-web.outputs.labels }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-from: type=registry,ref=harbor.pollinger.dev/build-cache/aur-builder
+          cache-to: mode=max,image-manifest=true,oci-mediatypes=true,type=registry,ref=harbor.pollinger.dev/build-cache/aur-builder
           target: web
 
       - name: Build and push worker image
@@ -169,8 +169,8 @@ jobs:
           provenance: mode=max
           tags: ${{ steps.meta-worker.outputs.tags }}
           labels: ${{ steps.meta-worker.outputs.labels }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-from: type=registry,ref=harbor.pollinger.dev/build-cache/aur-builder
+          cache-to: mode=max,image-manifest=true,oci-mediatypes=true,type=registry,ref=harbor.pollinger.dev/build-cache/aur-builder
           target: worker
 
       - name: Build and push notifier image
@@ -183,8 +183,8 @@ jobs:
           provenance: mode=max
           tags: ${{ steps.meta-notifier.outputs.tags }}
           labels: ${{ steps.meta-notifier.outputs.labels }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-from: type=registry,ref=harbor.pollinger.dev/build-cache/aur-builder
+          cache-to: mode=max,image-manifest=true,oci-mediatypes=true,type=registry,ref=harbor.pollinger.dev/build-cache/aur-builder
           target: notifier
 
           # Sign the resulting Docker image digest except on PRs.

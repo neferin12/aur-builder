@@ -26,9 +26,9 @@
     </cargoProject>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="30df73c6-6061-4a44-ad67-d8c0fc6fb8e8" name="Changes" comment="fix: mail template do not show image alt if it cannot be loaded">
+    <list default="true" id="30df73c6-6061-4a44-ad67-d8c0fc6fb8e8" name="Changes" comment="fix: improver error messages in log">
+      <change beforePath="$PROJECT_DIR$/.github/workflows/docker.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.github/workflows/docker.yml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build-container/build-package" beforeDir="false" afterPath="$PROJECT_DIR$/build-container/build-package" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -285,7 +285,7 @@
       <workItem from="1743426891681" duration="11000" />
       <workItem from="1743426921945" duration="3840000" />
       <workItem from="1743430768332" duration="4798000" />
-      <workItem from="1743509501729" duration="880000" />
+      <workItem from="1743509501729" duration="1697000" />
     </task>
     <task id="LOCAL-00001" summary="ci">
       <option name="closed" value="true" />
@@ -391,7 +391,15 @@
       <option name="project" value="LOCAL" />
       <updated>1743510199058</updated>
     </task>
-    <option name="localTasksCounter" value="14" />
+    <task id="LOCAL-00014" summary="fix: improver error messages in log">
+      <option name="closed" value="true" />
+      <created>1743510521798</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1743510521798</updated>
+    </task>
+    <option name="localTasksCounter" value="15" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -422,7 +430,8 @@
     <MESSAGE value="ci: rename harbor image for builder container" />
     <MESSAGE value="fix: make sleep duration configurable" />
     <MESSAGE value="fix: mail template do not show image alt if it cannot be loaded" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix: mail template do not show image alt if it cannot be loaded" />
+    <MESSAGE value="fix: improver error messages in log" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix: improver error messages in log" />
   </component>
   <component name="XDebuggerManager">
     <watches-manager>
