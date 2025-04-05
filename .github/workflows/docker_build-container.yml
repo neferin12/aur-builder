@@ -47,6 +47,7 @@ jobs:
         if: github.event_name != 'pull_request'
         uses: sigstore/cosign-installer@v3
       - name: Check cosign install
+        if: github.event_name != 'pull_request'
         run: cosign version
 
       # Set up BuildKit Docker container builder to be able to build
