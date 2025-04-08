@@ -6,7 +6,7 @@ edition = "2024"
 [dependencies]
 common = { path = "../common" }
 lettre = { version = "~0.11", features = ["default", "tokio1-native-tls"]}
-tokio = "1.44.0"
+tokio = "1.44.2"
 simple_logger = "~5.0.0"
 log = "~0.4.26"
 lapin = { version = "~2.5.0", features = ["native-tls"]}
