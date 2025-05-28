@@ -27,7 +27,14 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="30df73c6-6061-4a44-ad67-d8c0fc6fb8e8" name="Changes" comment="ci: log in to push build cache on pull request">
-      <change beforePath="$PROJECT_DIR$/docker-compose.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Cargo.lock" beforeDir="false" afterPath="$PROJECT_DIR$/Cargo.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/Cargo.toml" beforeDir="false" afterPath="$PROJECT_DIR$/common/Cargo.toml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/database/Cargo.toml" beforeDir="false" afterPath="$PROJECT_DIR$/database/Cargo.toml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/Cargo.toml" beforeDir="false" afterPath="$PROJECT_DIR$/server/Cargo.toml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/package_checkers/git.rs" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/package_checkers/git.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/Cargo.toml" beforeDir="false" afterPath="$PROJECT_DIR$/web/Cargo.toml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/worker/Cargo.toml" beforeDir="false" afterPath="$PROJECT_DIR$/worker/Cargo.toml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -290,7 +297,7 @@
       <workItem from="1744044214136" duration="1001000" />
       <workItem from="1744114156859" duration="15000" />
       <workItem from="1745844620158" duration="91000" />
-      <workItem from="1748426050407" duration="676000" />
+      <workItem from="1748426050407" duration="1775000" />
     </task>
     <task id="LOCAL-00001" summary="ci">
       <option name="closed" value="true" />
@@ -463,7 +470,9 @@
     <MESSAGE value="ci: caching" />
     <MESSAGE value="ci: do not check cosign on pull request" />
     <MESSAGE value="ci: log in to push build cache on pull request" />
-    <option name="LAST_COMMIT_MESSAGE" value="ci: log in to push build cache on pull request" />
+    <MESSAGE value="build: add bind to compose for server tmp" />
+    <MESSAGE value="build: add bind to compose for server tmp" />
+    <option name="LAST_COMMIT_MESSAGE" value="build: add bind to compose for server tmp" />
   </component>
   <component name="XDebuggerManager">
     <watches-manager>

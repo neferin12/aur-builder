@@ -1,12 +1,10 @@
 use std::error::Error;
 use common::types::{GitPackageSettings, PackageSearchResult};
 use git2::Repository;
-use std::path::PathBuf;
 use srcinfo::Srcinfo;
-use tempdir::TempDir;
 
 pub async fn get_git_data(pkg: &GitPackageSettings) -> Result<PackageSearchResult, Box<dyn Error>> {
-    let temp_dir = TempDir::new("aur-builder-git-tmp")?;
+    let temp_dir = tempfile::tempdir()?;
     let mut dir = temp_dir.as_ref().canonicalize()?;
     let repo = Repository::clone(pkg.source.as_str(), &dir)?;
     if let Some(subfolder) = &pkg.subfolder {
