@@ -26,8 +26,10 @@
     </cargoProject>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="30df73c6-6061-4a44-ad67-d8c0fc6fb8e8" name="Changes" comment="ci: do not check cosign on pull request">
-      <change beforePath="$PROJECT_DIR$/.github/workflows/docker.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.github/workflows/docker.yml" afterDir="false" />
+    <list default="true" id="30df73c6-6061-4a44-ad67-d8c0fc6fb8e8" name="Changes" comment="ci: log in to push build cache on pull request">
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources.local.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources.local.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/package_checkers/git.rs" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/package_checkers/git.rs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -142,7 +144,7 @@
   <component name="RsExternalLinterProjectSettings">
     <option name="runOnTheFly" value="true" />
   </component>
-  <component name="RunManager" selected="Cargo.Run web">
+  <component name="RunManager" selected="Docker.docker-compose.yaml.rabbitmq: Compose Deployment">
     <configuration name="Run notifier" type="CargoCommandRunConfiguration" factoryName="Cargo Command">
       <option name="buildProfileId" value="dev" />
       <option name="command" value="run --package notifier --bin notifier" />
@@ -253,9 +255,9 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Docker.docker-compose.yaml.rabbitmq: Compose Deployment" />
         <item itemvalue="Cargo.Run web" />
         <item itemvalue="Cargo.Run worker" />
-        <item itemvalue="Docker.docker-compose.yaml.rabbitmq: Compose Deployment" />
         <item itemvalue="Cargo.Run worker" />
         <item itemvalue="Docker.docker-compose.yaml.rabbitmq: Compose Deployment" />
       </list>
@@ -286,7 +288,10 @@
       <workItem from="1743430768332" duration="4798000" />
       <workItem from="1743509501729" duration="2591000" />
       <workItem from="1743512145103" duration="554000" />
-      <workItem from="1744044214136" duration="691000" />
+      <workItem from="1744044214136" duration="1001000" />
+      <workItem from="1744114156859" duration="15000" />
+      <workItem from="1745844620158" duration="91000" />
+      <workItem from="1748426050407" duration="471000" />
     </task>
     <task id="LOCAL-00001" summary="ci">
       <option name="closed" value="true" />
@@ -416,7 +421,15 @@
       <option name="project" value="LOCAL" />
       <updated>1744044247448</updated>
     </task>
-    <option name="localTasksCounter" value="17" />
+    <task id="LOCAL-00017" summary="ci: log in to push build cache on pull request">
+      <option name="closed" value="true" />
+      <created>1744048680641</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1744048680641</updated>
+    </task>
+    <option name="localTasksCounter" value="18" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -450,7 +463,8 @@
     <MESSAGE value="fix: improver error messages in log" />
     <MESSAGE value="ci: caching" />
     <MESSAGE value="ci: do not check cosign on pull request" />
-    <option name="LAST_COMMIT_MESSAGE" value="ci: do not check cosign on pull request" />
+    <MESSAGE value="ci: log in to push build cache on pull request" />
+    <option name="LAST_COMMIT_MESSAGE" value="ci: log in to push build cache on pull request" />
   </component>
   <component name="XDebuggerManager">
     <watches-manager>

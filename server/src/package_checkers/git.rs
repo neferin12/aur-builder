@@ -7,7 +7,7 @@ use tempdir::TempDir;
 
 pub async fn get_git_data(pkg: &GitPackageSettings) -> Result<PackageSearchResult, Box<dyn Error>> {
     let temp_dir = TempDir::new("aur-builder-git-tmp")?;
-    let mut dir: PathBuf = temp_dir.into_path();
+    let mut dir = temp_dir.as_ref().canonicalize()?;
     let repo = Repository::clone(pkg.source.as_str(), &dir)?;
     if let Some(subfolder) = &pkg.subfolder {
         dir = dir.join(subfolder);
@@ -18,6 +18,7 @@ pub async fn get_git_data(pkg: &GitPackageSettings) -> Result<PackageSearchResul
 
     // Time since Unix epoch (seconds)
     let epoch_seconds = time.seconds();
+    temp_dir.close()?;
     Ok(PackageSearchResult {
         name: srcinfo.base.pkgbase,
         version: srcinfo.base.pkgver,
