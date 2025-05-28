@@ -25,6 +25,7 @@ services:
     volumes:
       - ./db:/app/db
       - ./config.yaml:/config.yaml
+      - ./server_tmp:/tmp
     depends_on:
       - rabbitmq
     restart: always
