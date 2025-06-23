@@ -28,6 +28,7 @@ fn get_image_name() -> String {
 }
 
 pub async fn pull_docker_image() -> Result<(), Box<dyn std::error::Error>> {
+    info!("Pulling docker image...");
     let docker = Docker::connect_with_local_defaults()?;
     let image = get_image_name();
     let options = Some(CreateImageOptions {
@@ -42,6 +43,7 @@ pub async fn pull_docker_image() -> Result<(), Box<dyn std::error::Error>> {
         })
         .await?;
 
+    info!("Image pulled successfully!");
     Ok(())
 }
 
@@ -86,6 +88,10 @@ pub async fn build(
     source_url: String,
     subfolder: &Option<String>,
 ) -> Result<BuildResultTransmissionFormat, Box<dyn std::error::Error>> {
+    match pull_docker_image().await {
+        Err(_) => warn!("Builder image could not be pulled"),
+        _ => {}
+    }
     info!("Building package {}", task.name);
     let config = WorkerConfig::new(env::var("AB_CONFIG_PATH").ok()).unwrap();
     let build_start_time = Utc::now().naive_utc();

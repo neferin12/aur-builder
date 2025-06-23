@@ -26,7 +26,12 @@
     </cargoProject>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="30df73c6-6061-4a44-ad67-d8c0fc6fb8e8" name="Changes" comment="ci: log in to push build cache on pull request" />
+    <list default="true" id="30df73c6-6061-4a44-ad67-d8c0fc6fb8e8" name="Changes" comment="ci: log in to push build cache on pull request">
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources.local.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources.local.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/worker/src/build/docker.rs" beforeDir="false" afterPath="$PROJECT_DIR$/worker/src/build/docker.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/worker/src/main.rs" beforeDir="false" afterPath="$PROJECT_DIR$/worker/src/main.rs" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -289,6 +294,8 @@
       <workItem from="1744114156859" duration="15000" />
       <workItem from="1745844620158" duration="91000" />
       <workItem from="1748426050407" duration="3930000" />
+      <workItem from="1749475709469" duration="296000" />
+      <workItem from="1750695442889" duration="288000" />
     </task>
     <task id="LOCAL-00001" summary="ci">
       <option name="closed" value="true" />

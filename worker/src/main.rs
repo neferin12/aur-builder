@@ -1,5 +1,6 @@
 mod build;
 
+use std::error::Error;
 use crate::build::build_package;
 use crate::build::docker::pull_docker_image;
 use common::environment::{load_dotenv, VERSION};
@@ -20,11 +21,10 @@ async fn main() {
     simple_logger::init_with_env().unwrap();
 
     info!("Starting Aur-Builder Worker v{VERSION}");
-
-    info!("Pulling docker image...");
+    
     match pull_docker_image().await {
-        Ok(_) => info!("Image pulled successfully!"),
         Err(_) => warn!("Builder image could not be pulled"),
+        _ => {}
     }
 
     let conn = connect_to_rabbitmq().await;
