@@ -887,7 +887,7 @@ dependencies = [
 
 [[package]]
 name = "common"
-version = "1.1.8"
+version = "1.1.9"
 dependencies = [
  "config",
  "dotenvy",
@@ -1145,7 +1145,7 @@ checksum = "2a2330da5de22e8a3cb63252ce2abb30116bf5265e89c0e01bc17015ce30a476"
 
 [[package]]
 name = "database"
-version = "1.1.8"
+version = "1.1.9"
 dependencies = [
  "common",
  "log",
@@ -2586,7 +2586,7 @@ dependencies = [
 
 [[package]]
 name = "notifier"
-version = "1.1.8"
+version = "1.1.9"
 dependencies = [
  "common",
  "css-inline",
@@ -4131,7 +4131,7 @@ dependencies = [
 
 [[package]]
 name = "server"
-version = "1.1.8"
+version = "1.1.9"
 dependencies = [
  "common",
  "database",
@@ -5327,7 +5327,7 @@ dependencies = [
 
 [[package]]
 name = "web"
-version = "1.1.8"
+version = "1.1.9"
 dependencies = [
  "axum",
  "cached",
@@ -5722,7 +5722,7 @@ dependencies = [
 
 [[package]]
 name = "worker"
-version = "1.1.8"
+version = "1.1.9"
 dependencies = [
  "bollard",
  "bytes",
