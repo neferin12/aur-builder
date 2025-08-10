@@ -27,10 +27,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="30df73c6-6061-4a44-ad67-d8c0fc6fb8e8" name="Changes" comment="ci: log in to push build cache on pull request">
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources.local.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources.local.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/worker/src/build/docker.rs" beforeDir="false" afterPath="$PROJECT_DIR$/worker/src/build/docker.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/worker/src/main.rs" beforeDir="false" afterPath="$PROJECT_DIR$/worker/src/main.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build-container/install-dependencies" beforeDir="false" afterPath="$PROJECT_DIR$/build-container/install-dependencies" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -255,6 +253,14 @@
       </deployment>
       <method v="2" />
     </configuration>
+    <list>
+      <item itemvalue="Cargo.Run notifier" />
+      <item itemvalue="Cargo.Run server" />
+      <item itemvalue="Cargo.Test aur-builder" />
+      <item itemvalue="Cargo.Run web" />
+      <item itemvalue="Cargo.Run worker" />
+      <item itemvalue="Docker.docker-compose.yaml.rabbitmq: Compose Deployment" />
+    </list>
     <recent_temporary>
       <list>
         <item itemvalue="Docker.docker-compose.yaml.rabbitmq: Compose Deployment" />
