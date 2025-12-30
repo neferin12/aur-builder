@@ -14,6 +14,7 @@ use futures_util::{StreamExt, TryStreamExt};
 use sea_orm::sqlx::types::chrono::Utc;
 use std::env;
 
+const IMAGE: &str = "ghcr.io/neferin12/aur-builder-build-container";
 const VERSION: &str = env!("CARGO_PKG_VERSION");
 
 fn get_image_name() -> String {
@@ -22,8 +23,10 @@ fn get_image_name() -> String {
         "{}:{}",
         config
             .builder
-            .unwrap_or("ghcr.io/neferin12/aur-builder-build-container".to_string()),
-        VERSION
+            .unwrap_or(IMAGE.to_string()),
+        config
+            .builder_tag
+            .unwrap_or(VERSION.to_string())
     )
 }
 

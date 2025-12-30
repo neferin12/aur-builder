@@ -60,6 +60,7 @@ pub struct GiteaSettings {
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct WorkerConfig {
     pub builder:  Option<String>,
+    pub builder_tag: Option<String>,
     pub gitea: GiteaSettings,
 }
 
