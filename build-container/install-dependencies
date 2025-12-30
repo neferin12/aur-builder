@@ -18,6 +18,6 @@ do
     then
         DEP=$(echo "$value" | cut -d ' ' -f2 | cut -d '>' -f1)
         echo "installing $DEP..."
-        yay --mflags "--nocheck" --noconfirm --removemake -S "$DEP" || exit 104
+        yay --mflags "--nocheck" --noconfirm --removemake --needed -S "$DEP" || exit 104
     fi
 done 9< "SINFO"

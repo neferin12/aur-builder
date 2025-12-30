@@ -6,27 +6,36 @@
   <component name="CargoProjects">
     <cargoProject FILE="$PROJECT_DIR$/Cargo.toml">
       <package file="$PROJECT_DIR$/common">
-        <enabledFeature name="default" />
+        <feature name="default" enabled="true" />
       </package>
       <package file="$PROJECT_DIR$/database">
-        <enabledFeature name="default" />
+        <feature name="default" enabled="true" />
       </package>
       <package file="$PROJECT_DIR$/notifier">
-        <enabledFeature name="default" />
+        <feature name="default" enabled="true" />
       </package>
       <package file="$PROJECT_DIR$/server">
-        <enabledFeature name="default" />
+        <feature name="default" enabled="true" />
       </package>
       <package file="$PROJECT_DIR$/web">
-        <enabledFeature name="default" />
+        <feature name="default" enabled="true" />
       </package>
       <package file="$PROJECT_DIR$/worker">
-        <enabledFeature name="default" />
+        <feature name="default" enabled="true" />
       </package>
     </cargoProject>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="30df73c6-6061-4a44-ad67-d8c0fc6fb8e8" name="Changes" comment="ci: log in to push build cache on pull request">
+    <list default="true" id="30df73c6-6061-4a44-ad67-d8c0fc6fb8e8" name="Changes" comment="fix: add `--needed` flag to dependency installation in build container">
+      <change afterPath="$PROJECT_DIR$/.idea/copilot.data.migration.agent.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/copilot.data.migration.ask.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/copilot.data.migration.ask2agent.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/copilot.data.migration.edit.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_30_12_25,_21_55_[Changes]/shelved.patch" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_30_12_25__21_55__Changes_.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources.local.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources.local.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources/e62f5c6a-c691-4db2-a144-46c587c2ac23.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/e62f5c6a-c691-4db2-a144-46c587c2ac23.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/build-container/install-dependencies" beforeDir="false" afterPath="$PROJECT_DIR$/build-container/install-dependencies" afterDir="false" />
     </list>
@@ -34,6 +43,9 @@
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="EmbeddingIndexingInfo">
+    <option name="cachedIndexableFilesCount" value="86" />
   </component>
   <component name="ExecutionTargetManager" SELECTED_TARGET="RsBuildProfile:dev" />
   <component name="FileTemplateManagerImpl">
@@ -82,6 +94,10 @@
   <component name="MacroExpansionManager">
     <option name="directoryName" value="wbmbS0Ju" />
   </component>
+  <component name="McpProjectServerCommands">
+    <commands />
+    <urls />
+  </component>
   <component name="ProjectColorInfo">{
   &quot;customColor&quot;: &quot;&quot;,
   &quot;associatedIndex&quot;: 5
@@ -91,41 +107,47 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;Cargo.Build `Run notifier`.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Build `Run server`.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Run notifier.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Run server.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Run web.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Run worker.executor&quot;: &quot;Run&quot;,
-    &quot;Docker.docker-compose.yaml.rabbitmq: Compose Deployment.executor&quot;: &quot;Run&quot;,
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.rust.reset.selective.auto.import&quot;: &quot;true&quot;,
-    &quot;SHELLCHECK.PATH&quot;: &quot;/home/julian/.local/share/JetBrains/RustRover2025.1/Shell Script/shellcheck&quot;,
-    &quot;dart.analysis.tool.window.visible&quot;: &quot;false&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/home/julian/projects/privat/aur-builder/web/src/assets&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;org.rust.cargo.project.model.PROJECT_DISCOVERY&quot;: &quot;true&quot;,
-    &quot;org.rust.cargo.project.model.impl.CargoExternalSystemProjectAware.subscribe.first.balloon&quot;: &quot;&quot;,
-    &quot;org.rust.first.attach.projects&quot;: &quot;true&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Cargo.Build `Run notifier`.executor": "Run",
+    "Cargo.Build `Run server`.executor": "Run",
+    "Cargo.Run notifier.executor": "Run",
+    "Cargo.Run server.executor": "Run",
+    "Cargo.Run web.executor": "Run",
+    "Cargo.Run worker.executor": "Run",
+    "Docker.docker-compose.yaml.rabbitmq: Compose Deployment.executor": "Run",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.MCP Project settings loaded": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.rust.reset.selective.auto.import": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "SHELLCHECK.PATH": "/home/julian/.local/share/JetBrains/RustRover2025.1/Shell Script/shellcheck",
+    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
+    "dart.analysis.tool.window.visible": "false",
+    "git-widget-placeholder": "main",
+    "junie.onboarding.icon.badge.shown": "true",
+    "last_opened_file_path": "/home/julian/projects/privat/aur-builder",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "org.rust.cargo.project.model.PROJECT_DISCOVERY": "true",
+    "org.rust.cargo.project.model.impl.CargoExternalSystemProjectAware.subscribe.first.balloon": "",
+    "org.rust.first.attach.projects": "true",
+    "settings.editor.selected.configurable": "io.commitlint.settings.SettingsConfiguration",
+    "to.speed.mode.migration.done": "true",
+    "vue.rearranger.settings.migration": "true"
   },
-  &quot;keyToStringList&quot;: {
-    &quot;DatabaseDriversLRU&quot;: [
-      &quot;sqlite&quot;
+  "keyToStringList": {
+    "DatabaseDriversLRU": [
+      "sqlite"
     ]
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/web/src/assets" />
@@ -253,14 +275,6 @@
       </deployment>
       <method v="2" />
     </configuration>
-    <list>
-      <item itemvalue="Cargo.Run notifier" />
-      <item itemvalue="Cargo.Run server" />
-      <item itemvalue="Cargo.Test aur-builder" />
-      <item itemvalue="Cargo.Run web" />
-      <item itemvalue="Cargo.Run worker" />
-      <item itemvalue="Docker.docker-compose.yaml.rabbitmq: Compose Deployment" />
-    </list>
     <recent_temporary>
       <list>
         <item itemvalue="Docker.docker-compose.yaml.rabbitmq: Compose Deployment" />
@@ -473,10 +487,11 @@
     <MESSAGE value="fix: improver error messages in log" />
     <MESSAGE value="ci: caching" />
     <MESSAGE value="ci: do not check cosign on pull request" />
+    <MESSAGE value="build: add bind to compose for server tmp" />
+    <MESSAGE value="build: add bind to compose for server tmp" />
     <MESSAGE value="ci: log in to push build cache on pull request" />
-    <MESSAGE value="build: add bind to compose for server tmp" />
-    <MESSAGE value="build: add bind to compose for server tmp" />
-    <option name="LAST_COMMIT_MESSAGE" value="build: add bind to compose for server tmp" />
+    <MESSAGE value="fix: add `--needed` flag to dependency installation in build container" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix: add `--needed` flag to dependency installation in build container" />
   </component>
   <component name="XDebuggerManager">
     <watches-manager>
@@ -484,5 +499,13 @@
         <watch expression="dir" />
       </configuration>
     </watches-manager>
+  </component>
+  <component name="github-copilot-workspace">
+    <instructionFileLocations>
+      <option value=".github/instructions" />
+    </instructionFileLocations>
+    <promptFileLocations>
+      <option value=".github/prompts" />
+    </promptFileLocations>
   </component>
 </project>
