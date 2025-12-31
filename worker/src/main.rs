@@ -1,6 +1,5 @@
 mod build;
 
-use std::error::Error;
 use crate::build::build_package;
 use crate::build::docker::pull_docker_image;
 use common::environment::{load_dotenv, VERSION};
