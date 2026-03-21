@@ -49,3 +49,39 @@ pub async fn connect_to_rabbitmq() -> Connection {
 pub fn get_rand_string() -> String {
     rand::rng().next_u32().to_string()
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_get_rand_string_is_not_empty() {
+        let result = get_rand_string();
+        assert!(!result.is_empty());
+    }
+
+    #[test]
+    fn test_get_rand_string_is_parseable_as_u32() {
+        let result = get_rand_string();
+        assert!(result.parse::<u32>().is_ok(), "Expected a numeric string, got: {result}");
+    }
+
+    #[test]
+    fn test_get_rand_string_produces_valid_strings_repeatedly() {
+        for _ in 0..10 {
+            let s = get_rand_string();
+            assert!(!s.is_empty());
+            assert!(s.parse::<u32>().is_ok());
+        }
+    }
+
+    #[test]
+    fn test_connection_retry_number_constant() {
+        assert_eq!(CONNECTION_RETRY_NUMBER, 10);
+    }
+
+    #[test]
+    fn test_retry_timeout_constant() {
+        assert_eq!(RETRY_TIMEOUT, 10);
+    }
+}

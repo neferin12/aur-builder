@@ -225,3 +225,74 @@ pub async fn build(
 
     Err("Unexpected end of wait stream".into())
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use bytes::Bytes;
+
+    #[test]
+    fn test_log_message_to_string_stdout() {
+        let bytes = Bytes::from("hello world\n");
+        let result = log_message_to_string("stdout", bytes);
+        assert_eq!(result, "stdout: hello world\n");
+    }
+
+    #[test]
+    fn test_log_message_to_string_stderr() {
+        let bytes = Bytes::from("error occurred\n");
+        let result = log_message_to_string("stderr", bytes);
+        assert_eq!(result, "stderr: error occurred\n");
+    }
+
+    #[test]
+    fn test_log_message_to_string_empty_message() {
+        let bytes = Bytes::from("");
+        let result = log_message_to_string("stdout", bytes);
+        assert_eq!(result, "stdout: ");
+    }
+
+    #[test]
+    fn test_log_message_to_string_multiline() {
+        let bytes = Bytes::from("line1\nline2\n");
+        let result = log_message_to_string("stdout", bytes);
+        assert_eq!(result, "stdout: line1\nline2\n");
+    }
+
+    #[test]
+    fn test_get_image_name_uses_defaults_when_config_has_no_builder() {
+        use std::io::Write;
+        // Use a config file without builder/builder_tag to test defaults
+        let mut file = tempfile::Builder::new().suffix(".yaml").tempfile().unwrap();
+        write!(
+            file,
+            "gitea:\n  repo: test-repo\n  user: test-user\n  token: test-token\n"
+        )
+        .unwrap();
+        unsafe { std::env::set_var("AB_CONFIG_PATH", file.path().to_str().unwrap()) };
+
+        let name = get_image_name();
+        // Should be in format "image:tag"
+        assert!(name.contains(':'), "Expected 'image:tag' format, got: {name}");
+        assert!(name.starts_with(IMAGE), "Expected image name to start with default image: {name}");
+
+        unsafe { std::env::remove_var("AB_CONFIG_PATH") };
+    }
+
+    #[test]
+    fn test_get_image_name_uses_custom_builder_from_config() {
+        use std::io::Write;
+        let mut file = tempfile::Builder::new().suffix(".yaml").tempfile().unwrap();
+        write!(
+            file,
+            "gitea:\n  repo: r\n  user: u\n  token: t\nbuilder: custom.registry.io/my-builder\nbuilder_tag: v2.0.0\n"
+        )
+        .unwrap();
+        unsafe { std::env::set_var("AB_CONFIG_PATH", file.path().to_str().unwrap()) };
+
+        let name = get_image_name();
+        assert_eq!(name, "custom.registry.io/my-builder:v2.0.0");
+
+        unsafe { std::env::remove_var("AB_CONFIG_PATH") };
+    }
+}

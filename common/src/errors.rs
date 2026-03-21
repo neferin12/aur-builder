@@ -68,3 +68,123 @@ impl Display for AurRequestError {
 }
 
 impl Error for AurRequestError {}
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_missing_field_error_display() {
+        let error = MissingFieldError::new("results".to_string());
+        assert_eq!(error.to_string(), "Field 'results' is missing");
+    }
+
+    #[test]
+    fn test_missing_field_error_display_custom_field() {
+        let error = MissingFieldError::new("my_custom_field".to_string());
+        assert_eq!(error.to_string(), "Field 'my_custom_field' is missing");
+    }
+
+    #[test]
+    fn test_aur_request_error_display() {
+        let error = AurRequestError::new("some-package".to_string(), 404);
+        assert_eq!(
+            error.to_string(),
+            "Aur request for 'some-package' failed with code 404"
+        );
+    }
+
+    #[test]
+    fn test_aur_request_error_display_server_error() {
+        let error = AurRequestError::new("another-pkg".to_string(), 500);
+        assert_eq!(
+            error.to_string(),
+            "Aur request for 'another-pkg' failed with code 500"
+        );
+    }
+
+    #[test]
+    fn test_get_error_descriptions_success() {
+        assert_eq!(get_error_descriptions(0), "Success");
+    }
+
+    #[test]
+    fn test_get_error_descriptions_unable_to_change_dir() {
+        assert_eq!(get_error_descriptions(100), "Unable to change dir");
+    }
+
+    #[test]
+    fn test_get_error_descriptions_env_missing() {
+        assert_eq!(get_error_descriptions(101), "Environment Variable missing");
+    }
+
+    #[test]
+    fn test_get_error_descriptions_git_clone_failed() {
+        assert_eq!(get_error_descriptions(102), "Git clone failed");
+    }
+
+    #[test]
+    fn test_get_error_descriptions_yay_failed() {
+        assert_eq!(get_error_descriptions(103), "Failed to run `yay -Syu`");
+    }
+
+    #[test]
+    fn test_get_error_descriptions_dependency_install_failed() {
+        assert_eq!(get_error_descriptions(104), "Failed to install dependency");
+    }
+
+    #[test]
+    fn test_get_error_descriptions_build_failed() {
+        assert_eq!(get_error_descriptions(105), "Failed to build package");
+    }
+
+    #[test]
+    fn test_get_error_descriptions_copy_failed() {
+        assert_eq!(get_error_descriptions(106), "Failed to copy result files");
+    }
+
+    #[test]
+    fn test_get_error_descriptions_upload_failed() {
+        assert_eq!(get_error_descriptions(107), "Failed to upload pkg file");
+    }
+
+    #[test]
+    fn test_get_error_descriptions_unknown_code() {
+        assert_eq!(get_error_descriptions(999), "Unknown error");
+    }
+
+    #[test]
+    fn test_get_error_descriptions_negative_code() {
+        assert_eq!(get_error_descriptions(-1), "Unknown error");
+    }
+
+    #[test]
+    fn test_error_codes_map_contains_all_defined_codes() {
+        assert!(ERROR_CODES.contains_key(&0));
+        assert!(ERROR_CODES.contains_key(&100));
+        assert!(ERROR_CODES.contains_key(&101));
+        assert!(ERROR_CODES.contains_key(&102));
+        assert!(ERROR_CODES.contains_key(&103));
+        assert!(ERROR_CODES.contains_key(&104));
+        assert!(ERROR_CODES.contains_key(&105));
+        assert!(ERROR_CODES.contains_key(&106));
+        assert!(ERROR_CODES.contains_key(&107));
+    }
+
+    #[test]
+    fn test_error_codes_map_does_not_contain_undefined_codes() {
+        assert!(!ERROR_CODES.contains_key(&999));
+        assert!(!ERROR_CODES.contains_key(&-5));
+    }
+
+    #[test]
+    fn test_missing_field_error_is_error() {
+        let error = MissingFieldError::new("field".to_string());
+        let _: &dyn Error = &error;
+    }
+
+    #[test]
+    fn test_aur_request_error_is_error() {
+        let error = AurRequestError::new("pkg".to_string(), 400);
+        let _: &dyn Error = &error;
+    }
+}
