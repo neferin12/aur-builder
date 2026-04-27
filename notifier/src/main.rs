@@ -121,3 +121,128 @@ async fn receive_delivery(
 
     Ok(())
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use common::types::{BuildResultTransmissionFormat, BuildTaskTransmissionFormat, Timestamps};
+    use chrono::NaiveDateTime;
+
+    fn make_tera() -> Tera {
+        let manifest_dir = env!("CARGO_MANIFEST_DIR");
+        let pattern = format!("{manifest_dir}/src/templates/**/*.html");
+        Tera::new(&pattern).unwrap()
+    }
+
+    fn make_build_result(name: &str, version: &str, success: bool, status_code: i64) -> BuildResultTransmissionFormat {
+        let start = NaiveDateTime::parse_from_str("2024-06-01 10:00:00", "%Y-%m-%d %H:%M:%S").unwrap();
+        let end = NaiveDateTime::parse_from_str("2024-06-01 10:05:00", "%Y-%m-%d %H:%M:%S").unwrap();
+        BuildResultTransmissionFormat {
+            task: BuildTaskTransmissionFormat {
+                id: 1,
+                name: name.to_string(),
+                version: version.to_string(),
+                source: None,
+                subfolder: None,
+                options: None,
+                env: None,
+            },
+            status_code,
+            log_lines: vec!["stdout: some output".to_string()],
+            success,
+            timestamps: Timestamps { start, end },
+        }
+    }
+
+    #[test]
+    fn test_template_renders_success_notification() {
+        let tera = make_tera();
+        let build_result = make_build_result("my-package", "1.2.3", true, 0);
+        let mut context = Context::new();
+        context.insert("build_result", &build_result);
+        context.insert("maillogo", "https://example.com/logo.png");
+        context.insert("error_description", &get_error_descriptions(0));
+
+        let rendered = tera.render("build_notification.html", &context).unwrap();
+        assert!(rendered.contains("my-package"));
+        assert!(rendered.contains("1.2.3"));
+        assert!(rendered.contains("Updated my-package!"));
+    }
+
+    #[test]
+    fn test_template_renders_failure_notification() {
+        let tera = make_tera();
+        let build_result = make_build_result("failing-pkg", "2.0.0", false, 105);
+        let mut context = Context::new();
+        context.insert("build_result", &build_result);
+        context.insert("maillogo", "https://example.com/logo.png");
+        context.insert("error_description", &get_error_descriptions(105));
+
+        let rendered = tera.render("build_notification.html", &context).unwrap();
+        assert!(rendered.contains("failing-pkg"));
+        assert!(rendered.contains("Failed to update failing-pkg!"));
+        assert!(rendered.contains("105"));
+        assert!(rendered.contains("Failed to build package"));
+    }
+
+    #[test]
+    fn test_template_renders_maillogo() {
+        let tera = make_tera();
+        let build_result = make_build_result("logo-pkg", "1.0.0", true, 0);
+        let mut context = Context::new();
+        context.insert("build_result", &build_result);
+        context.insert("maillogo", "https://example.com/custom-logo.png");
+        context.insert("error_description", &get_error_descriptions(0));
+
+        let rendered = tera.render("build_notification.html", &context).unwrap();
+        // Tera HTML-escapes '/' as '&#x2F;', so check for the logo filename
+        assert!(
+            rendered.contains("custom-logo.png"),
+            "Expected maillogo reference in rendered output"
+        );
+    }
+
+    #[test]
+    fn test_success_subject_format() {
+        let build_result = make_build_result("test-pkg", "3.0.0", true, 0);
+        let subject = if build_result.success {
+            format!("Updated {}", build_result.task.name)
+        } else {
+            format!("Failed to update {}", build_result.task.name)
+        };
+        assert_eq!(subject, "Updated test-pkg");
+    }
+
+    #[test]
+    fn test_failure_subject_format() {
+        let build_result = make_build_result("broken-pkg", "1.0.0", false, 105);
+        let subject = if build_result.success {
+            format!("Updated {}", build_result.task.name)
+        } else {
+            format!("Failed to update {}", build_result.task.name)
+        };
+        assert_eq!(subject, "Failed to update broken-pkg");
+    }
+
+    #[test]
+    fn test_error_description_used_in_context() {
+        let desc = get_error_descriptions(102);
+        assert_eq!(desc, "Git clone failed");
+    }
+
+    #[test]
+    fn test_css_inlining_produces_valid_html() {
+        let tera = make_tera();
+        let build_result = make_build_result("css-pkg", "1.0.0", true, 0);
+        let mut context = Context::new();
+        context.insert("build_result", &build_result);
+        context.insert("maillogo", "");
+        context.insert("error_description", &get_error_descriptions(0));
+
+        let rendered = tera.render("build_notification.html", &context).unwrap();
+        let inlined = css_inline::inline(&rendered).unwrap();
+        // After inlining, the HTML should still be valid
+        assert!(inlined.contains("<!DOCTYPE html>") || inlined.contains("<html"));
+        assert!(inlined.contains("css-pkg"));
+    }
+}
