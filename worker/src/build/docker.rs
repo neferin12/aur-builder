@@ -21,12 +21,8 @@ fn get_image_name() -> String {
     let config = WorkerConfig::new(env::var("AB_CONFIG_PATH").ok()).unwrap();
     format!(
         "{}:{}",
-        config
-            .builder
-            .unwrap_or(IMAGE.to_string()),
-        config
-            .builder_tag
-            .unwrap_or(VERSION.to_string())
+        config.builder.unwrap_or(IMAGE.to_string()),
+        config.builder_tag.unwrap_or(VERSION.to_string())
     )
 }
 
@@ -96,7 +92,6 @@ pub async fn build(
         _ => {}
     }
     info!("Building package {}", task.name);
-    let config = WorkerConfig::new(env::var("AB_CONFIG_PATH").ok()).unwrap();
     let build_start_time = Utc::now().naive_utc();
 
     let docker = Docker::connect_with_local_defaults()?;
@@ -112,9 +107,10 @@ pub async fn build(
             "AB_SUBFOLDER={}",
             subfolder.clone().unwrap_or("".to_string())
         ),
-        format!("AB_GITEA_REPO={}", config.gitea.repo),
-        format!("AB_GITEA_USER={}", config.gitea.user),
-        format!("AB_GITEA_TOKEN={}", config.gitea.token),
+        format!(
+            "AB_UPLOAD_URL={}",
+            task.upload.as_ref().ok_or("missing upload grant")?.url
+        ),
         format!(
             "AB_OPTIONS={}",
             task.clone().options.unwrap_or("".to_string())
@@ -123,7 +119,9 @@ pub async fn build(
 
     if let Some(task_env) = task.env.clone() {
         for env_var in task_env {
-            env.push(format!("{}={}", env_var.name, env_var.value));
+            if env_var.name != "AB_UPLOAD_URL" {
+                env.push(format!("{}={}", env_var.name, env_var.value));
+            }
         }
     }
 
@@ -190,7 +188,11 @@ pub async fn build(
         let build_end_time = Utc::now().naive_utc();
 
         let mut results = BuildResultTransmissionFormat {
-            task: task.to_owned(),
+            task: {
+                let mut t = task.clone();
+                t.upload = None;
+                t
+            },
             status_code: -5,
             log_lines: logs_vec,
             success: true,
@@ -205,6 +207,7 @@ pub async fn build(
                 info!("Build container exited with: {:?}", exit.status_code);
 
                 results.status_code = exit.status_code;
+                results.success = exit.status_code == 0;
 
                 Ok(results)
             }

@@ -2,14 +2,14 @@ pub mod types;
 
 use lapin::{Connection, ConnectionProperties};
 use log::{error, info};
+use rand::RngCore;
 use std::process::exit;
 use std::time::Duration;
-use rand::RngCore;
 use tokio::time::sleep;
 
+pub mod config;
 pub mod environment;
 pub mod errors;
-pub mod config;
 
 /// The maximum number of retry attempts for establishing a database/rabbitmq connection.
 pub const CONNECTION_RETRY_NUMBER: u8 = 10;
@@ -49,3 +49,7 @@ pub async fn connect_to_rabbitmq() -> Connection {
 pub fn get_rand_string() -> String {
     rand::rng().next_u32().to_string()
 }
+
+pub mod storage;
+
+pub mod messaging;

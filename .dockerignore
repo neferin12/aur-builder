@@ -12,3 +12,7 @@ Dockerfile
 release.sh
 sqlite.db
 target
+repo-gnupg
+
+.env-*
+__pycache__

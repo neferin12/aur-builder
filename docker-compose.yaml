@@ -38,8 +38,11 @@ services:
         context: .
         dockerfile: Dockerfile
         target: worker
-    env_file:
-      - .env
+    environment:
+      AMQP_ADDR: ${AMQP_ADDR}
+      RUST_LOG: ${RUST_LOG:-info}
+      AB_BUILDER: ${AB_BUILDER:-ghcr.io/neferin12/aur-builder-build-container}
+      AB_BUILDER_TAG: ${AB_BUILDER_TAG:-1.1.11}
     depends_on:
       - rabbitmq
     volumes:
@@ -67,5 +70,38 @@ services:
     env_file:
       - .env
     restart: always
+  garage:
+    image: dxflrs/garage:v2.1.0
+    restart: always
+    environment:
+      GARAGE_RPC_SECRET: ${GARAGE_RPC_SECRET:?set GARAGE_RPC_SECRET}
+    ports:
+      - "3900:3900"
+    volumes:
+      - ./garage.toml:/etc/garage.toml:ro
+      - garage-meta:/var/lib/garage/meta
+      - garage-data:/var/lib/garage/data
+  repo:
+    build:
+      context: .
+      target: repo
+    env_file:
+      - .env
+    environment:
+      GNUPGHOME: /run/repo-gnupg
+    tmpfs:
+      - /run/repo-gnupg:mode=0700
+    command: ["/bin/sh", "-c", "cp -a /run/signing-source/. /run/repo-gnupg/ && chmod 700 /run/repo-gnupg && exec repo"]
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./db:/app/db
+      - ./repo-gnupg:/run/signing-source:ro
+    depends_on:
+      - rabbitmq
+      - garage
+    restart: always
 volumes:
     rabbitmq-data:
+    garage-meta:
+    garage-data:

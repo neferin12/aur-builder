@@ -1,15 +1,6 @@
 {% extends "base.html" %}
-
-{% block title %}Force Rebuild{% endblock title %}
-
+{% block title %}Rebuild requested{% endblock title %}
+{% block location %}<a href="/">Packages</a><span class="separator">/</span>Rebuild requested{% endblock location %}
 {% block content %}
-<h2>Forced Rebuild For Package "<span class="jetbrains-mono">{{package.name}}</span>"</h2>
-<p>Forced rebuild has been initiated, it can take up to 10 minutes to start.</p>
-<div class="btn-group" role="group" aria-label="Basic example">
-    <a href="/" class="btn btn-primary">Return to Home</a>
-    <a href="/build-results/{{package.id}}" class="btn btn-secondary">
-        Return to Build Results for "<span class="jetbrains-mono">{{package.name}}</span>"
-    </a>
-</div>
-
+<div class="confirmation panel"><span class="confirmation-icon" aria-hidden="true">✓</span><p class="eyebrow">REQUEST RECEIVED</p><h1>Rebuild requested</h1><p>Marked <strong class="mono">{{ package.name }}</strong> for rebuilding at the next server check.</p><p class="muted">It may take up to 10 minutes to start, depending on the check interval and available workers. A result will appear when the build finishes.</p><div class="confirmation-actions"><a href="/build-results/{{ package.id }}" class="button primary">View build history →</a><a href="/" class="button secondary">All packages</a></div></div>
 {% endblock content %}

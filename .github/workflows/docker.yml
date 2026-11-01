@@ -129,6 +129,20 @@ jobs:
             type=semver,pattern={{major}}.{{minor}}
             type=semver,pattern={{major}}
 
+      - name: Extract Docker metadata for repo
+        id: meta-repo
+        uses: docker/metadata-action@v5
+        with:
+          images: |
+            ghcr.io/neferin12/aur-builder-repo
+            harbor.pollinger.dev/julian/aur-builder/repo
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=semver,pattern={{major}}
+
       # Build and push Docker image with Buildx (don't push on PR)
       # https://github.com/docker/build-push-action
       - name: Build and push server image
@@ -187,6 +201,20 @@ jobs:
           cache-to: mode=max,image-manifest=true,oci-mediatypes=true,type=registry,ref=harbor.pollinger.dev/build-cache/aur-builder
           target: notifier
 
+      - name: Build and push repo image
+        id: build-and-push-repo
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: ${{ github.event_name != 'pull_request' }}
+          sbom: true
+          provenance: mode=max
+          tags: ${{ steps.meta-repo.outputs.tags }}
+          labels: ${{ steps.meta-repo.outputs.labels }}
+          cache-from: type=registry,ref=harbor.pollinger.dev/build-cache/aur-builder
+          cache-to: mode=max,image-manifest=true,oci-mediatypes=true,type=registry,ref=harbor.pollinger.dev/build-cache/aur-builder
+          target: repo
+
           # Sign the resulting Docker image digest except on PRs.
           # This will only write to the public Rekor transparency log when the Docker
           # repository is public to avoid leaking data.  If you would like to publish
@@ -218,4 +246,11 @@ jobs:
         env:
           TAGS: ${{ steps.meta-notifier.outputs.tags }}
           DIGEST: ${{ steps.build-and-push-notifier.outputs.digest }}
+        run: echo "${TAGS}" | xargs -I {} cosign sign --yes {}@${DIGEST}
+
+      - name: Sign the published repo image
+        if: ${{ github.event_name != 'pull_request' }}
+        env:
+          TAGS: ${{ steps.meta-repo.outputs.tags }}
+          DIGEST: ${{ steps.build-and-push-repo.outputs.digest }}
         run: echo "${TAGS}" | xargs -I {} cosign sign --yes {}@${DIGEST}

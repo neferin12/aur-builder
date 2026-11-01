@@ -1,18 +1,15 @@
-mod setup_rabbit_mq;
 mod package_checkers;
+mod setup_rabbit_mq;
 
-use std::process::exit;
+use common::config::{Configurable, ServerConfig};
+use common::environment::{VERSION, get_environment_variable, load_dotenv};
 use database::connect_to_db;
-use common::environment::{get_environment_variable, load_dotenv, VERSION};
-use common::types::BuildTaskTransmissionFormat;
-use lapin::options::BasicPublishOptions;
-use lapin::BasicProperties;
 use log::{debug, error, info};
+use std::process::exit;
 use std::time::Duration;
 use tokio::time::sleep;
-use common::config::{Configurable, ServerConfig};
 
-use package_checkers::{*};
+use package_checkers::*;
 
 #[tokio::main]
 async fn main() {
@@ -29,6 +26,7 @@ async fn main() {
     };
     info!("Starting Aur-Builder Server v{VERSION}");
 
+    let storage = common::storage::Storage::from_env().unwrap();
     let db = connect_to_db().await;
     db.migrate().await;
 
@@ -39,6 +37,26 @@ async fn main() {
     let build_tx = channels.build_tx;
 
     loop {
+        // Recover tasks recorded before a crash between persistence and broker confirmation.
+        for mut pending in db.pending_attempts().await.unwrap() {
+            if !db.latest_attempt(&pending).await.unwrap() {
+                db.attempt_state(&pending.attempt, "superseded")
+                    .await
+                    .unwrap();
+                continue;
+            }
+            storage.renew(&mut pending).unwrap();
+            common::messaging::publish(
+                &build_tx,
+                "pkg_build",
+                &serde_json::to_vec(&pending).unwrap(),
+            )
+            .await
+            .unwrap();
+            db.attempt_state(&pending.attempt, "dispatched")
+                .await
+                .unwrap();
+        }
         info!("Checking for package updates...");
         let mut package_data = Vec::new();
 
@@ -53,7 +71,6 @@ async fn main() {
                     error!("Failed to get data for aur package \"{}\": {}", pkg.name, e);
                 }
             }
-
         }
 
         for pkg in &config.git_packages {
@@ -64,41 +81,31 @@ async fn main() {
                     package_data.push(git_data);
                 }
                 Err(e) => {
-                    error!("Failed to get data for git package \"{}\": {}", pkg.source, e);
+                    error!(
+                        "Failed to get data for git package \"{}\": {}",
+                        pkg.source, e
+                    );
                 }
             }
         }
 
         for data in &package_data {
-            let updated = db.update_metadata(&data).await;
-            // let updated = true;
-            if updated {
+            if let Some(task) = db
+                .schedule_build(data, |task| storage.grant(task))
+                .await
+                .unwrap()
+            {
                 info!("{} was updated!", data.name);
-                let package = db.get_package_by_name(&data.name).await.unwrap().unwrap();
-                let task = BuildTaskTransmissionFormat {
-                    id: package.id.clone(),
-                    name: package.name.clone(),
-                    version: data.version.clone(),
-                    source: package.source.clone(),
-                    subfolder: package.subfolder.clone(),
-                    options: data.options.clone(),
-                    env: data.environment.clone()
-                };
-                build_tx
-                    .basic_publish(
-                        "",
-                        "pkg_build",
-                        BasicPublishOptions::default(),
-                        serde_json::to_string(&task).unwrap().as_ref(),
-                        BasicProperties::default(),
-                    )
-                    .await
-                    .unwrap()
-                    .await
-                    .unwrap();
+                common::messaging::publish(
+                    &build_tx,
+                    "pkg_build",
+                    serde_json::to_string(&task).unwrap().as_ref(),
+                )
+                .await
+                .unwrap();
+                db.attempt_state(&task.attempt, "dispatched").await.unwrap();
             }
         }
-        sleep(Duration::from_secs(config.sleepduration.unwrap_or(60*5))).await;
+        sleep(Duration::from_secs(config.sleepduration.unwrap_or(60 * 5))).await;
     }
 }
-

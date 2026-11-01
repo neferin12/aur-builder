@@ -1,39 +1,26 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    {% block head %}
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="theme-color" content="#003495" />
-    <title>{% block title %}{% endblock title %} - Aur Builder</title>
-<!--    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"-->
-<!--          integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">-->
-    <link rel="stylesheet" href="/assets/bootstrap.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&family=Raleway:ital,wght@0,100..900;1,100..900&display=swap"
-          rel="stylesheet">
+    <meta name="theme-color" content="#111c24">
+    <title>{% block title %}Packages{% endblock title %} · AUR Builder</title>
+    <link rel="icon" href="/assets/logo.svg" type="image/svg+xml">
     <link rel="stylesheet" href="/assets/style.css">
-    {% endblock head %}
+    <script src="/assets/app.js" defer></script>
 </head>
 <body>
-<nav class="navbar bg-primary sticky-top" data-bs-theme="dark">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="/">
-            AUR Builder
-            <span class="version">v{{version}}</span>
-        </a>
-    </div>
-</nav>
-<div id="content">{% block content %}{% endblock content %}</div>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
-        crossorigin="anonymous"></script>
-<script>
-    const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
-    const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
-
-</script>
+<a class="skip-link" href="#content">Skip to content</a>
+<aside class="sidebar">
+    <a class="brand" href="/"><span class="brand-mark" aria-hidden="true">A</span><span>AUR Builder<small>Package workspace</small></span></a>
+    <div class="nav-label">Workspace</div>
+    <nav aria-label="Main navigation"><a class="nav-link active" href="/" {% if current_page == "packages" %}aria-current="page"{% endif %}><span aria-hidden="true">▦</span> Packages</a></nav>
+    <div class="sidebar-footer"><span class="dot"></span> Self-hosted build system<small>Version {{ version }}</small></div>
+</aside>
+<div class="workspace">
+    <header class="topbar"><span>Workspace <span class="separator">/</span> {% block location %}Packages{% endblock location %}</span><span class="topbar-label">AUR / Git sources</span></header>
+    <main id="content" tabindex="-1">{% block content %}{% endblock content %}</main>
+    <footer class="page-footer">AUR Builder <span>Built for your packages.</span></footer>
+</div>
 </body>
 </html>

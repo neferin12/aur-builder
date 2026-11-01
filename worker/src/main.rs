@@ -2,14 +2,15 @@ mod build;
 
 use crate::build::build_package;
 use crate::build::docker::pull_docker_image;
-use common::environment::{load_dotenv, VERSION};
-use common::{connect_to_rabbitmq, get_rand_string};
-use futures_util::stream::StreamExt;
-use lapin::BasicProperties;
-use lapin::options::{BasicAckOptions, BasicConsumeOptions, BasicNackOptions, BasicPublishOptions, BasicQosOptions, QueueDeclareOptions};
-use lapin::types::FieldTable;
+use common::environment::{VERSION, load_dotenv};
 use common::errors::get_error_descriptions;
 use common::types::BuildTaskTransmissionFormat;
+use common::{connect_to_rabbitmq, get_rand_string};
+use futures_util::stream::StreamExt;
+use lapin::options::{
+    BasicAckOptions, BasicConsumeOptions, BasicNackOptions, BasicQosOptions, QueueDeclareOptions,
+};
+use lapin::types::FieldTable;
 
 #[macro_use]
 extern crate log;
@@ -20,7 +21,7 @@ async fn main() {
     simple_logger::init_with_env().unwrap();
 
     info!("Starting Aur-Builder Worker v{VERSION}");
-    
+
     match pull_docker_image().await {
         Err(_) => warn!("Builder image could not be pulled"),
         _ => {}
@@ -36,7 +37,10 @@ async fn main() {
     rx_channel
         .queue_declare(
             "pkg_build",
-            QueueDeclareOptions::default(),
+            QueueDeclareOptions {
+                durable: true,
+                ..Default::default()
+            },
             FieldTable::default(),
         )
         .await
@@ -53,9 +57,16 @@ async fn main() {
 
     let tx_results = conn.create_channel().await.unwrap();
     tx_results
+        .confirm_select(lapin::options::ConfirmSelectOptions::default())
+        .await
+        .unwrap();
+    tx_results
         .queue_declare(
             "build_results",
-            QueueDeclareOptions::default(),
+            QueueDeclareOptions {
+                durable: true,
+                ..Default::default()
+            },
             FieldTable::default(),
         )
         .await
@@ -63,28 +74,70 @@ async fn main() {
 
     while let Some(delivery) = consumer.next().await {
         let delivery = delivery.expect("error in consumer");
-        let raw_data = match std::str::from_utf8(&*delivery.data) {
-            Ok(v) => v.to_string(),
-            Err(e) => panic!("Invalid UTF-8 sequence: {}", e),
+        let build_task: BuildTaskTransmissionFormat = match serde_json::from_slice(&delivery.data) {
+            Ok(task) => task,
+            Err(_) => {
+                error!("Rejecting malformed build task");
+                delivery
+                    .reject(lapin::options::BasicRejectOptions { requeue: false })
+                    .await
+                    .unwrap();
+                continue;
+            }
         };
-        let build_task: BuildTaskTransmissionFormat = serde_json::from_str(raw_data.as_str()).unwrap();
 
+        if build_task
+            .upload
+            .as_ref()
+            .map(|g| g.expires_at <= sea_orm::sqlx::types::chrono::Utc::now().timestamp())
+            .unwrap_or(true)
+        {
+            tx_results
+                .queue_declare(
+                    "expired_tasks",
+                    QueueDeclareOptions {
+                        durable: true,
+                        ..Default::default()
+                    },
+                    FieldTable::default(),
+                )
+                .await
+                .unwrap();
+            let mut expired = build_task.clone();
+            expired.upload = None;
+            common::messaging::publish(
+                &tx_results,
+                "expired_tasks",
+                serde_json::to_vec(&expired).unwrap().as_slice(),
+            )
+            .await
+            .unwrap();
+            delivery.ack(BasicAckOptions::default()).await.unwrap();
+            continue;
+        }
         match build_package(&build_task).await {
             Ok(results) => {
-                delivery.ack(BasicAckOptions::default()).await.expect("ack");
                 if !results.success {
-                    warn!("Failed to build package '{}': {}", results.task.name, get_error_descriptions(results.status_code));
+                    warn!(
+                        "Failed to build package '{}': {}",
+                        results.task.name,
+                        get_error_descriptions(results.status_code)
+                    );
                 }
-                tx_results.basic_publish(
-                    "",
+                common::messaging::publish(
+                    &tx_results,
                     "build_results",
-                    BasicPublishOptions::default(),
                     serde_json::to_string(&results).unwrap().as_ref(),
-                    BasicProperties::default(),
-                ).await.unwrap();
+                )
+                .await
+                .unwrap();
+                delivery.ack(BasicAckOptions::default()).await.expect("ack");
             }
             Err(error) => {
-                error!("System error while building package '{}':\n{:?}", build_task.name, error);
+                error!(
+                    "System error while building package '{}':\n{:?}",
+                    build_task.name, error
+                );
                 delivery
                     .nack(BasicNackOptions::default())
                     .await

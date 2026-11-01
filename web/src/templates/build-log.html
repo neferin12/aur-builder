@@ -1,35 +1,11 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Logs - Aur Builder</title>
-<!--    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"-->
-<!--          integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">-->
-    <link rel="stylesheet" href="/assets/bootstrap.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&family=Raleway:ital,wght@0,100..900;1,100..900&display=swap"
-          rel="stylesheet">
-    <link rel="stylesheet" href="/assets/style.css">
-</head>
-<body class="bg-dark text-light p-2">
-<div class="jetbrains-mono logviewer">
-    {% for line in
-    build_result.build_log
-    | default(value="No logs available")
-    | split(pat="\n")
-    %}
-    {% if line is matching("^stderr:") %}
-    <pre class="log stderr text-danger">{{line | replace(from="stderr: ", to="")}}</pre>
-    {% else %}
-    <pre class="log stdout">{{line | replace(from="stdout: ", to="")}}</pre>
-    {% endif %}
-    {% endfor %}
-</div>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
-        crossorigin="anonymous"></script>
-</body>
-</html>
+{% extends "base.html" %}
+{% block title %}{{ package.name }} · Build #{{ build_result.id }}{% endblock title %}
+{% block location %}<a href="/">Packages</a><span class="separator">/</span><a href="/build-results/{{ package.id }}">{{ package.name }}</a><span class="separator">/</span>Build #{{ build_result.id }}{% endblock location %}
+{% block content %}
+<a class="back-link" href="/build-results/{{ package.id }}">← Build history</a>
+<div class="page-heading"><div><p class="eyebrow">BUILD DIAGNOSTICS</p><h1>{{ package.name }} <span class="muted">/ #{{ build_result.id }}</span></h1><p class="subtitle"><span class="mono">{{ build_result.version | default(value="Unknown version") }}</span> <span class="separator">·</span> Exit {{ build_result.exit_code }} — {{ build_result.exit_code | err_desc }}</p></div>{% if build_result.success %}<span class="badge success">● Successful</span>{% else %}<span class="badge failed">● Failed</span>{% endif %}</div>
+<section class="log-panel" aria-label="Build output"><div class="log-toolbar"><span class="terminal-title"><i class="dot green"></i> Build output</span><div class="log-actions" data-log-controls hidden><label class="sr-only" for="log-search">Filter log lines</label><input id="log-search" type="search" placeholder="Filter log lines…"><label class="wrap-control"><input type="checkbox" id="wrap-lines" checked> Wrap lines</label><button type="button" class="button log-button" id="log-bottom">↓ Bottom</button></div></div>
+<div class="logviewer wrap" id="log-output" tabindex="0" aria-label="Scrollable build log">
+{% if build_result.build_log %}{% for line in build_result.build_log | split(pat="\n") %}<pre class="log {% if line is starting_with("stderr:") %}stderr{% endif %}" data-log-line><span class="line-number" aria-hidden="true">{{ loop.index }}</span><code>{{ line | trim_start_matches(pat="stdout: ") | trim_start_matches(pat="stderr: ") }}</code></pre>{% endfor %}{% else %}<p class="log-empty">No output was captured for this build.</p>{% endif %}
+<p id="log-no-matches" class="log-empty" hidden>No log lines match your filter.</p></div><div class="log-footer">Output captured from the build worker<span id="log-count" role="status" aria-live="polite"></span></div></section>
+{% endblock content %}

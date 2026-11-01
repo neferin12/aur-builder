@@ -10,7 +10,7 @@ pub struct PackageSearchResult {
     pub source: Option<String>,
     pub subfolder: Option<String>,
     pub options: Option<String>,
-    pub environment: Option<Environment>
+    pub environment: Option<Environment>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -19,7 +19,7 @@ pub struct BuildResultTransmissionFormat {
     pub status_code: i64,
     pub log_lines: Vec<String>,
     pub success: bool,
-    pub timestamps: Timestamps
+    pub timestamps: Timestamps,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -31,12 +31,16 @@ pub struct Timestamps {
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct BuildTaskTransmissionFormat {
     pub id: i32,
+    pub attempt: String,
+    pub object_key: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub upload: Option<UploadGrant>,
     pub name: String,
     pub version: String,
     pub source: Option<String>,
     pub subfolder: Option<String>,
     pub options: Option<String>,
-    pub env: Option<Environment>
+    pub env: Option<Environment>,
 }
 
 type Environment = Vec<EnvironmentVariable>;
@@ -44,7 +48,7 @@ type Environment = Vec<EnvironmentVariable>;
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct EnvironmentVariable {
     pub name: String,
-    pub value: String
+    pub value: String,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -60,4 +64,14 @@ pub struct GitPackageSettings {
     pub subfolder: Option<String>,
     pub env: Option<Environment>,
     pub options: Option<String>,
+}
+#[derive(Serialize, Deserialize, Clone)]
+pub struct UploadGrant {
+    pub url: String,
+    pub expires_at: i64,
+}
+impl std::fmt::Debug for UploadGrant {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str("UploadGrant([redacted])")
+    }
 }

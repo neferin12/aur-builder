@@ -14,6 +14,9 @@
       <package file="$PROJECT_DIR$/notifier">
         <feature name="default" enabled="true" />
       </package>
+      <package file="$PROJECT_DIR$/repo">
+        <feature name="default" enabled="true" />
+      </package>
       <package file="$PROJECT_DIR$/server">
         <feature name="default" enabled="true" />
       </package>
@@ -27,8 +30,43 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="30df73c6-6061-4a44-ad67-d8c0fc6fb8e8" name="Changes" comment="feat(worker): add support for configurable Docker tag">
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.dockerignore" beforeDir="false" afterPath="$PROJECT_DIR$/.dockerignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.env.template" beforeDir="false" afterPath="$PROJECT_DIR$/.env.template" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.github/workflows/build_rust.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.github/workflows/build_rust.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.github/workflows/docker.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.github/workflows/docker.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/aur-builder.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/aur-builder.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources.local.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources.local.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources/e62f5c6a-c691-4db2-a144-46c587c2ac23.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/e62f5c6a-c691-4db2-a144-46c587c2ac23.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_30_12_25,_21_55_[Changes]/shelved.patch" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_30_12_25__21_55__Changes_.xml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Cargo.lock" beforeDir="false" afterPath="$PROJECT_DIR$/Cargo.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Cargo.toml" beforeDir="false" afterPath="$PROJECT_DIR$/Cargo.toml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/Dockerfile" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build-container/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/build-container/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build-container/build-package" beforeDir="false" afterPath="$PROJECT_DIR$/build-container/build-package" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/Cargo.toml" beforeDir="false" afterPath="$PROJECT_DIR$/common/Cargo.toml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/src/config.rs" beforeDir="false" afterPath="$PROJECT_DIR$/common/src/config.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/src/lib.rs" beforeDir="false" afterPath="$PROJECT_DIR$/common/src/lib.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/src/types.rs" beforeDir="false" afterPath="$PROJECT_DIR$/common/src/types.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/database/Cargo.toml" beforeDir="false" afterPath="$PROJECT_DIR$/database/Cargo.toml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/database/src/lib.rs" beforeDir="false" afterPath="$PROJECT_DIR$/database/src/lib.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/database/src/migrator/mod.rs" beforeDir="false" afterPath="$PROJECT_DIR$/database/src/migrator/mod.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docker-compose.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/notifier/src/main.rs" beforeDir="false" afterPath="$PROJECT_DIR$/notifier/src/main.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/main.rs" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/setup_rabbit_mq.rs" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/setup_rabbit_mq.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/Cargo.toml" beforeDir="false" afterPath="$PROJECT_DIR$/web/Cargo.toml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/assets/style.css" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/assets/style.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/main.rs" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/main.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/templates/base.html" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/templates/base.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/templates/build-log.html" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/templates/build-log.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/templates/build-results.html" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/templates/build-results.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/templates/force-rebuild.html" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/templates/force-rebuild.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/templates/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/templates/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/worker/src/build/docker.rs" beforeDir="false" afterPath="$PROJECT_DIR$/worker/src/build/docker.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/worker/src/main.rs" beforeDir="false" afterPath="$PROJECT_DIR$/worker/src/main.rs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -50,7 +88,7 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="yaml-config" />
+        <entry key="$PROJECT_DIR$" value="main" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -90,6 +128,65 @@
     <commands />
     <urls />
   </component>
+  <component name="NextEditCompletionFeaturesState">
+    <decayedCancelled>
+      <entry key="MS100" value="1.0002951499707298" />
+      <entry key="MS500" value="1.3346225293517517" />
+      <entry key="S2" value="3.4483688725854598" />
+      <entry key="S5" value="7.066691189432219" />
+      <entry key="S10" value="11.843833191260627" />
+      <entry key="S30" value="23.16725072997404" />
+      <entry key="S60" value="30.401675906092844" />
+      <entry key="M2" value="36.35849720687858" />
+      <entry key="M5" value="45.50341547360236" />
+      <entry key="M10" value="53.905867337636344" />
+      <entry key="M15" value="58.466604752690195" />
+      <entry key="M30" value="64.9044135978321" />
+      <entry key="H1" value="72.9132444071357" />
+      <entry key="H2" value="89.46979876362109" />
+      <entry key="H4" value="111.00008053374638" />
+      <entry key="D1" value="145.28869950057836" />
+      <entry key="W1" value="153.53940333221078" />
+    </decayedCancelled>
+    <decayedSelected>
+      <entry key="MS100" value="0.0" />
+      <entry key="MS500" value="0.0" />
+      <entry key="S2" value="0.0" />
+      <entry key="S5" value="0.0" />
+      <entry key="S10" value="0.0" />
+      <entry key="S30" value="0.0" />
+      <entry key="S60" value="0.0" />
+      <entry key="M2" value="0.0" />
+      <entry key="M5" value="0.0" />
+      <entry key="M10" value="0.0" />
+      <entry key="M15" value="0.0" />
+      <entry key="M30" value="0.0" />
+      <entry key="H1" value="0.0" />
+      <entry key="H2" value="0.0" />
+      <entry key="H4" value="0.0" />
+      <entry key="D1" value="0.0" />
+      <entry key="W1" value="0.0" />
+    </decayedSelected>
+    <decayedShown>
+      <entry key="MS100" value="0.9865168549539494" />
+      <entry key="MS500" value="1.3040201228786008" />
+      <entry key="S2" value="3.400356830060042" />
+      <entry key="S5" value="7.022944379019151" />
+      <entry key="S10" value="11.805153371041953" />
+      <entry key="S30" value="23.145206160155567" />
+      <entry key="S60" value="30.388574431137886" />
+      <entry key="M2" value="36.35126855535843" />
+      <entry key="M5" value="45.50029148808036" />
+      <entry key="M10" value="53.904238834447774" />
+      <entry key="M15" value="58.465498224415384" />
+      <entry key="M30" value="64.90384653186673" />
+      <entry key="H1" value="72.91295322282157" />
+      <entry key="H2" value="89.46964583862207" />
+      <entry key="H4" value="110.99999938138556" />
+      <entry key="D1" value="145.28868473643223" />
+      <entry key="W1" value="153.539401180528" />
+    </decayedShown>
+  </component>
   <component name="ProjectColorInfo">{
   &quot;customColor&quot;: &quot;&quot;,
   &quot;associatedIndex&quot;: 5
@@ -99,47 +196,49 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;Cargo.Build `Run notifier`.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Build `Run server`.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Run notifier.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Run server.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Run web.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Run worker.executor&quot;: &quot;Run&quot;,
-    &quot;Docker.docker-compose.yaml.rabbitmq: Compose Deployment.executor&quot;: &quot;Run&quot;,
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.MCP Project settings loaded&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.rust.reset.selective.auto.import&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
-    &quot;SHELLCHECK.PATH&quot;: &quot;/home/julian/.local/share/JetBrains/RustRover2025.1/Shell Script/shellcheck&quot;,
-    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
-    &quot;dart.analysis.tool.window.visible&quot;: &quot;false&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/home/julian/projects/privat/aur-builder&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;org.rust.cargo.project.model.PROJECT_DISCOVERY&quot;: &quot;true&quot;,
-    &quot;org.rust.cargo.project.model.impl.CargoExternalSystemProjectAware.subscribe.first.balloon&quot;: &quot;&quot;,
-    &quot;org.rust.first.attach.projects&quot;: &quot;true&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;io.commitlint.settings.SettingsConfiguration&quot;,
-    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Cargo.Build `Run notifier`.executor": "Run",
+    "Cargo.Build `Run server`.executor": "Run",
+    "Cargo.Run notifier.executor": "Run",
+    "Cargo.Run server.executor": "Run",
+    "Cargo.Run web.executor": "Run",
+    "Cargo.Run worker.executor": "Run",
+    "CidrDebugProfileConversion": "true",
+    "Docker.docker-compose.yaml.rabbitmq: Compose Deployment.executor": "Run",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.MCP Project settings loaded": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.rust.reset.selective.auto.import": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "SHELLCHECK.PATH": "/home/julian/.local/share/JetBrains/RustRover2025.1/Shell Script/shellcheck",
+    "codeWithMe.voiceChat.enabledByDefault": "false",
+    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
+    "dart.analysis.tool.window.visible": "false",
+    "git-widget-placeholder": "s3",
+    "junie.onboarding.icon.badge.shown": "true",
+    "last_opened_file_path": "/home/julian/projects/privat/aur-builder",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "org.rust.cargo.project.model.PROJECT_DISCOVERY": "true",
+    "org.rust.cargo.project.model.impl.CargoExternalSystemProjectAware.subscribe.first.balloon": "",
+    "org.rust.first.attach.projects": "true",
+    "settings.editor.selected.configurable": "com.intellij.air.settings",
+    "to.speed.mode.migration.done": "true",
+    "vue.rearranger.settings.migration": "true"
   },
-  &quot;keyToStringList&quot;: {
-    &quot;DatabaseDriversLRU&quot;: [
-      &quot;sqlite&quot;
+  "keyToStringList": {
+    "DatabaseDriversLRU": [
+      "sqlite"
     ]
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/web/src/assets" />

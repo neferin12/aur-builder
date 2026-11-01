@@ -42,3 +42,8 @@ COPY --from=builder /app/target/x86_64-unknown-linux-musl/release/notifier /usr/
 COPY notifier/src/templates /app/notifier/src/templates
 
 CMD ["/usr/local/bin/notifier"]
+FROM archlinux:base AS repo
+RUN pacman -Syu --noconfirm --needed pacman gnupg libarchive ca-certificates && rm -rf /var/cache/pacman/pkg/*
+WORKDIR /app
+COPY --from=builder /app/target/x86_64-unknown-linux-musl/release/repo /usr/local/bin/repo
+CMD ["/usr/local/bin/repo"]

@@ -20,4 +20,5 @@ jobs:
 
       - run: |
           cargo check
+          cargo test --workspace
           cargo build --release

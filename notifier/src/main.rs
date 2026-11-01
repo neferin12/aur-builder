@@ -5,8 +5,7 @@ use common::types::BuildResultTransmissionFormat;
 use common::{connect_to_rabbitmq, get_rand_string};
 use futures_util::stream::StreamExt;
 use lapin::options::{
-    BasicAckOptions, BasicConsumeOptions, BasicNackOptions, BasicQosOptions,
-    QueueDeclareOptions,
+    BasicAckOptions, BasicConsumeOptions, BasicNackOptions, BasicQosOptions, QueueDeclareOptions,
 };
 use lapin::types::FieldTable;
 use lettre::message::header::ContentType;
@@ -44,7 +43,10 @@ async fn main() {
     rx_channel
         .queue_declare(
             "notifications",
-            QueueDeclareOptions::default(),
+            QueueDeclareOptions {
+                durable: true,
+                ..Default::default()
+            },
             FieldTable::default(),
         )
         .await
@@ -67,7 +69,7 @@ async fn main() {
         match receive_delivery(&build_results, &tera, &config).await {
             Ok(_) => {
                 delivery.ack(BasicAckOptions::default()).await.unwrap();
-            },
+            }
             Err(e) => {
                 error!("Error: {}", e);
                 delivery.nack(BasicNackOptions::default()).await.unwrap();
@@ -81,7 +83,6 @@ async fn receive_delivery(
     tera: &Tera,
     config: &NotifierConfig,
 ) -> Result<(), Box<dyn Error>> {
-
     let mut context = Context::new();
 
     context.insert("build_result", &build_result);
@@ -91,10 +92,11 @@ async fn receive_delivery(
         &get_error_descriptions(build_result.status_code),
     );
 
-    let mail_content =
-        css_inline::inline(
-            tera.render("build_notification.html", &context).unwrap().as_str()
-        )?;
+    let mail_content = css_inline::inline(
+        tera.render("build_notification.html", &context)
+            .unwrap()
+            .as_str(),
+    )?;
 
     let subject: String;
 
