@@ -1,0 +1,24 @@
+[package]
+name = "aur-builder-container"
+version = "0.1.0"
+edition = "2021"
+license = "GPL-3.0"
+
+[[bin]]
+name = "build-package"
+path = "src/main.rs"
+
+[dependencies]
+anyhow = "1"
+alpm = "=5.0.2"
+alpm-utils = "=5.0.0"
+aur-depends = "=5.0.0"
+aur-fetch = "=0.11.3"
+raur = "=7.0.0"
+srcinfo = "=2.1.0"
+tokio = { version = "1", features = ["macros", "rt"] }
+reqwest = { version = "0.12", default-features = false, features = ["blocking", "rustls-tls"] }
+tar = "0.4"
+
+[dev-dependencies]
+tempfile = "3"

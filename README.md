@@ -8,6 +8,25 @@ The web dashboard shows package versions and latest build results, provides
 searchable build logs, and lets you request rebuilds. Email notifications are
 available through the optional notifier service.
 
+## Documentation
+
+The VitePress documentation covers setup, configuration, Garage, GPG signing,
+pacman clients, Nginx, database reset, troubleshooting, and v2 upgrades.
+Start with the [getting-started guide](docs/guide/getting-started.md).
+
+To browse locally with Node.js 22.12+:
+
+```sh
+npm --prefix docs ci
+npm --prefix docs run dev
+```
+
+Build a static site with `npm --prefix docs run build`. See
+[documentation development](docs/guide/development.md#documentation) for preview,
+subpath hosting, and CI details. The Documentation workflow deploys successful
+default-branch builds to GitHub Pages; first set **Settings → Pages → Source** to
+**GitHub Actions**.
+
 ## How it works
 
 1. The server checks configured sources for changes and records build tasks in the
@@ -165,7 +184,7 @@ Then start the remaining core services:
 docker compose up -d worker repo web
 ```
 
-Workers use a separate build-container image. When changing its scripts, rebuild
+Workers use a separate build-container image. When changing its Rust builder, rebuild
 and deploy that image along with the worker; see [Build container](build-container/README.md).
 
 | Endpoint | Default port |

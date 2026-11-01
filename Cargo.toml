@@ -1,3 +1,4 @@
 [workspace]
 resolver = "2"
+exclude = ["build-container"]
 members = [ "common", "database", "notifier","server", "web", "worker", "repo"]

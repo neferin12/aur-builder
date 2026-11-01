@@ -1,5 +1,8 @@
 # Storage and repository operations
 
+For the browsable VitePress guides, see [Garage storage](docs/guide/storage.md),
+[GPG signing](docs/guide/signing.md), and [operations](docs/guide/operations.md).
+
 Workers now upload one tar bundle using the PUT capability included in each task.
 They need RabbitMQ access and connectivity to `AB_S3_PUBLIC_ENDPOINT`, but no S3
 credentials. The server and repo service need S3 credentials. Package downloads

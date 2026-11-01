@@ -1,7 +1,7 @@
 use bollard::Docker;
 use bollard::container::{
-    Config, CreateContainerOptions, LogOutput, LogsOptions, StartContainerOptions,
-    WaitContainerOptions,
+    Config, CreateContainerOptions, LogOutput, LogsOptions, RemoveContainerOptions,
+    StartContainerOptions, WaitContainerOptions,
 };
 use bollard::errors::Error;
 use bollard::image::CreateImageOptions;
@@ -132,7 +132,7 @@ pub async fn build(
         user: Some("builder".to_string()),
         env: Some(env),
         host_config: Some(HostConfig {
-            // e.g., to remove container automatically upon exit:
+            // Keep the container until its final logs have been collected.
             auto_remove: Some(false),
             cpu_period: Some(100000),
             cpu_quota: Some(100000),
@@ -145,86 +145,114 @@ pub async fn build(
         .create_container(Some(create_container_options), create_container_config)
         .await?;
 
-    docker
-        .start_container(&container.id, None::<StartContainerOptions<String>>)
-        .await?;
-
-    attach_logs(docker.clone(), container.id.clone());
-
-    let mut wait_stream =
-        docker.wait_container(&container.id, None::<WaitContainerOptions<String>>);
-    while let Some(res) = wait_stream.next().await {
-        let mut logs = docker.logs(
-            &container.id,
-            Some(LogsOptions::<String> {
-                stdout: true,
-                stderr: true,
-                // tail: "all",  // optional
-                ..Default::default()
-            }),
-        );
-        let mut logs_vec = Vec::new();
-
-        while let Some(log_result) = logs.next().await {
-            match log_result {
-                Ok(LogOutput::StdOut { message }) => {
-                    logs_vec.push(log_message_to_string("stdout", message));
-                }
-                Ok(LogOutput::StdErr { message }) => {
-                    logs_vec.push(log_message_to_string("stderr", message));
-                }
-                Err(e) => {
-                    error!("Error reading log stream: {}", e);
-                    break;
-                }
-                _ => {}
-            }
-        }
-
+    let result = async {
         docker
-            .remove_container(&container.id, Default::default())
+            .start_container(&container.id, None::<StartContainerOptions<String>>)
             .await?;
 
-        let build_end_time = Utc::now().naive_utc();
+        attach_logs(docker.clone(), container.id.clone());
 
-        let mut results = BuildResultTransmissionFormat {
-            task: {
-                let mut t = task.clone();
-                t.upload = None;
-                t
-            },
-            status_code: -5,
-            log_lines: logs_vec,
-            success: true,
-            timestamps: Timestamps {
-                start: build_start_time,
-                end: build_end_time,
-            },
-        };
+        let mut wait_stream =
+            docker.wait_container(&container.id, None::<WaitContainerOptions<String>>);
+        while let Some(res) = wait_stream.next().await {
+            let mut logs = docker.logs(
+                &container.id,
+                Some(LogsOptions::<String> {
+                    stdout: true,
+                    stderr: true,
+                    // tail: "all",  // optional
+                    ..Default::default()
+                }),
+            );
+            let mut logs_vec = Vec::new();
 
-        return match res {
-            Ok(exit) => {
-                info!("Build container exited with: {:?}", exit.status_code);
-
-                results.status_code = exit.status_code;
-                results.success = exit.status_code == 0;
-
-                Ok(results)
-            }
-            Err(e) => {
-                match e {
-                    Error::DockerContainerWaitError { code, .. } => {
-                        results.status_code = code;
-                        results.success = false;
-                        Ok(results)
+            while let Some(log_result) = logs.next().await {
+                match log_result {
+                    Ok(LogOutput::StdOut { message }) => {
+                        logs_vec.push(log_message_to_string("stdout", message));
                     }
-                    _ => Err(e.into()),
+                    Ok(LogOutput::StdErr { message }) => {
+                        logs_vec.push(log_message_to_string("stderr", message));
+                    }
+                    Err(e) => {
+                        error!("Error reading log stream: {}", e);
+                        break;
+                    }
+                    _ => {}
                 }
-                // error!("Error while waiting for build container: {:?}", e);
-                // return Err(results);
             }
-        };
-    }
 
-    Err("Unexpected end of wait stream".into())
+            let build_end_time = Utc::now().naive_utc();
+
+            let mut results = BuildResultTransmissionFormat {
+                task: {
+                    let mut t = task.clone();
+                    t.upload = None;
+                    t
+                },
+                status_code: -5,
+                log_lines: logs_vec,
+                success: true,
+                timestamps: Timestamps {
+                    start: build_start_time,
+                    end: build_end_time,
+                },
+            };
+
+            return match res {
+                Ok(exit) => {
+                    info!("Build container exited with: {:?}", exit.status_code);
+
+                    results.status_code = exit.status_code;
+                    results.success = exit.status_code == 0;
+
+                    Ok(results)
+                }
+                Err(e) => {
+                    match e {
+                        Error::DockerContainerWaitError { code, .. } => {
+                            results.status_code = code;
+                            results.success = false;
+                            Ok(results)
+                        }
+                        _ => Err(e.into()),
+                    }
+                    // error!("Error while waiting for build container: {:?}", e);
+                    // return Err(results);
+                }
+            };
+        }
+
+        Err("Unexpected end of wait stream".into())
+    }
+    .await;
+
+    // Also clean up after startup errors and broken wait streams. Force removal
+    // stops a container that may still be running after a Docker API failure.
+    let cleanup = docker
+        .remove_container(
+            &container.id,
+            Some(RemoveContainerOptions {
+                force: true,
+                v: true,
+                ..Default::default()
+            }),
+        )
+        .await;
+    match cleanup {
+        Ok(())
+        | Err(Error::DockerResponseServerError {
+            status_code: 404, ..
+        }) => result,
+        Err(error) => {
+            error!(
+                "Failed to remove build container {}: {}",
+                container.id, error
+            );
+            match result {
+                Ok(_) => Err(error.into()),
+                Err(build_error) => Err(build_error),
+            }
+        }
+    }
 }

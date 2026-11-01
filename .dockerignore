@@ -16,3 +16,8 @@ repo-gnupg
 
 .env-*
 __pycache__
+
+# Documentation dependencies and output
+docs/node_modules
+docs/.vitepress/cache
+docs/.vitepress/dist

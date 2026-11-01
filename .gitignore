@@ -11,3 +11,8 @@ config.yaml
 
 # Atomic setup writes may survive an interrupted process.
 /.env-*
+
+# VitePress documentation
+/docs/node_modules/
+/docs/.vitepress/cache/
+/docs/.vitepress/dist/

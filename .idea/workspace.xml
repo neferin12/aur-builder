@@ -31,47 +31,27 @@
   <component name="ChangeListManager">
     <list default="true" id="30df73c6-6061-4a44-ad67-d8c0fc6fb8e8" name="Changes" comment="feat(worker): add support for configurable Docker tag">
       <change beforePath="$PROJECT_DIR$/.dockerignore" beforeDir="false" afterPath="$PROJECT_DIR$/.dockerignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.env.template" beforeDir="false" afterPath="$PROJECT_DIR$/.env.template" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.github/workflows/build_rust.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.github/workflows/build_rust.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.github/workflows/docker.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.github/workflows/docker.yml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/aur-builder.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/aur-builder.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources.local.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources.local.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources/e62f5c6a-c691-4db2-a144-46c587c2ac23.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/e62f5c6a-c691-4db2-a144-46c587c2ac23.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_30_12_25,_21_55_[Changes]/shelved.patch" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_30_12_25__21_55__Changes_.xml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Cargo.lock" beforeDir="false" afterPath="$PROJECT_DIR$/Cargo.lock" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Cargo.toml" beforeDir="false" afterPath="$PROJECT_DIR$/Cargo.toml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/Dockerfile" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/STORAGE.md" beforeDir="false" afterPath="$PROJECT_DIR$/STORAGE.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build-container/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/build-container/Dockerfile" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/build-container/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/build-container/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build-container/build-package" beforeDir="false" afterPath="$PROJECT_DIR$/build-container/build-package" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/Cargo.toml" beforeDir="false" afterPath="$PROJECT_DIR$/common/Cargo.toml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/src/config.rs" beforeDir="false" afterPath="$PROJECT_DIR$/common/src/config.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/src/lib.rs" beforeDir="false" afterPath="$PROJECT_DIR$/common/src/lib.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/src/types.rs" beforeDir="false" afterPath="$PROJECT_DIR$/common/src/types.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/database/Cargo.toml" beforeDir="false" afterPath="$PROJECT_DIR$/database/Cargo.toml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/database/src/lib.rs" beforeDir="false" afterPath="$PROJECT_DIR$/database/src/lib.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/database/src/migrator/mod.rs" beforeDir="false" afterPath="$PROJECT_DIR$/database/src/migrator/mod.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docker-compose.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/notifier/src/main.rs" beforeDir="false" afterPath="$PROJECT_DIR$/notifier/src/main.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/src/main.rs" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/src/setup_rabbit_mq.rs" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/setup_rabbit_mq.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/Cargo.toml" beforeDir="false" afterPath="$PROJECT_DIR$/web/Cargo.toml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/assets/style.css" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/assets/style.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/main.rs" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/main.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/templates/base.html" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/templates/base.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/templates/build-log.html" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/templates/build-log.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/templates/build-results.html" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/templates/build-results.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/templates/force-rebuild.html" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/templates/force-rebuild.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/templates/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/templates/index.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/worker/src/build/docker.rs" beforeDir="false" afterPath="$PROJECT_DIR$/worker/src/build/docker.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/worker/src/main.rs" beforeDir="false" afterPath="$PROJECT_DIR$/worker/src/main.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build-container/build-package" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build-container/get-source" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build-container/install-dependencies" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ChangesViewManager">
+    <option name="groupingKeys">
+      <option value="directory" />
+      <option value="repository" />
+    </option>
   </component>
   <component name="EmbeddingIndexingInfo">
     <option name="cachedIndexableFilesCount" value="89" />
@@ -130,23 +110,23 @@
   </component>
   <component name="NextEditCompletionFeaturesState">
     <decayedCancelled>
-      <entry key="MS100" value="1.0002951499707298" />
-      <entry key="MS500" value="1.3346225293517517" />
-      <entry key="S2" value="3.4483688725854598" />
-      <entry key="S5" value="7.066691189432219" />
-      <entry key="S10" value="11.843833191260627" />
-      <entry key="S30" value="23.16725072997404" />
-      <entry key="S60" value="30.401675906092844" />
-      <entry key="M2" value="36.35849720687858" />
-      <entry key="M5" value="45.50341547360236" />
-      <entry key="M10" value="53.905867337636344" />
-      <entry key="M15" value="58.466604752690195" />
-      <entry key="M30" value="64.9044135978321" />
-      <entry key="H1" value="72.9132444071357" />
-      <entry key="H2" value="89.46979876362109" />
-      <entry key="H4" value="111.00008053374638" />
-      <entry key="D1" value="145.28869950057836" />
-      <entry key="W1" value="153.53940333221078" />
+      <entry key="MS100" value="1.000000361574458" />
+      <entry key="MS500" value="1.0712250130147472" />
+      <entry key="S2" value="2.7936051129315014" />
+      <entry key="S5" value="6.062166477629253" />
+      <entry key="S10" value="8.671705919791531" />
+      <entry key="S30" value="12.73821153772812" />
+      <entry key="S60" value="16.855151806088706" />
+      <entry key="M2" value="24.461453002318738" />
+      <entry key="M5" value="43.118522068507936" />
+      <entry key="M10" value="65.74426266862196" />
+      <entry key="M15" value="82.3942145083425" />
+      <entry key="M30" value="111.47546229624872" />
+      <entry key="H1" value="137.29044604716944" />
+      <entry key="H2" value="164.6284527897315" />
+      <entry key="H4" value="193.04714208815645" />
+      <entry key="D1" value="235.93687081003534" />
+      <entry key="W1" value="246.18537029124724" />
     </decayedCancelled>
     <decayedSelected>
       <entry key="MS100" value="0.0" />
@@ -168,23 +148,23 @@
       <entry key="W1" value="0.0" />
     </decayedSelected>
     <decayedShown>
-      <entry key="MS100" value="0.9865168549539494" />
-      <entry key="MS500" value="1.3040201228786008" />
-      <entry key="S2" value="3.400356830060042" />
-      <entry key="S5" value="7.022944379019151" />
-      <entry key="S10" value="11.805153371041953" />
-      <entry key="S30" value="23.145206160155567" />
-      <entry key="S60" value="30.388574431137886" />
-      <entry key="M2" value="36.35126855535843" />
-      <entry key="M5" value="45.50029148808036" />
-      <entry key="M10" value="53.904238834447774" />
-      <entry key="M15" value="58.465498224415384" />
-      <entry key="M30" value="64.90384653186673" />
-      <entry key="H1" value="72.91295322282157" />
-      <entry key="H2" value="89.46964583862207" />
-      <entry key="H4" value="110.99999938138556" />
-      <entry key="D1" value="145.28868473643223" />
-      <entry key="W1" value="153.539401180528" />
+      <entry key="MS100" value="0.97942065172029" />
+      <entry key="MS500" value="1.0667797515004318" />
+      <entry key="S2" value="2.7907260284156403" />
+      <entry key="S5" value="6.059635233089485" />
+      <entry key="S10" value="8.669876978974253" />
+      <entry key="S30" value="12.737290567797977" />
+      <entry key="S60" value="16.85452802328357" />
+      <entry key="M2" value="24.460974603070806" />
+      <entry key="M5" value="43.11763221902428" />
+      <entry key="M10" value="65.74282375991571" />
+      <entry key="M15" value="82.39270990563752" />
+      <entry key="M30" value="111.4742536702358" />
+      <entry key="H1" value="137.28967107240516" />
+      <entry key="H2" value="164.6280084828965" />
+      <entry key="H4" value="193.04690139276565" />
+      <entry key="D1" value="235.93682732158123" />
+      <entry key="W1" value="246.18536397968867" />
     </decayedShown>
   </component>
   <component name="ProjectColorInfo">{
@@ -218,7 +198,7 @@
     "codeWithMe.voiceChat.enabledByDefault": "false",
     "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
     "dart.analysis.tool.window.visible": "false",
-    "git-widget-placeholder": "s3",
+    "git-widget-placeholder": "main",
     "junie.onboarding.icon.badge.shown": "true",
     "last_opened_file_path": "/home/julian/projects/privat/aur-builder",
     "node.js.detected.package.eslint": "true",
@@ -226,6 +206,7 @@
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
+    "npm.dev.executor": "Run",
     "org.rust.cargo.project.model.PROJECT_DISCOVERY": "true",
     "org.rust.cargo.project.model.impl.CargoExternalSystemProjectAware.subscribe.first.balloon": "",
     "org.rust.first.attach.projects": "true",
@@ -257,7 +238,7 @@
   <component name="RsExternalLinterProjectSettings">
     <option name="runOnTheFly" value="true" />
   </component>
-  <component name="RunManager" selected="Docker.docker-compose.yaml.rabbitmq: Compose Deployment">
+  <component name="RunManager" selected="npm.dev">
     <configuration name="Run notifier" type="CargoCommandRunConfiguration" factoryName="Cargo Command">
       <option name="buildProfileId" value="dev" />
       <option name="command" value="run --package notifier --bin notifier" />
@@ -366,13 +347,23 @@
       </deployment>
       <method v="2" />
     </configuration>
+    <configuration name="dev" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
+      <package-json value="$PROJECT_DIR$/docs/package.json" />
+      <command value="run" />
+      <scripts>
+        <script value="dev" />
+      </scripts>
+      <node-interpreter value="project" />
+      <envs />
+      <method v="2" />
+    </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="npm.dev" />
         <item itemvalue="Docker.docker-compose.yaml.rabbitmq: Compose Deployment" />
         <item itemvalue="Cargo.Run web" />
         <item itemvalue="Cargo.Run worker" />
         <item itemvalue="Cargo.Run worker" />
-        <item itemvalue="Docker.docker-compose.yaml.rabbitmq: Compose Deployment" />
       </list>
     </recent_temporary>
   </component>
@@ -600,7 +591,9 @@
     <MESSAGE value="ci: log in to push build cache on pull request" />
     <MESSAGE value="fix: add `--needed` flag to dependency installation in build container" />
     <MESSAGE value="feat(worker): add support for configurable Docker tag" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(worker): add support for configurable Docker tag" />
+    <MESSAGE value="feat: standalone&#10;&#10;AI coded improvements:&#10;- standalone repo&#10;- internal usage of s3 storage&#10;- better web ui&#10;- setup script&#10;&#10;BREAKING CHANGE: New config vars" />
+    <MESSAGE value="chore(docker-compose): update service images to version 2" />
+    <option name="LAST_COMMIT_MESSAGE" value="chore(docker-compose): update service images to version 2" />
   </component>
   <component name="XDebuggerManager">
     <watches-manager>
