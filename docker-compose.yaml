@@ -12,7 +12,7 @@ services:
     environment:
       RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS: "-rabbit consumer_timeout 36000000"
   server:
-    image: ghcr.io/neferin12/aur-builder-server:1
+    image: ghcr.io/neferin12/aur-builder-server:2
     container_name: 'aur-builder-server'
     build:
         context: .
@@ -30,7 +30,7 @@ services:
       - rabbitmq
     restart: always
   worker:
-    image: ghcr.io/neferin12/aur-builder-worker:1
+    image: ghcr.io/neferin12/aur-builder-worker:2
     deploy:
         mode: replicated
         replicas: 2
@@ -42,14 +42,14 @@ services:
       AMQP_ADDR: ${AMQP_ADDR}
       RUST_LOG: ${RUST_LOG:-info}
       AB_BUILDER: ${AB_BUILDER:-ghcr.io/neferin12/aur-builder-build-container}
-      AB_BUILDER_TAG: ${AB_BUILDER_TAG:-1.1.11}
+      AB_BUILDER_TAG: ${AB_BUILDER_TAG:-2}
     depends_on:
       - rabbitmq
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     restart: always
   web:
-    image: ghcr.io/neferin12/aur-builder-web:1
+    image: ghcr.io/neferin12/aur-builder-web:2
     build:
       context: .
       dockerfile: Dockerfile
@@ -62,7 +62,7 @@ services:
     volumes:
       - ./db:/app/db
   notifier:
-    image: ghcr.io/neferin12/aur-builder-notifier:1
+    image: ghcr.io/neferin12/aur-builder-notifier:2
     build:
       context: .
       dockerfile: Dockerfile
@@ -82,6 +82,7 @@ services:
       - garage-meta:/var/lib/garage/meta
       - garage-data:/var/lib/garage/data
   repo:
+    image: ghcr.io/neferin12/aur-builder-repo:2
     build:
       context: .
       target: repo
