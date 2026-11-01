@@ -29,19 +29,7 @@
     </cargoProject>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="30df73c6-6061-4a44-ad67-d8c0fc6fb8e8" name="Changes" comment="feat(worker): add support for configurable Docker tag">
-      <change beforePath="$PROJECT_DIR$/.dockerignore" beforeDir="false" afterPath="$PROJECT_DIR$/.dockerignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Cargo.toml" beforeDir="false" afterPath="$PROJECT_DIR$/Cargo.toml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/STORAGE.md" beforeDir="false" afterPath="$PROJECT_DIR$/STORAGE.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build-container/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/build-container/Dockerfile" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build-container/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/build-container/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build-container/build-package" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/build-container/get-source" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/build-container/install-dependencies" beforeDir="false" />
-    </list>
+    <list default="true" id="30df73c6-6061-4a44-ad67-d8c0fc6fb8e8" name="Changes" comment="feat: refactor build container into rust module" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -110,23 +98,23 @@
   </component>
   <component name="NextEditCompletionFeaturesState">
     <decayedCancelled>
-      <entry key="MS100" value="1.000000361574458" />
-      <entry key="MS500" value="1.0712250130147472" />
-      <entry key="S2" value="2.7936051129315014" />
-      <entry key="S5" value="6.062166477629253" />
-      <entry key="S10" value="8.671705919791531" />
-      <entry key="S30" value="12.73821153772812" />
-      <entry key="S60" value="16.855151806088706" />
-      <entry key="M2" value="24.461453002318738" />
-      <entry key="M5" value="43.118522068507936" />
-      <entry key="M10" value="65.74426266862196" />
-      <entry key="M15" value="82.3942145083425" />
-      <entry key="M30" value="111.47546229624872" />
-      <entry key="H1" value="137.29044604716944" />
-      <entry key="H2" value="164.6284527897315" />
-      <entry key="H4" value="193.04714208815645" />
-      <entry key="D1" value="235.93687081003534" />
-      <entry key="W1" value="246.18537029124724" />
+      <entry key="MS100" value="1.005199089954834" />
+      <entry key="MS500" value="1.5075039015171332" />
+      <entry key="S2" value="4.124595520638106" />
+      <entry key="S5" value="7.0899242495595685" />
+      <entry key="S10" value="9.213159658823702" />
+      <entry key="S30" value="12.644783379571695" />
+      <entry key="S60" value="17.22448487159676" />
+      <entry key="M2" value="25.48702688688658" />
+      <entry key="M5" value="46.94497362307565" />
+      <entry key="M10" value="73.94057351152752" />
+      <entry key="M15" value="93.77839494188235" />
+      <entry key="M30" value="128.99185558083437" />
+      <entry key="H1" value="160.1989568657685" />
+      <entry key="H2" value="191.13742311458063" />
+      <entry key="H4" value="221.82204962614875" />
+      <entry key="D1" value="267.27984109355396" />
+      <entry key="W1" value="278.0874392672213" />
     </decayedCancelled>
     <decayedSelected>
       <entry key="MS100" value="0.0" />
@@ -148,23 +136,23 @@
       <entry key="W1" value="0.0" />
     </decayedSelected>
     <decayedShown>
-      <entry key="MS100" value="0.97942065172029" />
-      <entry key="MS500" value="1.0667797515004318" />
-      <entry key="S2" value="2.7907260284156403" />
-      <entry key="S5" value="6.059635233089485" />
-      <entry key="S10" value="8.669876978974253" />
-      <entry key="S30" value="12.737290567797977" />
-      <entry key="S60" value="16.85452802328357" />
-      <entry key="M2" value="24.460974603070806" />
-      <entry key="M5" value="43.11763221902428" />
-      <entry key="M10" value="65.74282375991571" />
-      <entry key="M15" value="82.39270990563752" />
-      <entry key="M30" value="111.4742536702358" />
-      <entry key="H1" value="137.28967107240516" />
-      <entry key="H2" value="164.6280084828965" />
-      <entry key="H4" value="193.04690139276565" />
-      <entry key="D1" value="235.93682732158123" />
-      <entry key="W1" value="246.18536397968867" />
+      <entry key="MS100" value="0.9913602176296942" />
+      <entry key="MS500" value="1.5026149069041836" />
+      <entry key="S2" value="4.110003884295368" />
+      <entry key="S5" value="7.077210214181734" />
+      <entry key="S10" value="9.20480898338761" />
+      <entry key="S30" value="12.641356309834796" />
+      <entry key="S60" value="17.222574076950288" />
+      <entry key="M2" value="25.485919259674915" />
+      <entry key="M5" value="46.944115764834365" />
+      <entry key="M10" value="73.93936701504568" />
+      <entry key="M15" value="93.77707820538083" />
+      <entry key="M30" value="128.99071508411956" />
+      <entry key="H1" value="160.19819083310375" />
+      <entry key="H2" value="191.13697304560665" />
+      <entry key="H4" value="221.82180281178208" />
+      <entry key="D1" value="267.2797960544045" />
+      <entry key="W1" value="278.087432719728" />
     </decayedShown>
   </component>
   <component name="ProjectColorInfo">{
@@ -593,7 +581,8 @@
     <MESSAGE value="feat(worker): add support for configurable Docker tag" />
     <MESSAGE value="feat: standalone&#10;&#10;AI coded improvements:&#10;- standalone repo&#10;- internal usage of s3 storage&#10;- better web ui&#10;- setup script&#10;&#10;BREAKING CHANGE: New config vars" />
     <MESSAGE value="chore(docker-compose): update service images to version 2" />
-    <option name="LAST_COMMIT_MESSAGE" value="chore(docker-compose): update service images to version 2" />
+    <MESSAGE value="feat: refactor build container into rust module" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: refactor build container into rust module" />
   </component>
   <component name="XDebuggerManager">
     <watches-manager>
