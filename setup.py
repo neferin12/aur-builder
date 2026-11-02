@@ -199,6 +199,17 @@ class Setup:
         if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9@_+.-]*", name):
             raise SetupError("Use a repository name beginning with a letter or digit.")
         self.env.set("AB_REPO_NAME", name)
+        web_url = origin(ask("Web UI HTTPS origin", self.env.get("AB_WEB_URL")))
+        if urlsplit(web_url).scheme != "https":
+            raise SetupError("The web UI requires HTTPS for OIDC session cookies.")
+        self.env.set("AB_WEB_URL", web_url)
+        for key, label in [("AB_OIDC_ISSUER", "OIDC issuer URL"),
+                           ("AB_OIDC_CLIENT_ID", "OIDC client ID"),
+                           ("AB_OIDC_CLIENT_SECRET", "OIDC client secret"),
+                           ("AB_OIDC_ADMIN_GROUP", "OIDC administrator group")]:
+            self.env.set(key, ask(label, self.env.get(key), key.endswith("SECRET")))
+        self.env.set("AB_OIDC_GROUPS_CLAIM", self.env.get("AB_OIDC_GROUPS_CLAIM") or "groups")
+        self.env.set("AB_AI_MODE", self.env.get("AB_AI_MODE") or "disabled")
         self.env.save()
         for directory in ("db", "server_tmp"):
             (self.root / directory).mkdir(exist_ok=True)
@@ -413,8 +424,8 @@ class Setup:
         for service in ("server", "worker", "web", "repo"):
             self.ensure_running(service)
         self.compose("ps")
-        print("\nServices started. Dashboard: http://localhost:3000; repo: port 3001.")
-        print("Configure HTTPS for repo and S3, and protect the dashboard with your network or proxy authentication.")
+        print(f"\nServices started. Dashboard: {self.env.get('AB_WEB_URL')}; repo: port 3001.")
+        print("Configure HTTPS for the dashboard, repo and S3. Sign in with the configured OIDC administrator group and approve releases.")
         print("Credentials are in .env. Trust repo-public-key.asc on pacman clients as described in README.md.")
         print("If no packages were configured, edit config.yaml and restart server.")
 

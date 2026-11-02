@@ -16,12 +16,14 @@ COPY . .
 RUN cargo build --release --target x86_64-unknown-linux-musl
 
 FROM alpine AS server
+RUN apk add --no-cache ca-certificates
 WORKDIR /app
 COPY --from=builder /app/target/x86_64-unknown-linux-musl/release/server /usr/local/bin/server
 
 CMD ["/usr/local/bin/server"]
 
 FROM alpine AS web
+RUN apk add --no-cache ca-certificates
 WORKDIR /app
 COPY --from=builder /app/target/x86_64-unknown-linux-musl/release/web /usr/local/bin/web
 COPY web/src/templates /app/web/src/templates

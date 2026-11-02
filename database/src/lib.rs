@@ -8,8 +8,10 @@ use std::process::exit;
 use std::time::Duration;
 use tokio::time::sleep;
 
+pub mod access;
 pub mod entities;
 pub mod migrator;
+pub mod reviews;
 
 use common::environment::get_environment_variable;
 use common::types::{BuildResultTransmissionFormat, PackageSearchResult};
@@ -258,7 +260,7 @@ pub async fn connect_to_db() -> Database {
 }
 
 impl Database {
-    async fn storage_query(
+    pub(crate) async fn storage_query(
         &self,
         sql: &str,
         values: Vec<sea_orm::Value>,
@@ -283,60 +285,6 @@ impl Database {
         Ok(sea_orm::Statement::from_sql_and_values(
             backend, sql, values,
         ))
-    }
-    /// Persist the metadata change and its queued task together, so a crash cannot lose a build.
-    pub async fn schedule_build(
-        &self,
-        data: &PackageSearchResult,
-        grant: impl FnOnce(
-            &mut common::types::BuildTaskTransmissionFormat,
-        ) -> Result<(), common::storage::Error>,
-    ) -> Result<Option<common::types::BuildTaskTransmissionFormat>, DbErr> {
-        use sea_orm::{ConnectionTrait, TransactionTrait};
-        let tx = self.db.begin().await?;
-        let existing = PackageMetadata::find()
-            .filter(package_metadata::Column::Name.eq(&data.name))
-            .one(&tx)
-            .await?;
-        if existing
-            .as_ref()
-            .is_some_and(|p| p.last_modified >= data.last_modified)
-        {
-            return Ok(None);
-        }
-        let model = package_metadata::ActiveModel {
-            id: existing
-                .as_ref()
-                .map(|p| ActiveValue::Set(p.id))
-                .unwrap_or(ActiveValue::NotSet),
-            name: ActiveValue::Set(data.name.clone()),
-            version: ActiveValue::Set(data.version.clone()),
-            maintainer: ActiveValue::Set(data.maintainer.clone()),
-            last_modified: ActiveValue::Set(data.last_modified),
-            source: ActiveValue::Set(data.source.clone()),
-            subfolder: ActiveValue::Set(data.subfolder.clone()),
-        };
-        let package = if existing.is_some() {
-            model.update(&tx).await?
-        } else {
-            model.insert(&tx).await?
-        };
-        let mut task = common::types::BuildTaskTransmissionFormat {
-            id: package.id,
-            name: package.name,
-            version: data.version.clone(),
-            source: package.source,
-            subfolder: package.subfolder,
-            options: data.options.clone(),
-            env: data.environment.clone(),
-            attempt: String::new(),
-            object_key: String::new(),
-            upload: None,
-        };
-        grant(&mut task).map_err(|_| DbErr::Custom("failed to issue upload grant".into()))?;
-        tx.execute(self.attempt_insert(&task).await?).await?;
-        tx.commit().await?;
-        Ok(Some(task))
     }
     pub async fn pending_attempts(
         &self,
@@ -376,6 +324,9 @@ impl Database {
         task: &common::types::BuildTaskTransmissionFormat,
     ) -> Result<bool, DbErr> {
         use sea_orm::ConnectionTrait;
+        if !self.approved_task(task).await? {
+            return Ok(false);
+        }
         let q = self
             .storage_query(
                 "SELECT task FROM build_attempt WHERE attempt=? AND package_id=? AND object_key=?",
@@ -455,6 +406,9 @@ impl Database {
         catalog: &str,
     ) -> Result<bool, DbErr> {
         use sea_orm::ConnectionTrait;
+        if !self.valid_attempt(task).await? {
+            return Ok(false);
+        }
         let q=self.storage_query("INSERT INTO repo_catalog (id,catalog) SELECT 1,? WHERE ?=(SELECT attempt FROM build_attempt WHERE package_id=? ORDER BY created_at DESC,attempt DESC LIMIT 1) ON CONFLICT(id) DO UPDATE SET catalog=excluded.catalog",vec![catalog.into(),task.attempt.clone().into(),task.id.into()]).await?;
         Ok(self.db.execute(q).await?.rows_affected() == 1)
     }
@@ -483,15 +437,7 @@ mod storage_tests {
             options: None,
             environment: None,
         };
-        let task = db
-            .schedule_build(&data, |task| {
-                task.attempt = "status-1".into();
-                task.object_key = "builds/status-1/bundle.tar".into();
-                Ok(())
-            })
-            .await
-            .unwrap()
-            .unwrap();
+        let task = approved_fixture(&db, &data, "status-1").await;
         let now = sea_orm::sqlx::types::chrono::Utc::now().naive_utc();
         let mut result = BuildResultTransmissionFormat {
             task: task.clone(),
@@ -514,74 +460,25 @@ mod storage_tests {
         );
     }
     #[tokio::test]
-    async fn metadata_and_task_are_atomic() {
+    async fn attempts_validation_and_catalog_replacement() {
         let db = Database::new("sqlite::memory:".into()).await.unwrap();
         db.migrate().await;
         let data = PackageSearchResult {
-            name: "atomic".into(),
+            name: "test".into(),
             version: "1".into(),
             maintainer: "test".into(),
             last_modified: 1,
-            source: None,
+            source: Some("https://example.com/source.git".into()),
             subfolder: None,
             options: None,
             environment: None,
         };
-        assert!(
-            db.schedule_build(&data, |_| Err("grant failed".into()))
-                .await
-                .is_err()
-        );
-        assert!(db.get_package_by_name(&data.name).await.unwrap().is_none());
-        assert!(db.pending_attempts().await.unwrap().is_empty());
-        let task = db
-            .schedule_build(&data, |task| {
-                task.attempt = "atomic-1".into();
-                task.object_key = "builds/atomic-1/bundle.tar".into();
-                Ok(())
-            })
-            .await
-            .unwrap()
-            .unwrap();
-        assert!(db.valid_attempt(&task).await.unwrap());
-        assert!(db.attempt_needs_build(&task).await.unwrap());
-        db.finish_attempt(&task.attempt).await.unwrap();
-        db.attempt_state(&task.attempt, "dispatched").await.unwrap();
-        assert!(!db.attempt_needs_build(&task).await.unwrap());
-        db.attempt_state(&task.attempt, "queued").await.unwrap();
-        assert_eq!(db.pending_attempts().await.unwrap().len(), 1);
-        assert!(
-            db.schedule_build(&data, |_| panic!(
-                "unchanged metadata must not issue a grant"
-            ))
-            .await
-            .unwrap()
-            .is_none()
-        );
-    }
-    #[tokio::test]
-    async fn attempts_validation_and_catalog_replacement() {
-        let db = Database::new("sqlite::memory:".into()).await.unwrap();
-        db.migrate().await;
-        let mut task = common::types::BuildTaskTransmissionFormat {
-            id: 1,
-            name: "test".into(),
-            version: "1".into(),
-            source: None,
-            subfolder: None,
-            options: None,
-            env: None,
-            attempt: "a".into(),
-            object_key: "builds/a/bundle.tar".into(),
-            upload: None,
-        };
-        db.record_attempt(&task).await.unwrap();
+        let mut task = approved_fixture(&db, &data, "a").await;
         assert!(db.valid_attempt(&task).await.unwrap());
         assert!(db.latest_attempt(&task).await.unwrap());
         task.object_key = "another-object".into();
         assert!(!db.valid_attempt(&task).await.unwrap());
         task.attempt = "b".into();
-        tokio::time::sleep(Duration::from_millis(2)).await;
         db.record_attempt(&task).await.unwrap();
         assert!(db.latest_attempt(&task).await.unwrap());
         task.attempt = "a".into();
@@ -591,9 +488,36 @@ mod storage_tests {
         task.attempt = "b".into();
         assert!(db.publish_catalog(&task, "current").await.unwrap());
         assert_eq!(db.load_catalog().await.unwrap(), "current");
-        db.save_catalog("{\"generation\":1}").await.unwrap();
-        assert_eq!(db.load_catalog().await.unwrap(), "{\"generation\":1}");
-        db.save_catalog("{\"generation\":2}").await.unwrap();
-        assert_eq!(db.load_catalog().await.unwrap(), "{\"generation\":2}");
+        task.revision = None;
+        assert!(!db.valid_attempt(&task).await.unwrap());
+        assert!(!db.publish_catalog(&task, "legacy").await.unwrap());
+    }
+    async fn approved_fixture(
+        db: &Database,
+        data: &PackageSearchResult,
+        attempt: &str,
+    ) -> common::types::BuildTaskTransmissionFormat {
+        db.observe_release(
+            data,
+            &"a".repeat(40),
+            "first",
+            &reviews::Snapshot {
+                files: vec![],
+                complete: true,
+            },
+        )
+        .await
+        .unwrap();
+        let c = db.candidates().await.unwrap().remove(0);
+        assert!(
+            db.decide_release(&c.id, "reviewer", true, "", |t| {
+                t.attempt = attempt.into();
+                t.object_key = format!("builds/{attempt}/bundle.tar");
+                Ok(())
+            })
+            .await
+            .unwrap()
+        );
+        db.pending_attempts().await.unwrap().remove(0)
     }
 }

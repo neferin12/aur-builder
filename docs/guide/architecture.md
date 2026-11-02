@@ -30,19 +30,21 @@ flowchart TB
 | `worker` | Runs Docker build containers and reports results |
 | `build-container` | Fetches sources, installs dependencies, runs `makepkg`, and uploads a bundle |
 | `repo` | Validates artifacts, signs packages/databases, publishes the catalog, and authenticates downloads |
-| `web` | Dashboard, history, logs, and rebuild requests |
+| `web` | OIDC login, permissions, source diffs, approval queue, history, logs, and rebuilds |
 | `notifier` | Optional SMTP notifications |
 | `database` | Shared SQL access and migrations |
 | `common` | Configuration, message types, S3 signing, and messaging helpers |
 
 ## Task and upload flow
 
-The server records a metadata change and its queued task together. Each task has a
+The server captures immutable packaging revisions as pending release candidates.
+Human approval or configured AI approval records a decision and a queued task in
+one database transaction. Each task pins the approved commit and has a
 unique attempt ID, private bundle object key, presigned PUT URL, and URL expiry.
 Pending task records allow recovery after a crash before broker confirmation.
 
 Workers receive no S3 access keys. A worker starts an Arch container with the
-source, build options, environment, and task upload URL. Successful outputs are
+approved source revision, build options, environment, and task upload URL. Successful outputs are
 bundled and uploaded before the result is published. Upload failure is a build
 failure. Logs remain in the SQL build-result flow.
 

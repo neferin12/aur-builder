@@ -7,6 +7,9 @@ mod m20250316_173233_source;
 mod m20250316_182755_subfolder;
 mod m20250319_110511_switch_start_and_end_timestamps;
 mod m20261101_000001_storage;
+mod m20261102_000001_reviews;
+mod m20261102_000002_review_notifications;
+mod m20261102_000003_auth_and_observations;
 
 use sea_orm_migration::prelude::*;
 
@@ -25,6 +28,9 @@ impl MigratorTrait for Migrator {
             Box::new(m20250316_182755_subfolder::Migration),
             Box::new(m20250319_110511_switch_start_and_end_timestamps::Migration),
             Box::new(m20261101_000001_storage::Migration),
+            Box::new(m20261102_000001_reviews::Migration),
+            Box::new(m20261102_000002_review_notifications::Migration),
+            Box::new(m20261102_000003_auth_and_observations::Migration),
         ]
     }
 }

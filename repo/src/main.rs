@@ -609,20 +609,33 @@ mod integration_tests {
             ],
             dir.path(),
         )?;
-        let mut task = common::types::BuildTaskTransmissionFormat {
-            id: 1,
+        let data = common::types::PackageSearchResult {
             name: "storage-test".into(),
             version: "1.0-1".into(),
-            source: None,
+            source: Some("https://example.com/source.git".into()),
             subfolder: None,
             options: None,
-            env: None,
-            attempt: String::new(),
-            object_key: String::new(),
-            upload: None,
+            environment: None,
+            maintainer: "test".into(),
+            last_modified: 1,
         };
-        app.storage.grant(&mut task)?;
-        db.record_attempt(&task).await?;
+        db.observe_release(
+            &data,
+            &"a".repeat(40),
+            "storage-test",
+            &database::reviews::Snapshot {
+                files: vec![],
+                complete: true,
+            },
+        )
+        .await?;
+        let candidate = db.candidates().await?.remove(0);
+        db.decide_release(&candidate.id, "reviewer", true, "", |t| {
+            app.storage.grant(t)
+        })
+        .await?;
+        let mut task = db.pending_attempts().await?.remove(0);
+        app.storage.renew(&mut task)?;
         let url = task.upload.take().unwrap().url;
         assert!(
             client

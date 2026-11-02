@@ -323,6 +323,15 @@ fn upload(bundle: &Path, url: &str) -> Result<()> {
     result.map_err(|_| anyhow::anyhow!("bundle upload failed"))
 }
 
+fn checkout_approved_source(root: &Path, revision: &str) -> Result<()> {
+    if revision.len() != 40 || !revision.bytes().all(|b| b.is_ascii_hexdigit()) {
+        bail!("missing or invalid approved revision");
+    }
+    run(Command::new("git")
+        .current_dir(root)
+        .args(["checkout", "--detach", revision]))
+}
+
 async fn execute() -> std::result::Result<(), (i32, anyhow::Error)> {
     let url = env::var("AB_UPLOAD_URL")
         .ok()
@@ -337,10 +346,22 @@ async fn execute() -> std::result::Result<(), (i32, anyhow::Error)> {
         .current_dir(&home)
         .args(["clone", "--", &source, "source"]))
     .map_err(|e| (102, e))?;
+    let revision = env::var("AB_REVISION").map_err(|e| (102, e.into()))?;
+    checkout_approved_source(&home.join("source"), &revision).map_err(|e| (102, e))?;
     let dir = home
         .join("source")
         .join(env::var("AB_SUBFOLDER").unwrap_or_default());
     let dir = dir.canonicalize().map_err(|e| (100, e.into()))?;
+    if !dir.starts_with(
+        home.join("source")
+            .canonicalize()
+            .map_err(|e| (100, e.into()))?,
+    ) {
+        return Err((
+            100,
+            anyhow::anyhow!("package subfolder escapes source repository"),
+        ));
+    }
     let opts = options(&env::var("AB_OPTIONS").unwrap_or_default());
     println!("INFO: updating packages...");
     run(Command::new("sudo").args(["pacman", "-Syu", "--noconfirm"])).map_err(|e| (103, e))?;
@@ -494,5 +515,65 @@ mod tests {
             }
             server.join().unwrap();
         }
+    }
+}
+
+#[cfg(test)]
+mod approval_tests {
+    use super::*;
+    #[test]
+    fn checks_out_approved_commit_and_rejects_unpinned_input() {
+        let dir = tempfile::tempdir().unwrap();
+        run(Command::new("git")
+            .current_dir(dir.path())
+            .args(["init", "--quiet"]))
+        .unwrap();
+        std::fs::write(dir.path().join("PKGBUILD"), "approved").unwrap();
+        run(Command::new("git")
+            .current_dir(dir.path())
+            .args(["add", "PKGBUILD"]))
+        .unwrap();
+        run(Command::new("git").current_dir(dir.path()).args([
+            "-c",
+            "user.name=Test",
+            "-c",
+            "user.email=test@example.com",
+            "commit",
+            "--no-gpg-sign",
+            "--quiet",
+            "-m",
+            "approved",
+        ]))
+        .unwrap();
+        let output = Command::new("git")
+            .current_dir(dir.path())
+            .args(["rev-parse", "HEAD"])
+            .output()
+            .unwrap();
+        let revision = String::from_utf8(output.stdout).unwrap().trim().to_owned();
+        std::fs::write(dir.path().join("PKGBUILD"), "unapproved").unwrap();
+        run(Command::new("git")
+            .current_dir(dir.path())
+            .args(["add", "PKGBUILD"]))
+        .unwrap();
+        run(Command::new("git").current_dir(dir.path()).args([
+            "-c",
+            "user.name=Test",
+            "-c",
+            "user.email=test@example.com",
+            "commit",
+            "--no-gpg-sign",
+            "--quiet",
+            "-m",
+            "unapproved",
+        ]))
+        .unwrap();
+        assert!(checkout_approved_source(dir.path(), "HEAD").is_err());
+        checkout_approved_source(dir.path(), &revision).unwrap();
+        assert_eq!(
+            std::fs::read_to_string(dir.path().join("PKGBUILD")).unwrap(),
+            "approved"
+        );
+        assert!(checkout_approved_source(dir.path(), &"0".repeat(40)).is_err());
     }
 }

@@ -96,3 +96,42 @@ mod worker_config_tests {
         assert_eq!(settings.builder_tag.as_deref(), Some("setup-local"));
     }
 }
+
+/// Repository identity safe to display to viewers; credentials and query values stay private.
+pub fn public_source(source: &str) -> String {
+    if let Ok(mut url) = url::Url::parse(source) {
+        let hidden_query = url.query().is_some();
+        let _ = url.set_username("");
+        let _ = url.set_password(None);
+        url.set_query(None);
+        url.set_fragment(None);
+        let mut display = url.to_string();
+        if hidden_query {
+            display.push_str("?[redacted]");
+        }
+        display
+    } else if let Some((_, host_path)) = source.split_once('@') {
+        format!("[redacted]@{host_path}")
+    } else {
+        "Configured repository".into()
+    }
+}
+#[cfg(test)]
+mod source_redaction_tests {
+    use super::*;
+    #[test]
+    fn source_display_hides_url_authentication() {
+        assert_eq!(
+            public_source("https://user:token@example.com/pkg.git?access_token=secret#fragment"),
+            "https://example.com/pkg.git?[redacted]"
+        );
+        assert_eq!(
+            public_source("git@example.com:packages/pkg.git"),
+            "[redacted]@example.com:packages/pkg.git"
+        );
+        assert_eq!(
+            public_source("https://example.com/pkg.git"),
+            "https://example.com/pkg.git"
+        );
+    }
+}

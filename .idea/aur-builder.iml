@@ -9,6 +9,7 @@
       <sourceFolder url="file://$MODULE_DIR$/worker/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/notifier/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/repo/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/web/tests" isTestSource="true" />
       <excludeFolder url="file://$MODULE_DIR$/target" />
     </content>
     <orderEntry type="inheritedJdk" />

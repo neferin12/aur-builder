@@ -68,3 +68,30 @@ uploaded to Gitea.
 Verify a successful publication, import the public key on clients, and use the
 [new pacman repository entry](./pacman.md). A database request returning 404 before
 the first publication is expected.
+
+## Upgrade to release approvals and OIDC
+
+1. Stop detection and drain existing build/result/ingestion queues with the old
+   services. Back up the shared database. Stop the remaining services.
+2. Configure the mandatory OIDC settings and HTTPS web origin described in
+   [Release reviews and SSO](./reviews). Register the callback with your provider.
+3. Rebuild all application images **and the build-container image** together.
+   Workers now need the shared database; update Compose mounts and environment.
+4. Start the server to apply additive migrations, then start the other services.
+5. Sign in using the administrator group and approve the first captured packaging
+   snapshot for every existing package. Existing published packages remain available.
+
+Legacy unpinned tasks and results are rejected after upgrading. Do not mix old and
+new service versions or expect queued old attempts to publish. Pending approvals,
+users, and sessions live in SQL; protect database backups because candidate build
+payloads contain configured environment settings. Rollback requires a coordinated
+service rollback and restoration of the database backup after stopping all writers.
+
+### Authentication hardening migration
+
+The additive authentication migration clears existing web sessions and in-progress
+OIDC logins once. Users must sign in again. It also backfills the last observed source
+fingerprint so that source reverts supersede obsolete pending reviews correctly.
+Published artifacts, permissions, release candidates, decisions and notification
+records are retained. Back up the database and update server and web together; do
+not mix old authentication binaries with the new session storage format.

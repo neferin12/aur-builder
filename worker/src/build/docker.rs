@@ -104,6 +104,10 @@ pub async fn build(
     let mut env: Vec<String> = vec![
         format!("AB_SOURCE={source_url}"),
         format!(
+            "AB_REVISION={}",
+            task.revision.as_ref().ok_or("missing approved revision")?
+        ),
+        format!(
             "AB_SUBFOLDER={}",
             subfolder.clone().unwrap_or("".to_string())
         ),
@@ -119,7 +123,7 @@ pub async fn build(
 
     if let Some(task_env) = task.env.clone() {
         for env_var in task_env {
-            if env_var.name != "AB_UPLOAD_URL" {
+            if !env_var.name.starts_with("AB_") {
                 env.push(format!("{}={}", env_var.name, env_var.value));
             }
         }

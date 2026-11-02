@@ -8,6 +8,7 @@ use lapin::types::FieldTable;
 
 pub struct RabbitChannels {
     pub build_tx: Channel,
+    pub notify_tx: Channel,
 }
 
 pub async fn setup_rabbitmq(db: &Database) -> RabbitChannels {
@@ -131,6 +132,7 @@ pub async fn setup_rabbitmq(db: &Database) -> RabbitChannels {
         }
     });
     let locale_db = db.clone();
+    let notification_publisher = notify_tx.clone();
     common::messaging::supervise(async move {
         while let Some(delivery) = results_consumer.next().await {
             let delivery = delivery.expect("error in consumer");
@@ -176,5 +178,8 @@ pub async fn setup_rabbitmq(db: &Database) -> RabbitChannels {
         }
     });
 
-    RabbitChannels { build_tx }
+    RabbitChannels {
+        build_tx,
+        notify_tx: notification_publisher,
+    }
 }

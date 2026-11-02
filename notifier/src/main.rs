@@ -1,7 +1,7 @@
 use common::config::{Configurable, NotifierConfig};
 use common::environment::{VERSION, load_dotenv};
 use common::errors::get_error_descriptions;
-use common::types::BuildResultTransmissionFormat;
+use common::types::{Notification, ReviewNotification};
 use common::{connect_to_rabbitmq, get_rand_string};
 use futures_util::stream::StreamExt;
 use lapin::options::{
@@ -63,63 +63,143 @@ async fn main() {
 
     while let Some(delivery) = consumer.next().await {
         let delivery = delivery.expect("error in consumer");
-        let raw_data = std::str::from_utf8(&*delivery.data).unwrap();
-
-        let build_results: BuildResultTransmissionFormat = serde_json::from_str(raw_data).unwrap();
-        match receive_delivery(&build_results, &tera, &config).await {
+        let notification: Notification = match serde_json::from_slice(&delivery.data) {
+            Ok(notification) => notification,
+            Err(e) => {
+                error!("Rejecting malformed notification: {e}");
+                delivery
+                    .reject(lapin::options::BasicRejectOptions { requeue: false })
+                    .await
+                    .unwrap();
+                continue;
+            }
+        };
+        match receive_delivery(&notification, &tera, &config).await {
             Ok(_) => {
                 delivery.ack(BasicAckOptions::default()).await.unwrap();
             }
             Err(e) => {
                 error!("Error: {}", e);
-                delivery.nack(BasicNackOptions::default()).await.unwrap();
+                delivery
+                    .nack(BasicNackOptions {
+                        requeue: true,
+                        ..Default::default()
+                    })
+                    .await
+                    .unwrap();
+                tokio::time::sleep(std::time::Duration::from_secs(5)).await;
             }
         }
     }
 }
 
+fn render_notification(
+    notification: &Notification,
+    tera: &Tera,
+    maillogo: &str,
+) -> Result<(String, String), Box<dyn Error>> {
+    let mut context = Context::new();
+    context.insert("maillogo", maillogo);
+    let (subject, template) = match notification {
+        Notification::Build(build_result) => {
+            context.insert("build_result", build_result);
+            context.insert(
+                "error_description",
+                &get_error_descriptions(build_result.status_code),
+            );
+            (
+                if build_result.success {
+                    format!("Updated {}", build_result.task.name)
+                } else {
+                    format!("Failed to update {}", build_result.task.name)
+                },
+                "build_notification.html",
+            )
+        }
+        Notification::Review(ReviewNotification::ReviewRequired {
+            package_name,
+            version,
+            revision,
+            review_url,
+            reason,
+            ..
+        }) => {
+            context.insert("package_name", package_name);
+            context.insert("release_version", version);
+            context.insert("revision", revision);
+            context.insert("review_url", review_url);
+            context.insert("reason", reason);
+            (
+                format!("Review required: {package_name} {version}"),
+                "review_notification.html",
+            )
+        }
+    };
+    Ok((
+        subject,
+        css_inline::inline(&tera.render(template, &context)?)?,
+    ))
+}
 async fn receive_delivery(
-    build_result: &BuildResultTransmissionFormat,
+    notification: &Notification,
     tera: &Tera,
     config: &NotifierConfig,
 ) -> Result<(), Box<dyn Error>> {
-    let mut context = Context::new();
-
-    context.insert("build_result", &build_result);
-    context.insert("maillogo", &config.maillogo);
-    context.insert(
-        "error_description",
-        &get_error_descriptions(build_result.status_code),
-    );
-
-    let mail_content = css_inline::inline(
-        tera.render("build_notification.html", &context)
-            .unwrap()
-            .as_str(),
-    )?;
-
-    let subject: String;
-
-    match build_result.success {
-        true => subject = format!("Updated {}", build_result.task.name),
-        false => subject = format!("Failed to update {}", build_result.task.name),
-    }
-
+    let (subject, mail_content) = render_notification(notification, tera, &config.maillogo)?;
     let email = Message::builder()
-        .from(config.smtp.from.parse().unwrap())
-        .to(config.smtp.to.parse().unwrap())
+        .from(config.smtp.from.parse()?)
+        .to(config.smtp.to.parse()?)
         .subject(subject)
         .header(ContentType::TEXT_HTML)
         .body(mail_content)?;
 
     let creds = Credentials::new(config.smtp.user.clone(), config.smtp.pass.clone());
 
-    let mailer = SmtpTransport::relay(config.smtp.host.as_str())
-        .unwrap()
+    let mailer = SmtpTransport::relay(config.smtp.host.as_str())?
         .credentials(creds)
         .build();
 
     mailer.send(&email)?;
 
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test]
+    fn review_email_contains_action_link_and_escapes_source_text() {
+        let tera = Tera::new(concat!(
+            env!("CARGO_MANIFEST_DIR"),
+            "/src/templates/**/*.html"
+        ))
+        .unwrap();
+        let notification = Notification::Review(ReviewNotification::ReviewRequired {
+            candidate_id: "candidate".into(),
+            package_name: "example".into(),
+            version: "2-1".into(),
+            revision: "a".repeat(40),
+            review_url: "https://builder.example.com/reviews/candidate".into(),
+            reason: "<script>unsafe</script>".into(),
+        });
+        let (subject, body) = render_notification(&notification, &tera, "").unwrap();
+        assert_eq!(subject, "Review required: example 2-1");
+        assert!(body.contains("https://builder.example.com/reviews/candidate"));
+        assert!(body.contains("&lt;script&gt;"));
+        assert!(!body.contains("<script>"));
+    }
+    #[test]
+    fn legacy_build_messages_still_render() {
+        let tera = Tera::new(concat!(
+            env!("CARGO_MANIFEST_DIR"),
+            "/src/templates/**/*.html"
+        ))
+        .unwrap();
+        let value = serde_json::json!({"task":{"id":1,"attempt":"a","object_key":"bundle","name":"example","version":"1","source":null,"subfolder":null,"options":null,"env":null},"status_code":0,"log_lines":[],"success":true,"timestamps":{"start":"2026-11-02T10:00:00","end":"2026-11-02T10:01:00"}});
+        let message: Notification = serde_json::from_value(value).unwrap();
+        let (subject, body) = render_notification(&message, &tera, "").unwrap();
+        assert_eq!(subject, "Updated example");
+        assert!(body.contains("successfully updated"));
+        assert!(serde_json::from_str::<Notification>(r#"{"type":"unknown"}"#).is_err());
+    }
 }

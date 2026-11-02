@@ -15,5 +15,13 @@ reqwest = "~0.12"
 tokio = {version = "1.45", features = ["full"] }
 simple_logger = "~5.0.0"
 
-[dev-dependencies]
 serde_json = "1"
+
+serde = {version="1", features=["derive"]}
+openidconnect = "3.5"
+similar = "2.7"
+url = "2"
+
+[dev-dependencies]
+tower = {version="0.5",features=["util"]}
+base64 = "0.22"

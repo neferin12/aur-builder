@@ -41,6 +41,10 @@ class SetupTests(unittest.TestCase):
             root = Path(directory)
             (root / ".env").write_text("CUSTOM=untouched\nRABBITMQ_DEFAULT_PASS='special@:/password'\n")
             def answer(label, default="", secret=False, required=True):
+                if label.startswith("Web UI HTTPS"):
+                    return "https://builder.internal"
+                if label.startswith("OIDC"):
+                    return "https://identity.internal" if "URL" in label else "builder"
                 if label.startswith("S3 origin"):
                     return "https://storage.internal"
                 if label.startswith("AUR package"):

@@ -1,4 +1,7 @@
+mod ai;
 mod package_checkers;
+mod review_notifications;
+mod reviews;
 mod setup_rabbit_mq;
 
 use common::config::{Configurable, ServerConfig};
@@ -30,16 +33,20 @@ async fn main() {
     let db = connect_to_db().await;
     db.migrate().await;
 
-    debug!("aur packages: {:?}", &config.aur_packages);
-    debug!("git packages: {:?}", &config.git_packages);
+    debug!("Configured {} AUR packages", config.aur_packages.len());
+    debug!("Configured {} Git packages", config.git_packages.len());
 
     let channels = setup_rabbit_mq::setup_rabbitmq(&db).await;
     let build_tx = channels.build_tx;
 
+    review_notifications::start(db.clone(), channels.notify_tx);
+    ai::start(db.clone(), storage.clone());
     loop {
         // Recover tasks recorded before a crash between persistence and broker confirmation.
         for mut pending in db.pending_attempts().await.unwrap() {
-            if !db.latest_attempt(&pending).await.unwrap() {
+            if !db.approved_task(&pending).await.unwrap()
+                || !db.latest_attempt(&pending).await.unwrap()
+            {
                 db.attempt_state(&pending.attempt, "superseded")
                     .await
                     .unwrap();
@@ -61,7 +68,7 @@ async fn main() {
         let mut package_data = Vec::new();
 
         for pkg in &config.aur_packages {
-            debug!("Getting data for aur package {:?}", pkg);
+            debug!("Getting data for AUR package {}", pkg.name);
             let aur_result = aur::get_aur_data(pkg).await;
             match aur_result {
                 Ok(aur) => {
@@ -74,36 +81,32 @@ async fn main() {
         }
 
         for pkg in &config.git_packages {
-            debug!("Getting data for git package {:?}", pkg);
+            debug!("Getting data for configured Git package");
             let git_result = git::get_git_data(pkg).await;
             match git_result {
                 Ok(git_data) => {
                     package_data.push(git_data);
                 }
-                Err(e) => {
+                Err(_) => {
                     error!(
-                        "Failed to get data for git package \"{}\": {}",
-                        pkg.source, e
+                        "Failed to get package metadata from {}",
+                        common::config::public_source(&pkg.source)
                     );
                 }
             }
         }
 
-        for data in &package_data {
-            if let Some(task) = db
-                .schedule_build(data, |task| storage.grant(task))
-                .await
-                .unwrap()
-            {
-                info!("{} was updated!", data.name);
-                common::messaging::publish(
-                    &build_tx,
-                    "pkg_build",
-                    serde_json::to_string(&task).unwrap().as_ref(),
-                )
-                .await
-                .unwrap();
-                db.attempt_state(&task.attempt, "dispatched").await.unwrap();
+        for mut data in package_data {
+            match reviews::capture(&mut data) {
+                Ok((revision, fingerprint, snapshot)) => {
+                    if let Err(e) = db
+                        .observe_release(&data, &revision, &fingerprint, &snapshot)
+                        .await
+                    {
+                        error!("Could not persist release candidate for {}: {e}", data.name);
+                    }
+                }
+                Err(e) => error!("Could not capture packaging source for {}: {e}", data.name),
             }
         }
         sleep(Duration::from_secs(config.sleepduration.unwrap_or(60 * 5))).await;

@@ -23,8 +23,8 @@ services:
 
 These are changes to the existing services, not a replacement Compose file. Recreate
 the affected containers after editing their port mappings. Keep RabbitMQ's ports
-private as well. Protect the web dashboard separately with proxy authentication or
-network restrictions; the application itself does not authenticate rebuild requests.
+private as well. The web dashboard requires OIDC and an HTTPS reverse proxy; set
+`AB_WEB_URL` to its external HTTPS origin and preserve the browser Origin header.
 
 ## Garage S3 API
 
@@ -130,3 +130,24 @@ docker compose up -d garage server repo
 
 See the official [Garage reverse-proxy guide](https://garagehq.deuxfleurs.fr/documentation/cookbook/reverse-proxy/)
 and [Nginx proxy module reference](https://nginx.org/en/docs/http/ngx_http_proxy_module.html).
+
+## Web dashboard
+
+Terminate TLS for the hostname in `AB_WEB_URL` and proxy requests to port 3000:
+
+```nginx
+location / {
+    proxy_pass http://127.0.0.1:3000;
+    proxy_set_header Host $host;
+    proxy_set_header X-Forwarded-Proto $scheme;
+}
+```
+
+Use your existing TLS configuration for this location. The OIDC callback is
+`https://your-builder-host/auth/callback`. Cookies require HTTPS; plain HTTP
+access to port 3000 cannot establish a session. Do not replace the Origin header.
+
+The UI sends `Cache-Control: no-store`, `Referrer-Policy: no-referrer`, and framing
+restrictions on all responses, including OIDC redirects and errors. Preserve these
+headers and avoid caching `/auth/*`. Keep proxy access logs for `/auth/callback`
+free of query strings, because authorization codes and state are carried there.

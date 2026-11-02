@@ -8,6 +8,8 @@ Run all commands from the project root unless stated otherwise.
 - Python 3.10 or newer for the setup wizard.
 - `gpg` and `gpgconf` for repository signing.
 - Network access to Arch package mirrors and your configured package sources.
+- An OIDC provider with a confidential web client and an administrator group.
+- An HTTPS hostname for the web UI, registered with callback `/auth/callback`.
 - An S3 hostname reachable from build containers **and** pacman clients.
 - HTTPS reverse proxies for the repo and S3 APIs before using them over the internet.
 
@@ -110,3 +112,11 @@ optional; leave `notifier` stopped until its environment is configured.
 Check services with `docker compose ps` and `docker compose logs server worker repo`.
 Configure [Nginx](./nginx.md) and [pacman clients](./pacman.md). The repository
 returns 404 for its database until the first successful publication.
+
+## Approve the first release
+
+Open the HTTPS URL in `AB_WEB_URL` and sign in with an account belonging to
+`AB_OIDC_ADMIN_GROUP`. Open **Release reviews**, inspect the packaging files, and
+approve the first release. No builds run until approval. Administrators can grant
+view, rebuild and approval permissions in **User management** after users first
+sign in. See [Release reviews and SSO](./reviews) for AI review settings.

@@ -116,3 +116,25 @@ AB_MAILLOGO=https://example.com/logo.png
 
 Configure all fields, then run `docker compose up -d --build notifier`.
 Leave the notifier stopped if you do not use email notifications.
+
+## Release reviews, authentication, and AI
+
+The web UI requires `AB_WEB_URL`, `AB_OIDC_ISSUER`, `AB_OIDC_CLIENT_ID`,
+`AB_OIDC_CLIENT_SECRET`, and `AB_OIDC_ADMIN_GROUP`. `AB_OIDC_GROUPS_CLAIM` defaults
+to `groups`; `AB_OIDC_SCOPES` defaults to `profile` (space-separated, with `openid`
+always included); `AB_SESSION_SECONDS` defaults to `3600` (range 60–86400). Both web URL
+and issuer require HTTPS. OIDC discovery, authorization, token and signing-key
+endpoints must use HTTPS without URL credentials. The callback is `/auth/callback` on the configured web origin.
+
+`AB_AI_MODE` accepts `disabled` (default), `feedback`, or `auto_approve`.
+Enabled modes require `AB_AI_MODEL` and `OPENAI_API_KEY`. `AB_AI_MAX_BYTES` defaults
+to `200000`; `AB_AI_TIMEOUT_SECONDS` defaults to `90`. Settings are environment
+variables, loaded at service startup. Workers now require `DATABASE_URL` and access
+to the same database as server, web, and repo.
+
+See [Release reviews and SSO](../guide/reviews) for approval policy and setup.
+
+Changing the OIDC identity settings, client credentials, web origin, scopes, group
+mapping or session lifetime invalidates prior sessions and pending login flows.
+Set identical values across web replicas. Signing-key refresh is automatic with a
+five-minute cache and a one-minute minimum interval between refresh attempts.

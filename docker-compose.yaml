@@ -39,6 +39,7 @@ services:
         dockerfile: Dockerfile
         target: worker
     environment:
+      DATABASE_URL: ${DATABASE_URL}
       AMQP_ADDR: ${AMQP_ADDR}
       RUST_LOG: ${RUST_LOG:-info}
       AB_BUILDER: ${AB_BUILDER:-ghcr.io/neferin12/aur-builder-build-container}
@@ -47,6 +48,7 @@ services:
       - rabbitmq
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+      - ./db:/app/db
     restart: always
   web:
     image: ghcr.io/neferin12/aur-builder-web:2

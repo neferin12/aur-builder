@@ -27,6 +27,7 @@ async fn main() {
         _ => {}
     }
 
+    let db = database::connect_to_db().await;
     let conn = connect_to_rabbitmq().await;
 
     let rx_channel = conn.create_channel().await.unwrap();
@@ -86,6 +87,29 @@ async fn main() {
             }
         };
 
+        match db.valid_attempt(&build_task).await {
+            Ok(true) => {}
+            Ok(false) => {
+                error!("Rejecting unapproved or unpinned build task");
+                delivery
+                    .reject(lapin::options::BasicRejectOptions { requeue: false })
+                    .await
+                    .unwrap();
+                continue;
+            }
+            Err(e) => {
+                error!("Task validation temporarily unavailable: {e}");
+                delivery
+                    .nack(BasicNackOptions {
+                        requeue: true,
+                        ..Default::default()
+                    })
+                    .await
+                    .unwrap();
+                tokio::time::sleep(std::time::Duration::from_secs(2)).await;
+                continue;
+            }
+        }
         if build_task
             .upload
             .as_ref()

@@ -1,3 +1,5 @@
+mod auth;
+mod reviews;
 use axum::extract::Path;
 use axum::response::Html;
 use axum::routing::{get, post};
@@ -10,7 +12,7 @@ use log::{error, info};
 use reqwest::StatusCode;
 use std::collections::HashMap;
 use std::process::exit;
-use tera::{Context, Tera, Value, to_value};
+use tera::{Tera, Value, to_value};
 
 fn error_desc_filter(error: &Value, _: &HashMap<String, Value>) -> Result<Value, tera::Error> {
     let code = error.as_i64().unwrap_or(-1);
@@ -25,6 +27,9 @@ async fn main() {
     info!("Starting Aur-Builder Web v{VERSION}");
 
     let db = connect_to_db().await;
+    db.migrate().await;
+    let auth = std::sync::Arc::new(auth::Auth::discover().await);
+    let auth_state = (auth, db.clone());
     let mut tera = match Tera::new("web/src/templates/**/*.html") {
         Ok(t) => t,
         Err(e) => {
@@ -35,18 +40,34 @@ async fn main() {
     tera.register_filter("err_desc", error_desc_filter);
 
     // build our application with a route
-    let app = Router::new()
+    let protected = Router::new()
         // `GET /` goes to `root`
         .route("/", get(render_packages_function))
         .route("/build-results/{pid}", get(render_build_results_function))
         .route("/build-log/{pid}", get(render_build_log_function))
         .route("/force-rebuild/{pid}", post(init_force_rebuild))
+        .route("/reviews", get(reviews::queue))
+        .route("/reviews/{cid}", get(reviews::detail).post(reviews::decide))
+        .route("/admin/users", get(reviews::users))
+        .route("/admin/users/{uid}", post(reviews::update_user))
+        .route("/logout", post(auth::logout))
+        .route_layer(axum::middleware::from_fn_with_state(
+            auth_state.clone(),
+            auth::protect,
+        ));
+    let app = Router::new()
+        .route("/auth/login", get(auth::login))
+        .route("/auth/callback", get(auth::callback))
+        .route("/auth/signed-out", get(auth::signed_out))
+        .merge(protected)
+        .with_state(auth_state)
         .nest_service(
             "/assets",
             tower_http::services::ServeDir::new("web/src/assets"),
         )
         .layer(Extension(tera))
-        .layer(Extension(db));
+        .layer(Extension(db))
+        .layer(axum::middleware::from_fn(auth::security_headers));
 
     // run our app with hyper, listening globally on port 3000
     let listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await.unwrap();
@@ -55,9 +76,10 @@ async fn main() {
 
 async fn render_packages_function(
     Extension(tera): Extension<Tera>,
+    Extension(identity): Extension<auth::Identity>,
     Extension(db): Extension<Database>,
 ) -> Html<String> {
-    let mut context = Context::new();
+    let mut context = reviews::context(&identity, "packages");
     let packages = db.get_packages().await.unwrap();
     let statuses = db.latest_build_statuses().await.unwrap();
     let successful = statuses.values().filter(|&&s| s).count();
@@ -91,10 +113,11 @@ async fn render_packages_function(
 
 async fn render_build_results_function(
     Extension(tera): Extension<Tera>,
+    Extension(identity): Extension<auth::Identity>,
     Extension(db): Extension<Database>,
     Path(pid): Path<i32>,
 ) -> Result<Html<String>, StatusCode> {
-    let mut context = Context::new();
+    let mut context = reviews::context(&identity, "packages");
 
     let package: package_metadata::Model = match db.get_package(pid).await.unwrap() {
         None => {
@@ -115,10 +138,11 @@ async fn render_build_results_function(
 
 async fn render_build_log_function(
     Extension(tera): Extension<Tera>,
+    Extension(identity): Extension<auth::Identity>,
     Extension(db): Extension<Database>,
     Path(pid): Path<i32>,
 ) -> Result<Html<String>, StatusCode> {
-    let mut context = Context::new();
+    let mut context = reviews::context(&identity, "packages");
 
     let build_result = db
         .get_build_result(pid)
@@ -140,10 +164,16 @@ async fn render_build_log_function(
 
 async fn init_force_rebuild(
     Extension(tera): Extension<Tera>,
+    Extension(identity): Extension<auth::Identity>,
     Extension(db): Extension<Database>,
     Path(pid): Path<i32>,
+    axum::Form(form): axum::Form<HashMap<String, String>>,
 ) -> Result<Html<String>, StatusCode> {
-    let mut context = Context::new();
+    auth::check_csrf(
+        &identity,
+        form.get("csrf").map(String::as_str).unwrap_or(""),
+    )?;
+    let mut context = reviews::context(&identity, "packages");
 
     let package: package_metadata::Model = match db.get_package(pid).await.unwrap() {
         None => {
@@ -156,7 +186,15 @@ async fn init_force_rebuild(
     context.insert("current_page", "details");
     context.insert("package", &package);
 
-    db.reset_package_last_modified(package.id).await;
+    let storage =
+        common::storage::Storage::from_env().map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+    if !db
+        .rebuild_approved(package.id, &identity.user.id, |t| storage.grant(t))
+        .await
+        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?
+    {
+        return Err(StatusCode::CONFLICT);
+    }
 
     Ok(Html(tera.render("force-rebuild.html", &context).unwrap()))
 }
@@ -165,6 +203,7 @@ async fn init_force_rebuild(
 mod tests {
     use super::*;
     use serde_json::json;
+    use tera::Context;
     #[test]
     fn render_pages_and_escape_logs() {
         let mut tera = Tera::new(concat!(

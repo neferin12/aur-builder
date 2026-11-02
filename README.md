@@ -5,7 +5,7 @@ Git repositories, build them on Docker workers, and publish them to a private,
 GPG-signed pacman repository.
 
 The web dashboard shows package versions and latest build results, provides
-searchable build logs, and lets you request rebuilds. Email notifications are
+searchable build logs, release approval with source diffs, and rebuild requests. OIDC controls access; optional OpenAI reviews provide feedback or approve updates. Email notifications are
 available through the optional notifier service.
 
 ## Documentation
@@ -195,9 +195,10 @@ and deploy that image along with the worker; see [Build container](build-contain
 | RabbitMQ AMQP | `5672` |
 | RabbitMQ management UI | `15672` |
 
-The dashboard and rebuild endpoint have no built-in authentication. Restrict them
-to your network or put authentication in front of them. Expose the repo and S3
-endpoints through HTTPS; keep broker and Garage administration access internal.
+The dashboard requires OIDC login and HTTPS. Configure the issuer, client, callback
+and administrator group before starting `web`. Other users have no permissions until
+an administrator grants access. See [release reviews and SSO](docs/guide/reviews.md).
+Expose the repo and S3 endpoints through HTTPS; keep broker administration internal.
 
 ## Installing packages
 
@@ -283,8 +284,8 @@ Use disposable test services for these tests.
 
 ## Operations and upgrades
 
-- Request a rebuild from a package's build-history page. The server schedules it
-  during its next source check; results appear when the worker finishes.
+- Approve new releases in the review queue before they can build. Rebuild requests
+  reuse the last approved source revision and build settings.
 - Check `docker compose logs server worker repo` for scheduling, build, or
   publication failures. Invalid artifacts enter `repo_ingest_failed` for inspection.
 - Published package filenames are immutable. Increase `pkgrel` or `pkgver` when a

@@ -36,6 +36,7 @@ export default defineConfig({
           { text: 'Package & service configuration', link: '/reference/configuration' },
           { text: 'Garage storage', link: '/guide/storage' },
           { text: 'GPG signing', link: '/guide/signing' },
+          { text: 'Release reviews & SSO', link: '/guide/reviews' },
           { text: 'Connect pacman clients', link: '/guide/pacman' },
           { text: 'Nginx reverse proxies', link: '/guide/nginx' }
         ]
