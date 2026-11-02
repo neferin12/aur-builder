@@ -57,7 +57,13 @@ Sign out revokes the local browser session and shows a signed-out page. It does 
 end the identity provider's own session; selecting **Sign in again** may use SSO without
 a password prompt. Signing in again rotates the browser's previous local session.
 Authentication responses, including errors and redirects, disable caching and referrer
-forwarding; the UI also denies framing to protect approval controls.
+forwarding. Application pages use `Referrer-Policy: same-origin` so native form POSTs
+retain their origin; the UI also denies framing to protect approval controls.
+Do not override application pages with `Referrer-Policy: no-referrer` at the proxy,
+because browsers may then submit forms with `Origin: null` and receive 403.
+If approval returns 403, reload the review page after deploying this header fix,
+verify `AB_WEB_URL` matches the external origin, and check that the proxy preserves
+Origin and the application referrer policy. Never bypass the origin or CSRF checks.
 
 ## Manage users
 

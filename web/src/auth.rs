@@ -274,12 +274,19 @@ fn permission(method: &axum::http::Method, path: &str) -> Option<Permission> {
     }
 }
 pub async fn security_headers(req: Request, next: Next) -> Response {
+    // `no-referrer` makes native form submissions use Origin: null. Keep it on
+    // OAuth pages to protect codes, but preserve same-origin POSTs in the UI.
+    let referrer_policy = if req.uri().path().starts_with("/auth/") {
+        "no-referrer"
+    } else {
+        "same-origin"
+    };
     let mut response = next.run(req).await;
     for (name, value) in [
         ("cache-control", "no-store"),
         ("x-content-type-options", "nosniff"),
         ("x-frame-options", "DENY"),
-        ("referrer-policy", "no-referrer"),
+        ("referrer-policy", referrer_policy),
         (
             "content-security-policy",
             "frame-ancestors 'none'; base-uri 'self'; form-action 'self'",
@@ -1054,7 +1061,7 @@ mod security_regressions {
             assert_eq!(response.status(), StatusCode::FORBIDDEN, "{path}");
             assert_eq!(response.headers()[header::CACHE_CONTROL], "no-store");
             assert_eq!(response.headers()["x-frame-options"], "DENY");
-            assert_eq!(response.headers()["referrer-policy"], "no-referrer");
+            assert_eq!(response.headers()["referrer-policy"], "same-origin");
         }
         let response = app
             .oneshot(
@@ -1067,6 +1074,90 @@ mod security_regressions {
             .await
             .unwrap();
         assert_eq!(response.status(), StatusCode::FORBIDDEN);
+    }
+    #[tokio::test]
+    async fn review_form_origin_policy_preserves_strict_csrf_checks() {
+        let db = Database::new("sqlite::memory:".into()).await.unwrap();
+        db.migrate().await;
+        let auth = super::tests::auth();
+        let user = db
+            .login_user(&auth.issuer, "reviewer", "Reviewer", true)
+            .await
+            .unwrap();
+        let (sid, csrf) = db
+            .create_bound_session(&user.id, 3600, &auth.context())
+            .await
+            .unwrap();
+        async fn form_post(
+            axum::Extension(identity): axum::Extension<Identity>,
+            axum::Form(form): axum::Form<HashMap<String, String>>,
+        ) -> StatusCode {
+            match check_csrf(
+                &identity,
+                form.get("csrf").map(String::as_str).unwrap_or(""),
+            ) {
+                Ok(()) => StatusCode::NO_CONTENT,
+                Err(status) => status,
+            }
+        }
+        let app = Router::new()
+            .route(
+                "/reviews/{cid}",
+                get(|| async { "review form" }).post(form_post),
+            )
+            .route_layer(axum::middleware::from_fn_with_state((auth, db), protect))
+            .route("/auth/callback", get(|| async { "callback" }))
+            .route("/auth/login", get(|| async { "login" }))
+            .layer(axum::middleware::from_fn(security_headers));
+        let page = app
+            .clone()
+            .oneshot(
+                Request::builder()
+                    .uri("/reviews/test")
+                    .header(header::COOKIE, format!("__Host-aur-session={sid}"))
+                    .body(Body::empty())
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+        assert_eq!(page.status(), StatusCode::OK);
+        assert_eq!(page.headers()["referrer-policy"], "same-origin");
+        for origin in [
+            Some("https://builder.example.com"),
+            Some("null"),
+            Some("https://evil.example.com"),
+            None,
+        ] {
+            let mut req = Request::builder()
+                .method("POST")
+                .uri("/reviews/test")
+                .header(header::COOKIE, format!("__Host-aur-session={sid}"))
+                .header(header::CONTENT_TYPE, "application/x-www-form-urlencoded");
+            if let Some(origin) = origin {
+                req = req.header(header::ORIGIN, origin);
+            }
+            let response = app
+                .clone()
+                .oneshot(req.body(Body::from(format!("csrf={csrf}"))).unwrap())
+                .await
+                .unwrap();
+            assert_eq!(
+                response.status(),
+                if origin == Some("https://builder.example.com") {
+                    StatusCode::NO_CONTENT
+                } else {
+                    StatusCode::FORBIDDEN
+                }
+            );
+        }
+        for path in ["/auth/login", "/auth/callback?code=sensitive&state=state"] {
+            let response = app
+                .clone()
+                .oneshot(Request::builder().uri(path).body(Body::empty()).unwrap())
+                .await
+                .unwrap();
+            assert_eq!(response.headers()["referrer-policy"], "no-referrer");
+        }
     }
     #[tokio::test]
     async fn rotated_signing_keys_are_discovered_during_callback() {

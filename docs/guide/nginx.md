@@ -147,7 +147,10 @@ Use your existing TLS configuration for this location. The OIDC callback is
 `https://your-builder-host/auth/callback`. Cookies require HTTPS; plain HTTP
 access to port 3000 cannot establish a session. Do not replace the Origin header.
 
-The UI sends `Cache-Control: no-store`, `Referrer-Policy: no-referrer`, and framing
-restrictions on all responses, including OIDC redirects and errors. Preserve these
-headers and avoid caching `/auth/*`. Keep proxy access logs for `/auth/callback`
+The UI sends `Cache-Control: no-store` and framing restrictions on all responses.
+Application pages use `Referrer-Policy: same-origin`; `/auth/*` responses use
+`no-referrer` to protect OAuth codes. Preserve these headers and avoid caching
+`/auth/*`. Do not force `no-referrer` globally at the proxy: browsers can then send
+`Origin: null` for native form POSTs, causing approval, rebuild, and user-management
+requests to fail with 403. After changing headers, reload the form before retrying. Keep proxy access logs for `/auth/callback`
 free of query strings, because authorization codes and state are carried there.

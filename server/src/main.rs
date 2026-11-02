@@ -42,6 +42,18 @@ async fn main() {
     review_notifications::start(db.clone(), channels.notify_tx);
     ai::start(db.clone(), storage.clone());
     loop {
+        if let Err(e) = common::messaging::publish(
+            &build_tx,
+            "repo_ingest",
+            &serde_json::to_vec(&common::messaging::RetentionRequest {
+                keep_versions: config.keep_versions,
+            })
+            .unwrap(),
+        )
+        .await
+        {
+            error!("Could not request repository cleanup: {e}");
+        }
         // Recover tasks recorded before a crash between persistence and broker confirmation.
         for mut pending in db.pending_attempts().await.unwrap() {
             if !db.approved_task(&pending).await.unwrap()

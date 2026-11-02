@@ -8,6 +8,7 @@ Do not commit `.env` or `repo-gnupg/`.
 
 ```yaml
 sleepduration: 300
+keep_versions: 2
 
 aur_packages:
   - name: example-aur-package
@@ -27,6 +28,7 @@ use `[]` for an unused list. Restart the server after changing this file.
 
 | Field | Meaning |
 | --- | --- |
+| `keep_versions` | Published releases to retain per package base; defaults to `2`, minimum `1`. Cleanup runs each server loop; expired packages and signatures are deleted. Build bundles and history are retained. |
 | `sleepduration` | Source-check interval in seconds; defaults to `300` |
 | `aur_packages[].name` | AUR package to track |
 | `git_packages[].source` | Git clone URL |

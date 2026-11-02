@@ -29,43 +29,14 @@
     </cargoProject>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="30df73c6-6061-4a44-ad67-d8c0fc6fb8e8" name="Changes" comment="feat: refactor build container into rust module">
-      <change beforePath="$PROJECT_DIR$/.env.template" beforeDir="false" afterPath="$PROJECT_DIR$/.env.template" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/aur-builder.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/aur-builder.iml" afterDir="false" />
+    <list default="true" id="30df73c6-6061-4a44-ad67-d8c0fc6fb8e8" name="Changes" comment="feat: add release approvals, AI reviews, and OIDC authentication&#10;&#10;- Gate builds on approval of pinned source revisions&#10;- Add review queue, source diffs, decision history, and email alerts&#10;- Support optional OpenAI feedback and automatic approval&#10;- Add OIDC login and admin-managed permissions with default-denied access&#10;- Harden sessions, token validation, CSRF protection, and logout&#10;- Handle source reverts safely and redact repository credentials&#10;- Add migrations, regression tests, and deployment documentation">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Cargo.lock" beforeDir="false" afterPath="$PROJECT_DIR$/Cargo.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/Dockerfile" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build-container/src/main.rs" beforeDir="false" afterPath="$PROJECT_DIR$/build-container/src/main.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/common/src/config.rs" beforeDir="false" afterPath="$PROJECT_DIR$/common/src/config.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/src/types.rs" beforeDir="false" afterPath="$PROJECT_DIR$/common/src/types.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/database/Cargo.toml" beforeDir="false" afterPath="$PROJECT_DIR$/database/Cargo.toml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/src/messaging.rs" beforeDir="false" afterPath="$PROJECT_DIR$/common/src/messaging.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/database/src/lib.rs" beforeDir="false" afterPath="$PROJECT_DIR$/database/src/lib.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/database/src/migrator/mod.rs" beforeDir="false" afterPath="$PROJECT_DIR$/database/src/migrator/mod.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docker-compose.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/.vitepress/config.mjs" beforeDir="false" afterPath="$PROJECT_DIR$/docs/.vitepress/config.mjs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/guide/architecture.md" beforeDir="false" afterPath="$PROJECT_DIR$/docs/guide/architecture.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/guide/getting-started.md" beforeDir="false" afterPath="$PROJECT_DIR$/docs/guide/getting-started.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/guide/nginx.md" beforeDir="false" afterPath="$PROJECT_DIR$/docs/guide/nginx.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/guide/upgrading.md" beforeDir="false" afterPath="$PROJECT_DIR$/docs/guide/upgrading.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docs/reference/configuration.md" beforeDir="false" afterPath="$PROJECT_DIR$/docs/reference/configuration.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/notifier/src/main.rs" beforeDir="false" afterPath="$PROJECT_DIR$/notifier/src/main.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/repo/src/main.rs" beforeDir="false" afterPath="$PROJECT_DIR$/repo/src/main.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/test_setup.py" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/test_setup.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/Cargo.toml" beforeDir="false" afterPath="$PROJECT_DIR$/server/Cargo.toml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server/src/main.rs" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/src/package_checkers/aur.rs" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/package_checkers/aur.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/src/setup_rabbit_mq.rs" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/setup_rabbit_mq.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/setup.py" beforeDir="false" afterPath="$PROJECT_DIR$/setup.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/Cargo.toml" beforeDir="false" afterPath="$PROJECT_DIR$/web/Cargo.toml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/assets/app.js" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/assets/app.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/assets/style.css" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/assets/style.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/main.rs" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/main.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/templates/base.html" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/templates/base.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/templates/build-results.html" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/templates/build-results.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/worker/Cargo.toml" beforeDir="false" afterPath="$PROJECT_DIR$/worker/Cargo.toml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/worker/src/build/docker.rs" beforeDir="false" afterPath="$PROJECT_DIR$/worker/src/build/docker.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/worker/src/main.rs" beforeDir="false" afterPath="$PROJECT_DIR$/worker/src/main.rs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -135,23 +106,23 @@
   </component>
   <component name="NextEditCompletionFeaturesState">
     <decayedCancelled>
-      <entry key="MS100" value="1.0021838276564679" />
-      <entry key="MS500" value="1.4232338291693118" />
-      <entry key="S2" value="3.0286737251681024" />
-      <entry key="S5" value="5.760153535899359" />
-      <entry key="S10" value="9.132070887349581" />
-      <entry key="S30" value="14.268798945625054" />
-      <entry key="S60" value="18.079213011538698" />
-      <entry key="M2" value="27.270466318220354" />
-      <entry key="M5" value="58.5993804445457" />
-      <entry key="M10" value="95.94568060426262" />
-      <entry key="M15" value="124.48688949796728" />
-      <entry key="M30" value="182.57345545866622" />
-      <entry key="H1" value="240.17920158552494" />
-      <entry key="H2" value="291.70119601901774" />
-      <entry key="H4" value="336.15896481003557" />
-      <entry key="D1" value="397.3031216801356" />
-      <entry key="W1" value="411.4958530892385" />
+      <entry key="MS100" value="1.0961768912389325" />
+      <entry key="MS500" value="1.9626079150149884" />
+      <entry key="S2" value="4.238143960064045" />
+      <entry key="S5" value="5.6208625660770375" />
+      <entry key="S10" value="6.252732079760832" />
+      <entry key="S30" value="6.738490201114898" />
+      <entry key="S60" value="7.012844037656364" />
+      <entry key="M2" value="8.300573251074567" />
+      <entry key="M5" value="14.744782001987286" />
+      <entry key="M10" value="26.179082856974084" />
+      <entry key="M15" value="34.361251189219495" />
+      <entry key="M30" value="47.041680186342425" />
+      <entry key="H1" value="55.94395683295809" />
+      <entry key="H2" value="65.9794371718423" />
+      <entry key="H4" value="107.3760694249024" />
+      <entry key="D1" value="348.9397332239814" />
+      <entry key="W1" value="458.84662889354547" />
     </decayedCancelled>
     <decayedSelected>
       <entry key="MS100" value="0.0" />
@@ -173,23 +144,23 @@
       <entry key="W1" value="0.0" />
     </decayedSelected>
     <decayedShown>
-      <entry key="MS100" value="0.9415330444769675" />
-      <entry key="MS500" value="1.405153158912634" />
-      <entry key="S2" value="3.020842255956934" />
-      <entry key="S5" value="5.75578281661668" />
-      <entry key="S10" value="9.129231088685144" />
-      <entry key="S30" value="14.267529916491203" />
-      <entry key="S60" value="18.07845880978611" />
-      <entry key="M2" value="27.269936321683097" />
-      <entry key="M5" value="58.59893717388342" />
-      <entry key="M10" value="95.94519201726827" />
-      <entry key="M15" value="124.48628291570186" />
-      <entry key="M30" value="182.57271392727424" />
-      <entry key="H1" value="240.17856968112076" />
-      <entry key="H2" value="291.70077325085794" />
-      <entry key="H4" value="336.15871699904557" />
-      <entry key="D1" value="397.3030738612906" />
-      <entry key="W1" value="411.49584607074877" />
+      <entry key="MS100" value="1.0736179579827043" />
+      <entry key="MS500" value="1.954597720153056" />
+      <entry key="S2" value="4.2339334083844475" />
+      <entry key="S5" value="5.618635235764617" />
+      <entry key="S10" value="6.251493693341122" />
+      <entry key="S30" value="6.73804538004541" />
+      <entry key="S60" value="7.012612889564633" />
+      <entry key="M2" value="8.300437559755968" />
+      <entry key="M5" value="14.744682385609588" />
+      <entry key="M10" value="26.178988713644564" />
+      <entry key="M15" value="34.361166648568165" />
+      <entry key="M30" value="47.04162080630662" />
+      <entry key="H1" value="55.94392095235517" />
+      <entry key="H2" value="65.97941048027639" />
+      <entry key="H4" value="107.3760271175372" />
+      <entry key="D1" value="348.9396974376161" />
+      <entry key="W1" value="458.8466219513649" />
     </decayedShown>
   </component>
   <component name="ProjectColorInfo">{
@@ -619,7 +590,8 @@
     <MESSAGE value="feat: standalone&#10;&#10;AI coded improvements:&#10;- standalone repo&#10;- internal usage of s3 storage&#10;- better web ui&#10;- setup script&#10;&#10;BREAKING CHANGE: New config vars" />
     <MESSAGE value="chore(docker-compose): update service images to version 2" />
     <MESSAGE value="feat: refactor build container into rust module" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: refactor build container into rust module" />
+    <MESSAGE value="feat: add release approvals, AI reviews, and OIDC authentication&#10;&#10;- Gate builds on approval of pinned source revisions&#10;- Add review queue, source diffs, decision history, and email alerts&#10;- Support optional OpenAI feedback and automatic approval&#10;- Add OIDC login and admin-managed permissions with default-denied access&#10;- Harden sessions, token validation, CSRF protection, and logout&#10;- Handle source reverts safely and redact repository credentials&#10;- Add migrations, regression tests, and deployment documentation" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: add release approvals, AI reviews, and OIDC authentication&#10;&#10;- Gate builds on approval of pinned source revisions&#10;- Add review queue, source diffs, decision history, and email alerts&#10;- Support optional OpenAI feedback and automatic approval&#10;- Add OIDC login and admin-managed permissions with default-denied access&#10;- Harden sessions, token validation, CSRF protection, and logout&#10;- Handle source reverts safely and redact repository credentials&#10;- Add migrations, regression tests, and deployment documentation" />
   </component>
   <component name="XDebuggerManager">
     <watches-manager>

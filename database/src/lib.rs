@@ -387,6 +387,26 @@ impl Database {
         self.db.execute(q).await?;
         Ok(())
     }
+    pub async fn retention_attempts(
+        &self,
+    ) -> Result<Vec<common::types::BuildTaskTransmissionFormat>, DbErr> {
+        use sea_orm::ConnectionTrait;
+        let q = self
+            .storage_query(
+                "SELECT task FROM build_attempt ORDER BY created_at, attempt",
+                vec![],
+            )
+            .await?;
+        self.db
+            .query_all(q)
+            .await?
+            .into_iter()
+            .map(|row| {
+                let task: String = row.try_get("", "task")?;
+                serde_json::from_str(&task).map_err(|e| DbErr::Custom(e.to_string()))
+            })
+            .collect()
+    }
     pub async fn load_catalog(&self) -> Result<String, DbErr> {
         use sea_orm::ConnectionTrait;
         let q = self

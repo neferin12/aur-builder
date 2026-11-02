@@ -23,6 +23,125 @@ struct Catalog {
     bases: BTreeMap<String, Vec<String>>,
     #[serde(default)]
     attempts: BTreeMap<String, String>,
+    #[serde(default)]
+    releases: BTreeMap<String, Vec<Release>>,
+    #[serde(default)]
+    pending_deletions: Vec<String>,
+}
+#[derive(Clone, Serialize, Deserialize)]
+struct Release {
+    version: String,
+    files: BTreeMap<String, String>,
+}
+
+fn prune(catalog: &mut Catalog, keep: usize) {
+    let mut expired = BTreeMap::new();
+    for releases in catalog.releases.values_mut() {
+        if releases.len() > keep {
+            for release in releases.drain(..releases.len() - keep) {
+                expired.extend(release.files);
+            }
+        }
+    }
+    let protected: std::collections::HashSet<_> = catalog
+        .releases
+        .values()
+        .flatten()
+        .flat_map(|r| r.files.values())
+        .cloned()
+        .collect();
+    let active: std::collections::HashSet<_> = catalog
+        .bases
+        .values()
+        .flatten()
+        .flat_map(|name| [name.clone(), format!("{name}.sig")])
+        .collect();
+    for (name, object) in expired {
+        if !protected.contains(&object) && !active.contains(&name) {
+            if catalog.files.get(&name) == Some(&object) {
+                catalog.files.remove(&name);
+            }
+            if !catalog.files.values().any(|key| key == &object) {
+                catalog.pending_deletions.push(object);
+            }
+        }
+    }
+}
+
+async fn cleanup(app: &App, db: &database::Database, keep: usize) -> Result<(), Error> {
+    let mut next = app.catalog.read().await.clone();
+    // Recover only files whose immutable object prefix establishes ownership.
+    let mut publication_order = BTreeMap::new();
+    for (index, task) in db.retention_attempts().await?.into_iter().enumerate() {
+        publication_order
+            .entry((task.name.clone(), task.version.clone()))
+            .or_insert(index);
+        let prefix = format!("published/{}/", task.attempt);
+        let files: BTreeMap<_, _> = next
+            .files
+            .iter()
+            .filter(|(name, key)| key.starts_with(&prefix) && name.contains(".pkg.tar."))
+            .map(|(name, key)| (name.clone(), key.clone()))
+            .collect();
+        if files.is_empty() {
+            continue;
+        }
+        let releases = next.releases.entry(task.name).or_default();
+        if let Some(release) = releases.iter_mut().find(|r| r.version == task.version) {
+            release.files.extend(files);
+        } else {
+            releases.push(Release {
+                version: task.version,
+                files,
+            });
+        }
+    }
+    for (base, releases) in &mut next.releases {
+        releases.sort_by_key(|r| {
+            publication_order
+                .get(&(base.clone(), r.version.clone()))
+                .copied()
+                .unwrap_or(usize::MAX)
+        });
+    }
+    let tracked: std::collections::HashSet<_> = next
+        .releases
+        .values()
+        .flatten()
+        .flat_map(|r| r.files.keys())
+        .collect();
+    if next
+        .files
+        .keys()
+        .any(|name| name.contains(".pkg.tar.") && !tracked.contains(name))
+    {
+        log::warn!("Preserving legacy package files with unknown release ownership");
+    }
+    prune(&mut next, keep);
+    db.save_catalog(&serde_json::to_string(&next)?).await?;
+    *app.catalog.write().await = next.clone();
+    let client = storage_client();
+    let mut remaining = Vec::new();
+    for object in &next.pending_deletions {
+        if next.files.values().any(|key| key == object) {
+            continue;
+        }
+        let response = client
+            .delete(app.storage.sign("DELETE", object, 900, false)?)
+            .send()
+            .await;
+        match response {
+            Ok(r) if r.status().is_success() || r.status() == StatusCode::NOT_FOUND => {}
+            _ => {
+                log::warn!("Repository object deletion failed; will retry");
+                remaining.push(object.clone());
+            }
+        }
+    }
+    next.pending_deletions = remaining;
+    db.save_catalog(&serde_json::to_string(&next)?).await?;
+    *app.catalog.write().await = next;
+    Ok(())
 }
 struct App {
     storage: Storage,
@@ -328,6 +447,21 @@ async fn ingest(
             next.files.insert(n, object);
         }
     }
+    let release_files = packages
+        .iter()
+        .flat_map(|name| [name.clone(), format!("{name}.sig")])
+        .map(|name| (name.clone(), next.files[&name].clone()))
+        .collect();
+    let releases = next.releases.entry(task.name.clone()).or_default();
+    // Merge repeated versions without consuming a retention slot.
+    if let Some(previous) = releases.iter_mut().find(|r| r.version == task.version) {
+        previous.files.extend(release_files);
+    } else {
+        releases.push(Release {
+            version: task.version.clone(),
+            files: release_files,
+        });
+    }
     next.bases.insert(task.name.clone(), packages);
     let dbname = format!("{}.db.tar.gz", app.name);
     let mut args = vec![dbname.clone()];
@@ -462,6 +596,27 @@ async fn main() -> Result<(), Error> {
     common::messaging::supervise(async move {
         let _conn = conn;
         while let Some(Ok(delivery)) = consumer.next().await {
+            if let Ok(request) =
+                serde_json::from_slice::<common::messaging::RetentionRequest>(&delivery.data)
+            {
+                match cleanup(&state, &db, request.keep_versions.get()).await {
+                    Ok(()) => {
+                        delivery.ack(BasicAckOptions::default()).await.ok();
+                    }
+                    Err(e) => {
+                        log::error!("Repository cleanup failed: {e}");
+                        tokio::time::sleep(std::time::Duration::from_secs(10)).await;
+                        delivery
+                            .nack(BasicNackOptions {
+                                requeue: true,
+                                ..Default::default()
+                            })
+                            .await
+                            .ok();
+                    }
+                }
+                continue;
+            }
             let result = serde_json::from_slice::<BuildResultTransmissionFormat>(&delivery.data);
             match result {
                 Ok(result) => match ingest(&state, &db, &result).await {
@@ -506,6 +661,38 @@ async fn main() -> Result<(), Error> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn retention_keeps_latest_releases_and_active_files() {
+        let mut catalog = Catalog::default();
+        for version in ["1", "2", "3"] {
+            let name = format!("pkg-{version}.pkg.tar.gz");
+            let files = BTreeMap::from([
+                (name.clone(), name.clone()),
+                (format!("{name}.sig"), format!("{name}.sig")),
+            ]);
+            catalog.files.extend(files.clone());
+            catalog
+                .releases
+                .entry("pkg".into())
+                .or_default()
+                .push(Release {
+                    version: version.into(),
+                    files,
+                });
+        }
+        catalog
+            .bases
+            .insert("pkg".into(), vec!["pkg-3.pkg.tar.gz".into()]);
+        prune(&mut catalog, 2);
+        assert_eq!(catalog.releases["pkg"].len(), 2);
+        assert!(!catalog.files.contains_key("pkg-1.pkg.tar.gz"));
+        assert_eq!(catalog.pending_deletions.len(), 2);
+        prune(&mut catalog, 1);
+        assert!(catalog.files.contains_key("pkg-3.pkg.tar.gz"));
+        assert_eq!(catalog.files.len(), 2);
+        prune(&mut catalog, 1);
+        assert_eq!(catalog.pending_deletions.len(), 4);
+    }
     #[test]
     fn reject_paths() {
         for n in ["../a", "/a", "a/b", ".hidden", "-option", ""] {

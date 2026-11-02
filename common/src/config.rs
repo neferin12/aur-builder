@@ -28,6 +28,12 @@ pub struct ServerConfig {
     pub aur_packages: Vec<AurPackageSettings>,
     pub git_packages: Vec<GitPackageSettings>,
     pub sleepduration: Option<u64>,
+    #[serde(default = "default_keep_versions")]
+    pub keep_versions: std::num::NonZeroUsize,
+}
+
+fn default_keep_versions() -> std::num::NonZeroUsize {
+    std::num::NonZeroUsize::new(2).unwrap()
 }
 
 impl Configurable for ServerConfig {}
@@ -133,5 +139,22 @@ mod source_redaction_tests {
             public_source("https://example.com/pkg.git"),
             "https://example.com/pkg.git"
         );
+    }
+}
+
+#[cfg(test)]
+mod retention_tests {
+    use super::*;
+    #[test]
+    fn retention_configuration() {
+        for (value, expected) in [
+            ("", Some(2)),
+            (",\"keep_versions\":1", Some(1)),
+            (",\"keep_versions\":0", None),
+        ] {
+            let raw = format!("{{\"aur_packages\":[],\"git_packages\":[]{value}}}");
+            let parsed = serde_json::from_str::<ServerConfig>(&raw);
+            assert_eq!(parsed.ok().map(|c| c.keep_versions.get()), expected);
+        }
     }
 }

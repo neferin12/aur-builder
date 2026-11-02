@@ -138,3 +138,10 @@ mod broker_tests {
         Ok(())
     }
 }
+
+/// Periodic repository maintenance, serialized with ingestion.
+#[derive(serde::Serialize, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct RetentionRequest {
+    pub keep_versions: std::num::NonZeroUsize,
+}
