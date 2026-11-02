@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Human review required</title>
+<style>body{font:16px/1.6 sans-serif;color:#182c3b;background:#f6f8fa}main{max-width:600px;margin:24px auto;padding:28px;background:white;border:1px solid #e5ebef;border-radius:12px}a{color:#136d56;font-weight:bold}code{overflow-wrap:anywhere}.muted{color:#687b89}</style>
+</head>
+<body><main>
+{% if maillogo %}<img src="{{maillogo}}" alt="" width="60">{% endif %}
+<p class="muted">AUR Builder · Release review</p>
+<h1>Human review required</h1>
+<p><strong>{{package_name}} {{release_version}}</strong> is waiting for approval before it can build.</p>
+<p>{{reason}}</p>
+<p class="muted">Packaging revision: <code>{{revision}}</code></p>
+<p><a href="{{review_url}}">Review changes and approve or reject this release →</a></p>
+<p class="muted">Sign in with an account that has approval permission. If this release has already been reviewed or superseded, no further action is needed.</p>
+</main></body></html>
