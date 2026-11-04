@@ -266,7 +266,10 @@ mod tests {
                 .unwrap()
                 .contains("No builds recorded")
         );
-        context.insert("identity", &json!({"admin":false,"can_rebuild":true}));
+        context.insert(
+            "identity",
+            &json!({"admin":false,"can_rebuild":true,"display_name":"Builder"}),
+        );
         context.insert("csrf", "test-csrf");
         let history = tera.render("build-results.html", &context).unwrap();
         assert!(history.contains("data-rebuild-form"));
@@ -316,14 +319,10 @@ mod tests {
         )
         .await
         .unwrap();
-        assert_eq!(response.0, StatusCode::CONFLICT);
-        assert!(
-            response
-                .1
-                .0
-                .contains("This package has no approved release")
-        );
-        assert!(response.1.0.contains("href=\"/reviews\""));
+        let (status, Html(body)) = response;
+        assert_eq!(status, StatusCode::CONFLICT);
+        assert!(body.contains("This package has no approved release"));
+        assert!(body.contains("href=\"/reviews\""));
         assert!(db.pending_attempts().await.unwrap().is_empty());
     }
 }
