@@ -130,6 +130,12 @@ async fn render_build_results_function(
     context.insert("current_page", "details");
     context.insert("package", &package);
 
+    context.insert(
+        "rebuild_available",
+        &db.has_approved_release(package.id)
+            .await
+            .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?,
+    );
     let build_results = db.get_build_results(package.id).await.unwrap();
     context.insert("build_results", &build_results);
 
@@ -168,7 +174,7 @@ async fn init_force_rebuild(
     Extension(db): Extension<Database>,
     Path(pid): Path<i32>,
     axum::Form(form): axum::Form<HashMap<String, String>>,
-) -> Result<Html<String>, StatusCode> {
+) -> Result<(StatusCode, Html<String>), StatusCode> {
     auth::check_csrf(
         &identity,
         form.get("csrf").map(String::as_str).unwrap_or(""),
@@ -186,17 +192,36 @@ async fn init_force_rebuild(
     context.insert("current_page", "details");
     context.insert("package", &package);
 
-    let storage =
-        common::storage::Storage::from_env().map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
-    if !db
-        .rebuild_approved(package.id, &identity.user.id, |t| storage.grant(t))
+    let queued = if db
+        .has_approved_release(package.id)
         .await
         .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?
     {
-        return Err(StatusCode::CONFLICT);
+        let storage =
+            common::storage::Storage::from_env().map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+        db.rebuild_approved(package.id, &identity.user.id, |t| storage.grant(t))
+            .await
+            .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?
+    } else {
+        false
+    };
+    if !queued {
+        return Ok((
+            StatusCode::CONFLICT,
+            render_build_results_function(
+                Extension(tera),
+                Extension(identity),
+                Extension(db),
+                Path(pid),
+            )
+            .await?,
+        ));
     }
 
-    Ok(Html(tera.render("force-rebuild.html", &context).unwrap()))
+    Ok((
+        StatusCode::OK,
+        Html(tera.render("force-rebuild.html", &context).unwrap()),
+    ))
 }
 
 #[cfg(test)]
@@ -214,7 +239,7 @@ mod tests {
         tera.register_filter("err_desc", error_desc_filter);
         let package = json!({"id":1,"name":"example","version":"1.0-1","maintainer":"alice","last_modified":1700000000,"source":null,"build_status":"success"});
         let result = json!({"id":2,"package_id":1,"success":false,"version":"1.0-1","exit_code":105,"started_at":null,"finished_at":null,"build_log":"stdout: hello\nstderr: <script>alert(1)</script>"});
-        let mut context=Context::from_value(json!({"version":"test","current_page":"packages","packages":[package.clone()],"package":package,"successful":1,"failed":0,"unbuilt":0,"build_results":[result.clone()],"build_result":result})).unwrap();
+        let mut context=Context::from_value(json!({"version":"test","current_page":"packages","packages":[package.clone()],"package":package,"successful":1,"failed":0,"unbuilt":0,"build_results":[result.clone()],"build_result":result,"rebuild_available":true})).unwrap();
         for name in [
             "index.html",
             "build-results.html",
@@ -241,5 +266,63 @@ mod tests {
                 .unwrap()
                 .contains("No builds recorded")
         );
+        context.insert(
+            "identity",
+            &json!({"admin":false,"can_rebuild":true,"display_name":"Builder"}),
+        );
+        context.insert("csrf", "test-csrf");
+        let history = tera.render("build-results.html", &context).unwrap();
+        assert!(history.contains("data-rebuild-form"));
+        assert!(!history.contains("Approval required before rebuilding"));
+        context.insert("rebuild_available", &false);
+        let history = tera.render("build-results.html", &context).unwrap();
+        assert!(!history.contains("data-rebuild-form"));
+        assert!(history.contains("Approval required before rebuilding"));
+        assert!(history.contains("href=\"/reviews\""));
+    }
+
+    #[tokio::test]
+    async fn rebuild_without_approval_returns_actionable_conflict() {
+        let db = Database::new("sqlite::memory:".into()).await.unwrap();
+        db.migrate().await;
+        let data = common::types::PackageSearchResult {
+            name: "unapproved".into(),
+            version: "1-1".into(),
+            maintainer: "test".into(),
+            last_modified: 1,
+            source: None,
+            subfolder: None,
+            options: None,
+            environment: None,
+        };
+        assert!(db.update_metadata(&data).await);
+        let package = db.get_package_by_name(&data.name).await.unwrap().unwrap();
+        let identity = auth::Identity {
+            user: db
+                .login_user("https://issuer.example", "admin", "Admin", true)
+                .await
+                .unwrap(),
+            csrf: "test-csrf".into(),
+            session_id: "test-session".into(),
+        };
+        let tera = Tera::new(concat!(
+            env!("CARGO_MANIFEST_DIR"),
+            "/src/templates/**/*.html"
+        ))
+        .unwrap();
+        let response = init_force_rebuild(
+            Extension(tera),
+            Extension(identity),
+            Extension(db.clone()),
+            Path(package.id),
+            axum::Form(HashMap::from([("csrf".into(), "test-csrf".into())])),
+        )
+        .await
+        .unwrap();
+        let (status, Html(body)) = response;
+        assert_eq!(status, StatusCode::CONFLICT);
+        assert!(body.contains("This package has no approved release"));
+        assert!(body.contains("href=\"/reviews\""));
+        assert!(db.pending_attempts().await.unwrap().is_empty());
     }
 }

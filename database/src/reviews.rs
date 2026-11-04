@@ -242,6 +242,15 @@ impl Database {
             && d.options == t.options
             && json(&d.environment)? == json(&t.env)?)
     }
+    pub async fn has_approved_release(&self, pid: i32) -> Result<bool, DbErr> {
+        Ok(!self
+            .review_rows(
+                "SELECT id FROM release_candidate WHERE package_id=? AND state='approved' LIMIT 1",
+                vec![pid.into()],
+            )
+            .await?
+            .is_empty())
+    }
     pub async fn rebuild_approved(
         &self,
         pid: i32,
@@ -359,6 +368,14 @@ mod tests {
         assert!(db.pending_attempts().await.unwrap().is_empty());
         let c = db.candidates().await.unwrap().remove(0);
         assert!(c.baseline.is_none());
+        assert!(!db.has_approved_release(c.package_id).await.unwrap());
+        assert!(
+            !db.rebuild_approved(c.package_id, "human", |_| panic!(
+                "unapproved release must not receive an upload grant"
+            ))
+            .await
+            .unwrap()
+        );
         assert!(
             db.decide_release(&c.id, "human", true, "", |_| Err("failed".into()))
                 .await
@@ -371,6 +388,7 @@ mod tests {
                 .await
                 .unwrap()
         );
+        assert!(db.has_approved_release(c.package_id).await.unwrap());
         assert!(
             !db.decide_release(&c.id, "second", true, "", grant)
                 .await
@@ -422,6 +440,7 @@ mod tests {
             .into_iter()
             .find(|c| c.state == "pending")
             .unwrap();
+        assert!(!db.has_approved_release(second.package_id).await.unwrap());
         assert!(
             db.decide_release(&second.id, "human", false, "", grant)
                 .await
@@ -433,6 +452,7 @@ mod tests {
                 .unwrap()
         );
         assert!(db.pending_attempts().await.unwrap().is_empty());
+        assert!(!db.has_approved_release(second.package_id).await.unwrap());
         db.observe_release(&d, &"c".repeat(40), "three", &snapshot())
             .await
             .unwrap();
