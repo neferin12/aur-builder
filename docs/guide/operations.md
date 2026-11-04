@@ -8,9 +8,14 @@ docker compose logs --tail 100 server worker repo
 ```
 
 The web dashboard lists packages and latest recorded build status. Open a package
-to inspect its history, read worker output, or request a rebuild. Rebuild requests
-mark the package for the next server source check; they do not immediately start
-a container. Queue wait and build time affect when a result appears.
+to inspect its history, read worker output, or request a rebuild. Rebuilds queue
+the latest approved release with its pinned source and settings; they do not
+immediately start a container. Queue wait and build time affect when a result appears.
+
+If a rebuild returns HTTP 409, the package has no approved release. Open **Release
+reviews** and ask an administrator or a user with approval permission to approve a
+candidate first. Approval queues the initial build automatically. Packages carried
+over from an older installation also need approval before they can be rebuilt.
 
 Publication has its own logs. If a worker build succeeded but the package is not
 available, inspect `repo` logs and ingestion queues.
