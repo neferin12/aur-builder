@@ -41,19 +41,15 @@ async fn main() {
 
     review_notifications::start(db.clone(), channels.notify_tx);
     ai::start(db.clone(), storage.clone());
-    loop {
-        if let Err(e) = common::messaging::publish(
-            &build_tx,
-            "repo_ingest",
-            &serde_json::to_vec(&common::messaging::RetentionRequest {
-                keep_versions: config.keep_versions,
-            })
-            .unwrap(),
-        )
-        .await
-        {
-            error!("Could not request repository cleanup: {e}");
-        }
+    // Dispatch approvals independently of the package metadata polling interval.
+    let dispatch_db = db.clone();
+    let dispatch_storage = storage.clone();
+    let dispatch_tx = build_tx.clone();
+    common::messaging::supervise(async move {
+        let db = dispatch_db;
+        let storage = dispatch_storage;
+        let build_tx = dispatch_tx;
+        loop {
         // Recover tasks recorded before a crash between persistence and broker confirmation.
         for mut pending in db.pending_attempts().await.unwrap() {
             if !db.approved_task(&pending).await.unwrap()
@@ -77,6 +73,22 @@ async fn main() {
             db.attempt_state(&pending.attempt, "dispatched")
                 .await
                 .unwrap();
+        }
+            sleep(Duration::from_secs(5)).await;
+        }
+    });
+    loop {
+        if let Err(e) = common::messaging::publish(
+            &build_tx,
+            "repo_ingest",
+            &serde_json::to_vec(&common::messaging::RetentionRequest {
+                keep_versions: config.keep_versions,
+            })
+            .unwrap(),
+        )
+        .await
+        {
+            error!("Could not request repository cleanup: {e}");
         }
         let check_started = Instant::now();
         info!("Checking for package updates: aur={}, git={}", config.aur_packages.len(), config.git_packages.len());

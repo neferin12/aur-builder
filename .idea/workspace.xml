@@ -29,9 +29,7 @@
     </cargoProject>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="30df73c6-6061-4a44-ad67-d8c0fc6fb8e8" name="Changes" comment="fix: add user agent to AUR requests">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-    </list>
+    <list default="true" id="30df73c6-6061-4a44-ad67-d8c0fc6fb8e8" name="Changes" comment="feat: package status during queue and build" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -51,7 +49,7 @@
   <component name="EmbeddingIndexingInfo">
     <option name="cachedIndexableFilesCount" value="3078" />
   </component>
-  <component name="ExecutionTargetManager" SELECTED_TARGET="RsBuildProfile:test" />
+  <component name="ExecutionTargetManager" SELECTED_TARGET="RsBuildProfile:dev" />
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
@@ -104,23 +102,23 @@
   </component>
   <component name="NextEditCompletionFeaturesState">
     <decayedCancelled>
-      <entry key="MS100" value="1.012040188888125" />
-      <entry key="MS500" value="1.5757124310416875" />
-      <entry key="S2" value="2.437083691200418" />
-      <entry key="S5" value="2.749503974728933" />
-      <entry key="S10" value="2.870062631409467" />
-      <entry key="S30" value="2.9555977145623062" />
-      <entry key="S60" value="2.97767195091998" />
-      <entry key="M2" value="3.0038762103370815" />
-      <entry key="M5" value="4.585654876963616" />
-      <entry key="M10" value="12.933712408366636" />
-      <entry key="M15" value="23.025322284273795" />
-      <entry key="M30" value="46.226254895725475" />
-      <entry key="H1" value="68.44540550194256" />
-      <entry key="H2" value="88.15652913909369" />
-      <entry key="H4" value="133.25056104995633" />
-      <entry key="D1" value="380.58188848372447" />
-      <entry key="W1" value="494.8516718155434" />
+      <entry key="MS100" value="1.0259320715905593" />
+      <entry key="MS500" value="1.7322121789876657" />
+      <entry key="S2" value="3.3291889903137837" />
+      <entry key="S5" value="4.372853722188823" />
+      <entry key="S10" value="5.003536313081171" />
+      <entry key="S30" value="6.074153991266132" />
+      <entry key="S60" value="8.520311334006717" />
+      <entry key="M2" value="12.50417253691135" />
+      <entry key="M5" value="17.606585455800687" />
+      <entry key="M10" value="23.3016620121142" />
+      <entry key="M15" value="30.592923789719556" />
+      <entry key="M30" value="52.126503333250184" />
+      <entry key="H1" value="77.62768803280686" />
+      <entry key="H2" value="101.57260446249683" />
+      <entry key="H4" value="148.66627327744578" />
+      <entry key="D1" value="399.4200868561789" />
+      <entry key="W1" value="516.2631399902697" />
     </decayedCancelled>
     <decayedSelected>
       <entry key="MS100" value="0.0" />
@@ -142,23 +140,23 @@
       <entry key="W1" value="0.0" />
     </decayedSelected>
     <decayedShown>
-      <entry key="MS100" value="0.9776464969144555" />
-      <entry key="MS500" value="1.5653962969027968" />
-      <entry key="S2" value="2.433141497042262" />
-      <entry key="S5" value="2.747725622296059" />
-      <entry key="S10" value="2.8691344067858884" />
-      <entry key="S30" value="2.955279054170219" />
-      <entry key="S60" value="2.9775114127078197" />
-      <entry key="M2" value="3.003790499671512" />
-      <entry key="M5" value="4.585499678281386" />
-      <entry key="M10" value="12.933435878289066" />
-      <entry key="M15" value="23.025022760646287" />
-      <entry key="M30" value="46.22600265283181" />
-      <entry key="H1" value="68.44523883637697" />
-      <entry key="H2" value="88.15642700752504" />
-      <entry key="H4" value="133.25047991710852" />
-      <entry key="D1" value="380.58184578920276" />
-      <entry key="W1" value="494.8516638186788" />
+      <entry key="MS100" value="0.9977036771211476" />
+      <entry key="MS500" value="1.708968329613133" />
+      <entry key="S2" value="3.0027850234231512" />
+      <entry key="S5" value="3.9073657171346845" />
+      <entry key="S10" value="4.62634954645972" />
+      <entry key="S30" value="5.897447921785794" />
+      <entry key="S60" value="8.423785141259204" />
+      <entry key="M2" value="12.453644940057018" />
+      <entry key="M5" value="17.58577325279178" />
+      <entry key="M10" value="23.291076479777008" />
+      <entry key="M15" value="30.58576423262438" />
+      <entry key="M30" value="52.12280994477408" />
+      <entry key="H1" value="77.62578650087045" />
+      <entry key="H2" value="101.57162879141036" />
+      <entry key="H4" value="148.66575429011132" />
+      <entry key="D1" value="399.4199708563762" />
+      <entry key="W1" value="516.2631214796994" />
     </decayedShown>
   </component>
   <component name="ProjectColorInfo">{
@@ -423,7 +421,7 @@
       <workItem from="1749475709469" duration="296000" />
       <workItem from="1750695442889" duration="288000" />
       <workItem from="1767128749034" duration="1853000" />
-      <workItem from="1794248234175" duration="2463000" />
+      <workItem from="1794248234175" duration="2882000" />
     </task>
     <task id="LOCAL-00001" summary="ci">
       <option name="closed" value="true" />
@@ -593,7 +591,15 @@
       <option name="project" value="LOCAL" />
       <updated>1794249895872</updated>
     </task>
-    <option name="localTasksCounter" value="22" />
+    <task id="LOCAL-00022" summary="feat: package status during queue and build">
+      <option name="closed" value="true" />
+      <created>1794250908750</created>
+      <option name="number" value="00022" />
+      <option name="presentableId" value="LOCAL-00022" />
+      <option name="project" value="LOCAL" />
+      <updated>1794250908750</updated>
+    </task>
+    <option name="localTasksCounter" value="23" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -611,7 +617,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="ci: hopefully fix cosign" />
     <MESSAGE value="Release 1.0.0&#10;&#10;common@1.0.0&#10;database@1.0.0&#10;server@1.0.0&#10;web@1.0.0&#10;worker@1.0.0&#10;&#10;Generated by cargo-workspaces" />
     <MESSAGE value="make settings configurable via yaml" />
     <MESSAGE value="show error code meaning for builds in tooltip and log" />
@@ -636,7 +641,8 @@
     <MESSAGE value="fix: approval" />
     <MESSAGE value="fix: improve logging" />
     <MESSAGE value="fix: add user agent to AUR requests" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix: add user agent to AUR requests" />
+    <MESSAGE value="feat: package status during queue and build" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: package status during queue and build" />
   </component>
   <component name="XDebuggerManager">
     <watches-manager>
