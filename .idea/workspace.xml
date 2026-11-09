@@ -237,7 +237,7 @@
   <component name="RsExternalLinterProjectSettings">
     <option name="runOnTheFly" value="true" />
   </component>
-  <component name="RunManager" selected="Cargo.All Tests">
+  <component name="RunManager" selected="Cargo.Run web">
     <configuration name="All Tests" type="CargoCommandRunConfiguration" factoryName="Cargo Command" temporary="true">
       <option name="buildProfileId" value="test" />
       <option name="command" value="test" />
@@ -383,10 +383,10 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Cargo.Run web" />
         <item itemvalue="npm.dev" />
         <item itemvalue="Docker.docker-compose.yaml.rabbitmq: Compose Deployment" />
         <item itemvalue="Cargo.Run worker" />
-        <item itemvalue="Cargo.Run web" />
         <item itemvalue="Cargo.All Tests" />
       </list>
     </recent_temporary>
