@@ -1,94 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Aur Builder Notification</title>
+<head><meta charset="utf-8"><title>Build result</title>
+<style>body{font:16px/1.6 sans-serif;color:#182c3b;background:#f6f8fa}main{max-width:600px;margin:24px auto;padding:28px;background:white;border:1px solid #e5ebef;border-radius:12px}a{color:#410962;font-weight:bold}code{overflow-wrap:anywhere}.muted{color:#687b89}</style>
 </head>
-<style>
-    html,body {
-        height: 100%;
-        /*background: #e0e0e0;*/
-    }
-    #message {
-        width: 100%;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100%;
-    }
-    #content {
-        height: fit-content;
-        /*background: white;*/
-        border: solid 3px #a53df6;
-        padding: 10px;
-        text-align: center;
-        width: 400px;
-        max-width: 100%;
-        border-radius: 10px;
-        box-shadow:  0 0 15px #afafaf;
-    }
-    #text {
-        width: 100%;
-        text-align: left;
-    }
-    hr {
-        color: rgba(177, 177, 177, 0.36);
-        margin-left: -10px;
-        margin-right: -10px;
-    }
-    #logo {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    #logo > h1 {
-        /*margin-left: 20px;*/
-    }
-
-    #logo > img {
-        margin-right: 20px;
-        max-width: 70px;
-        max-height: 70px;
-    }
-
-    img:after, img:before {
-        display: none;
-    }
-</style>
-<body>
-<div id="message">
-    <div id="content">
-
-        <div id="logo">
-            <img src="{{maillogo}}" alt="">
-<!--            <img src="https://aur-builder.build.pollinger.dev/assets/logo.png" alt="Logo">-->
-            <h1>Aur Builder</h1>
-        </div>
-
-        <hr>
-
-        {% if build_result.success %}
-        <h2>Updated {{build_result.task.name}}!</h2>
-
-        <!--suppress XmlDuplicatedId -->
-        <div id="text">
-            <p>{{build_result.task.name}} was successfully updated to version {{build_result.task.version}}!</p>
-        </div>
-        {% else %}
-        <h2>Failed to update {{build_result.task.name}}!</h2>
-
-        <!--suppress XmlDuplicatedId -->
-        <div id="text">
-            <p>
-                There was an error while updating {{build_result.task.name}} to version {{build_result.task.version}}!
-                <br>
-                Build exited with code <strong>{{build_result.status_code}}</strong> ({{error_description}})
-            </p>
-        </div>
-        {% endif %}
-    </div>
-</div>
-</body>
-</html>
+<body><main>
+{% if maillogo %}<img src="{{maillogo}}" alt="" width="60">{% endif %}
+<p class="muted">AUR Builder · Build result</p>
+{% if build_result.success %}
+<h1>Updated {{build_result.task.name}}!</h1>
+<p><strong>{{build_result.task.name}}</strong> was successfully updated to version <strong>{{build_result.task.version}}</strong>!</p>
+{% else %}
+<h1>Failed to update {{build_result.task.name}}!</h1>
+<p>There was an error while updating <strong>{{build_result.task.name}}</strong> to version <strong>{{build_result.task.version}}</strong>!</p>
+<p class="muted">Build exited with code <strong>{{build_result.status_code}}</strong> ({{error_description}})</p>
+{% endif %}
+</main></body></html>
