@@ -1,9 +1,9 @@
+use lazy_static::lazy_static;
+use serde_json::Value;
 use std::collections::HashMap;
 use std::error::Error;
 use std::fmt;
 use std::fmt::{Display, Formatter};
-use lazy_static::lazy_static;
-use serde_json::Value;
 
 const BUILD_ERROR_CODES_JSON : &str = include_str!("./error_codes.json");
 

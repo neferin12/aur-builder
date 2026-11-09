@@ -80,6 +80,21 @@ async fn render_packages_function(
     Extension(db): Extension<Database>,
 ) -> Html<String> {
     let mut context = reviews::context(&identity, "packages");
+    let activity = db.build_activity().await.unwrap();
+    context.insert(
+        "building",
+        &activity
+            .iter()
+            .filter(|a| a["state"] == "building")
+            .collect::<Vec<_>>(),
+    );
+    context.insert(
+        "queued",
+        &activity
+            .iter()
+            .filter(|a| a["state"] != "building")
+            .collect::<Vec<_>>(),
+    );
     let packages = db.get_packages().await.unwrap();
     let statuses = db.latest_build_statuses().await.unwrap();
     let successful = statuses.values().filter(|&&s| s).count();
@@ -214,7 +229,7 @@ mod tests {
         tera.register_filter("err_desc", error_desc_filter);
         let package = json!({"id":1,"name":"example","version":"1.0-1","maintainer":"alice","last_modified":1700000000,"source":null,"build_status":"success"});
         let result = json!({"id":2,"package_id":1,"success":false,"version":"1.0-1","exit_code":105,"started_at":null,"finished_at":null,"build_log":"stdout: hello\nstderr: <script>alert(1)</script>"});
-        let mut context=Context::from_value(json!({"version":"test","current_page":"packages","packages":[package.clone()],"package":package,"successful":1,"failed":0,"unbuilt":0,"build_results":[result.clone()],"build_result":result})).unwrap();
+        let mut context=Context::from_value(json!({"version":"test","current_page":"packages","packages":[package.clone()],"package":package,"building":[],"queued":[],"successful":1,"failed":0,"unbuilt":0,"build_results":[result.clone()],"build_result":result})).unwrap();
         for name in [
             "index.html",
             "build-results.html",

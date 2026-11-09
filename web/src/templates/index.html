@@ -8,6 +8,16 @@
     <div class="stat"><span><i class="dot red"></i> Failed</span><strong>{{ failed }}</strong><small>Packages needing attention</small></div>
     <div class="stat"><span><i class="dot gray"></i> No builds yet</span><strong>{{ unbuilt }}</strong><small>Awaiting a first result</small></div>
 </section>
+{% for group in ["building", "queued"] %}
+<section class="panel" aria-label="{% if group == "building" %}Currently building{% else %}Build queue{% endif %}">
+    {% if group == "building" %}{% set tasks = building %}{% else %}{% set tasks = queued %}{% endif %}
+    <div class="panel-heading"><div><h2>{% if group == "building" %}Currently building{% else %}Build queue{% endif %} <span class="count">{{ tasks | length }}</span></h2><p>{% if group == "building" %}Packages being processed by workers.{% else %}Packages waiting for a worker, in dispatch order.{% endif %} Use Refresh to update.</p></div></div>
+    <div class="table-scroll"><table><thead><tr><th>Package</th><th>Version</th></tr></thead><tbody>
+    {% for task in tasks %}<tr><td><a class="package-name" href="/build-results/{{ task.id }}">{{ task.name }}</a></td><td class="mono">{{ task.version }}</td></tr>
+    {% else %}<tr><td colspan="2">{% if group == "building" %}No packages currently building.{% else %}No packages queued.{% endif %}</td></tr>{% endfor %}
+    </tbody></table></div>
+</section>
+{% endfor %}
 <section class="panel" aria-labelledby="package-heading">
     <div class="panel-heading"><div><h2 id="package-heading">Tracked packages <span class="count">{{ packages | length }}</span></h2><p>Open a package to inspect its build history or request a rebuild.</p></div></div>
     <div class="toolbar" data-package-controls hidden><label class="search"><span aria-hidden="true">⌕</span><input id="package-search" type="search" placeholder="Search packages or maintainers…" aria-label="Search packages or maintainers"></label><label class="filter-label">Status <select id="status-filter"><option value="all">All statuses</option><option value="success">Successful</option><option value="failed">Failed</option><option value="unbuilt">No builds yet</option></select></label></div>

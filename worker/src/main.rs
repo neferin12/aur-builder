@@ -141,6 +141,9 @@ async fn main() {
             delivery.ack(BasicAckOptions::default()).await.unwrap();
             continue;
         }
+        db.attempt_state(&build_task.attempt, "building")
+            .await
+            .expect("record build start");
         let build_started = std::time::Instant::now();
         info!("Starting build: package={}, version={}, attempt={}", build_task.name, build_task.version, build_task.attempt);
         match build_package(&build_task).await {
@@ -164,6 +167,9 @@ async fn main() {
                 delivery.ack(BasicAckOptions::default()).await.expect("ack");
             }
             Err(error) => {
+                db.attempt_state(&build_task.attempt, "dispatched")
+                    .await
+                    .expect("reset build state");
                 error!(
                     "System error while building package '{}', attempt={}: {:?}",
                     build_task.name, build_task.attempt, error

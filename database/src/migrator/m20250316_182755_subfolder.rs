@@ -1,5 +1,5 @@
-use sea_orm_migration::prelude::*;
 use crate::entities::prelude::PackageMetadata;
+use sea_orm_migration::prelude::*;
 
 #[derive(DeriveMigrationName)]
 pub struct Migration;

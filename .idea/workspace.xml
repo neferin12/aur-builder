@@ -29,7 +29,7 @@
     </cargoProject>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="30df73c6-6061-4a44-ad67-d8c0fc6fb8e8" name="Changes" comment="fix: improve logging">
+    <list default="true" id="30df73c6-6061-4a44-ad67-d8c0fc6fb8e8" name="Changes" comment="fix: add user agent to AUR requests">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -104,23 +104,23 @@
   </component>
   <component name="NextEditCompletionFeaturesState">
     <decayedCancelled>
-      <entry key="MS100" value="1.0058039550230928" />
-      <entry key="MS500" value="1.576994953276135" />
-      <entry key="S2" value="2.4595805791501935" />
-      <entry key="S5" value="2.7626305505514264" />
-      <entry key="S10" value="2.880992197099626" />
-      <entry key="S30" value="3.7125926891830767" />
-      <entry key="S60" value="6.129923985582391" />
-      <entry key="M2" value="10.593081490560378" />
-      <entry key="M5" value="21.881029781986562" />
-      <entry key="M10" value="36.85744692714371" />
-      <entry key="M15" value="47.99054021551677" />
-      <entry key="M30" value="66.91553509822812" />
-      <entry key="H1" value="81.42683567331504" />
-      <entry key="H2" value="94.98649483152279" />
-      <entry key="H4" value="137.56292201781002" />
-      <entry key="D1" value="381.03489656118654" />
-      <entry key="W1" value="492.4917399777379" />
+      <entry key="MS100" value="1.012040188888125" />
+      <entry key="MS500" value="1.5757124310416875" />
+      <entry key="S2" value="2.437083691200418" />
+      <entry key="S5" value="2.749503974728933" />
+      <entry key="S10" value="2.870062631409467" />
+      <entry key="S30" value="2.9555977145623062" />
+      <entry key="S60" value="2.97767195091998" />
+      <entry key="M2" value="3.0038762103370815" />
+      <entry key="M5" value="4.585654876963616" />
+      <entry key="M10" value="12.933712408366636" />
+      <entry key="M15" value="23.025322284273795" />
+      <entry key="M30" value="46.226254895725475" />
+      <entry key="H1" value="68.44540550194256" />
+      <entry key="H2" value="88.15652913909369" />
+      <entry key="H4" value="133.25056104995633" />
+      <entry key="D1" value="380.58188848372447" />
+      <entry key="W1" value="494.8516718155434" />
     </decayedCancelled>
     <decayedSelected>
       <entry key="MS100" value="0.0" />
@@ -142,23 +142,23 @@
       <entry key="W1" value="0.0" />
     </decayedSelected>
     <decayedShown>
-      <entry key="MS100" value="0.9709272202987087" />
-      <entry key="MS500" value="1.4433226247616304" />
-      <entry key="S2" value="2.333193583077985" />
-      <entry key="S5" value="2.696100610161657" />
-      <entry key="S10" value="2.844520123713302" />
-      <entry key="S30" value="3.699575333813055" />
-      <entry key="S60" value="6.1231595596087525" />
-      <entry key="M2" value="10.589466345349159" />
-      <entry key="M5" value="21.8793386231126" />
-      <entry key="M10" value="36.85648108886072" />
-      <entry key="M15" value="47.989848287785335" />
-      <entry key="M30" value="66.91515296886878" />
-      <entry key="H1" value="81.426631663443" />
-      <entry key="H2" value="94.98638241400998" />
-      <entry key="H4" value="137.56283704187" />
-      <entry key="D1" value="381.0348535895649" />
-      <entry key="W1" value="492.49173198653267" />
+      <entry key="MS100" value="0.9776464969144555" />
+      <entry key="MS500" value="1.5653962969027968" />
+      <entry key="S2" value="2.433141497042262" />
+      <entry key="S5" value="2.747725622296059" />
+      <entry key="S10" value="2.8691344067858884" />
+      <entry key="S30" value="2.955279054170219" />
+      <entry key="S60" value="2.9775114127078197" />
+      <entry key="M2" value="3.003790499671512" />
+      <entry key="M5" value="4.585499678281386" />
+      <entry key="M10" value="12.933435878289066" />
+      <entry key="M15" value="23.025022760646287" />
+      <entry key="M30" value="46.22600265283181" />
+      <entry key="H1" value="68.44523883637697" />
+      <entry key="H2" value="88.15642700752504" />
+      <entry key="H4" value="133.25047991710852" />
+      <entry key="D1" value="380.58184578920276" />
+      <entry key="W1" value="494.8516638186788" />
     </decayedShown>
   </component>
   <component name="ProjectColorInfo">{
@@ -423,7 +423,7 @@
       <workItem from="1749475709469" duration="296000" />
       <workItem from="1750695442889" duration="288000" />
       <workItem from="1767128749034" duration="1853000" />
-      <workItem from="1794248234175" duration="1507000" />
+      <workItem from="1794248234175" duration="2463000" />
     </task>
     <task id="LOCAL-00001" summary="ci">
       <option name="closed" value="true" />
@@ -585,7 +585,15 @@
       <option name="project" value="LOCAL" />
       <updated>1794248750825</updated>
     </task>
-    <option name="localTasksCounter" value="21" />
+    <task id="LOCAL-00021" summary="fix: add user agent to AUR requests">
+      <option name="closed" value="true" />
+      <created>1794249895872</created>
+      <option name="number" value="00021" />
+      <option name="presentableId" value="LOCAL-00021" />
+      <option name="project" value="LOCAL" />
+      <updated>1794249895872</updated>
+    </task>
+    <option name="localTasksCounter" value="22" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -603,7 +611,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="improve docker build" />
     <MESSAGE value="ci: hopefully fix cosign" />
     <MESSAGE value="Release 1.0.0&#10;&#10;common@1.0.0&#10;database@1.0.0&#10;server@1.0.0&#10;web@1.0.0&#10;worker@1.0.0&#10;&#10;Generated by cargo-workspaces" />
     <MESSAGE value="make settings configurable via yaml" />
@@ -628,7 +635,8 @@
     <MESSAGE value="feat: add release approvals, AI reviews, and OIDC authentication&#10;&#10;- Gate builds on approval of pinned source revisions&#10;- Add review queue, source diffs, decision history, and email alerts&#10;- Support optional OpenAI feedback and automatic approval&#10;- Add OIDC login and admin-managed permissions with default-denied access&#10;- Harden sessions, token validation, CSRF protection, and logout&#10;- Handle source reverts safely and redact repository credentials&#10;- Add migrations, regression tests, and deployment documentation" />
     <MESSAGE value="fix: approval" />
     <MESSAGE value="fix: improve logging" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix: improve logging" />
+    <MESSAGE value="fix: add user agent to AUR requests" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix: add user agent to AUR requests" />
   </component>
   <component name="XDebuggerManager">
     <watches-manager>

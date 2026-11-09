@@ -286,6 +286,22 @@ impl Database {
             backend, sql, values,
         ))
     }
+    /// Active attempts in dispatch order; upload credentials are never exposed.
+    pub async fn build_activity(&self) -> Result<Vec<serde_json::Value>, DbErr> {
+        use sea_orm::ConnectionTrait;
+        let query = self.storage_query(
+            "SELECT task,state FROM build_attempt WHERE state IN ('queued','dispatched','building') ORDER BY created_at,attempt",
+            vec![],
+        ).await?;
+        let mut activity = Vec::new();
+        for row in self.db.query_all(query).await? {
+            let task: common::types::BuildTaskTransmissionFormat =
+                serde_json::from_str(&row.try_get::<String>("", "task")?)
+                    .map_err(|e| DbErr::Custom(e.to_string()))?;
+            activity.push(serde_json::json!({"id":task.id,"name":task.name,"version":task.version,"state":row.try_get::<String>("", "state")?}));
+        }
+        Ok(activity)
+    }
     pub async fn pending_attempts(
         &self,
     ) -> Result<Vec<common::types::BuildTaskTransmissionFormat>, DbErr> {
@@ -363,12 +379,12 @@ impl Database {
         task: &common::types::BuildTaskTransmissionFormat,
     ) -> Result<bool, DbErr> {
         use sea_orm::ConnectionTrait;
-        let q=self.storage_query("SELECT attempt FROM build_attempt WHERE attempt=? AND state IN ('queued','dispatched')",vec![task.attempt.clone().into()]).await?;
+        let q=self.storage_query("SELECT attempt FROM build_attempt WHERE attempt=? AND state IN ('queued','dispatched','building')",vec![task.attempt.clone().into()]).await?;
         Ok(self.db.query_one(q).await?.is_some())
     }
     pub async fn finish_attempt(&self, attempt: &str) -> Result<(), DbErr> {
         use sea_orm::ConnectionTrait;
-        let q=self.storage_query("UPDATE build_attempt SET state='finished' WHERE attempt=? AND state IN ('queued','dispatched')",vec![attempt.into()]).await?;
+        let q=self.storage_query("UPDATE build_attempt SET state='finished' WHERE attempt=? AND state IN ('queued','dispatched','building')",vec![attempt.into()]).await?;
         self.db.execute(q).await?;
         Ok(())
     }

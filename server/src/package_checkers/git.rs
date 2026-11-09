@@ -1,7 +1,7 @@
-use std::error::Error;
 use common::types::{GitPackageSettings, PackageSearchResult};
 use git2::Repository;
 use srcinfo::Srcinfo;
+use std::error::Error;
 
 pub async fn get_git_data(pkg: &GitPackageSettings) -> Result<PackageSearchResult, Box<dyn Error>> {
     let temp_dir = tempfile::tempdir()?;
