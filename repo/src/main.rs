@@ -299,12 +299,14 @@ async fn ingest(
         || !db.valid_attempt(task).await?
         || !db.latest_attempt(task).await?
     {
+        log::debug!("Skipping unsuccessful, unapproved, or superseded build result: package={}, attempt={}", task.name, task.attempt);
         return Ok(());
     }
     let old = app.catalog.read().await.clone();
     if old.attempts.get(&task.name) == Some(&task.attempt) {
         return Ok(());
     }
+    log::info!("Ingesting build artifacts: package={}, attempt={}", task.name, task.attempt);
     let temp = tempfile::tempdir()?;
     let dir = temp.path();
     let bundle = dir.join("bundle.tar");
@@ -495,6 +497,7 @@ async fn ingest(
     }
     *app.catalog.write().await = next;
     db.attempt_state(&task.attempt, "published").await?;
+    log::info!("Repository release published: package={}, version={}, attempt={}", task.name, task.version, task.attempt);
     Ok(())
 }
 async fn serve(
@@ -621,10 +624,11 @@ async fn main() -> Result<(), Error> {
             match result {
                 Ok(result) => match ingest(&state, &db, &result).await {
                     Ok(()) => {
+                        log::debug!("Repository build result processed: package={}, attempt={}", result.task.name, result.task.attempt);
                         delivery.ack(BasicAckOptions::default()).await.ok();
                     }
                     Err(e) => {
-                        log::error!("Repository ingestion failed: {e}");
+                        log::error!("Repository ingestion failed: package={}, attempt={}, error={e}", result.task.name, result.task.attempt);
                         if e.is::<InvalidArtifact>() {
                             delivery
                                 .reject(BasicRejectOptions { requeue: false })

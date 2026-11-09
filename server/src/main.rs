@@ -9,7 +9,7 @@ use common::environment::{VERSION, get_environment_variable, load_dotenv};
 use database::connect_to_db;
 use log::{debug, error, info};
 use std::process::exit;
-use std::time::Duration;
+use std::time::{Duration, Instant};
 use tokio::time::sleep;
 
 use package_checkers::*;
@@ -64,6 +64,7 @@ async fn main() {
                     .unwrap();
                 continue;
             }
+            debug!("Dispatching pending build: package={}, attempt={}", pending.name, pending.attempt);
             storage.renew(&mut pending).unwrap();
             common::messaging::publish(
                 &build_tx,
@@ -72,11 +73,13 @@ async fn main() {
             )
             .await
             .unwrap();
+            info!("Build dispatched: package={}, attempt={}", pending.name, pending.attempt);
             db.attempt_state(&pending.attempt, "dispatched")
                 .await
                 .unwrap();
         }
-        info!("Checking for package updates...");
+        let check_started = Instant::now();
+        info!("Checking for package updates: aur={}, git={}", config.aur_packages.len(), config.git_packages.len());
         let mut package_data = Vec::new();
 
         for pkg in &config.aur_packages {
@@ -87,7 +90,7 @@ async fn main() {
                     package_data.push(aur);
                 }
                 Err(e) => {
-                    error!("Failed to get data for aur package \"{}\": {}", pkg.name, e);
+                    error!("Failed to get data for aur package \"{}\": {:?}", pkg.name, e);
                 }
             }
         }
@@ -108,6 +111,8 @@ async fn main() {
             }
         }
 
+        let fetched = package_data.len();
+        let mut observed = 0usize;
         for mut data in package_data {
             match reviews::capture(&mut data) {
                 Ok((revision, fingerprint, snapshot)) => {
@@ -115,12 +120,16 @@ async fn main() {
                         .observe_release(&data, &revision, &fingerprint, &snapshot)
                         .await
                     {
-                        error!("Could not persist release candidate for {}: {e}", data.name);
+                        error!("Could not persist release candidate for {}: {e:?}", data.name);
+                    } else {
+                        observed += 1;
                     }
                 }
                 Err(e) => error!("Could not capture packaging source for {}: {e}", data.name),
             }
         }
-        sleep(Duration::from_secs(config.sleepduration.unwrap_or(60 * 5))).await;
+        let sleep_seconds = config.sleepduration.unwrap_or(60 * 5);
+        info!("Package update check completed: fetched={fetched}, fetch_failed={}, observed={observed}, observation_failed={}, elapsed_ms={}, next_check_seconds={sleep_seconds}", config.aur_packages.len() + config.git_packages.len() - fetched, fetched - observed, check_started.elapsed().as_millis());
+        sleep(Duration::from_secs(sleep_seconds)).await;
     }
 }

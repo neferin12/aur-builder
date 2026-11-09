@@ -29,14 +29,11 @@
     </cargoProject>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="30df73c6-6061-4a44-ad67-d8c0fc6fb8e8" name="Changes" comment="feat: add release approvals, AI reviews, and OIDC authentication&#10;&#10;- Gate builds on approval of pinned source revisions&#10;- Add review queue, source diffs, decision history, and email alerts&#10;- Support optional OpenAI feedback and automatic approval&#10;- Add OIDC login and admin-managed permissions with default-denied access&#10;- Harden sessions, token validation, CSRF protection, and logout&#10;- Handle source reverts safely and redact repository credentials&#10;- Add migrations, regression tests, and deployment documentation">
+    <list default="true" id="30df73c6-6061-4a44-ad67-d8c0fc6fb8e8" name="Changes" comment="fix: approval">
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources.local.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources.local.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_02_11_26__00_05__Changes_.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/src/config.rs" beforeDir="false" afterPath="$PROJECT_DIR$/common/src/config.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/src/messaging.rs" beforeDir="false" afterPath="$PROJECT_DIR$/common/src/messaging.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/database/src/lib.rs" beforeDir="false" afterPath="$PROJECT_DIR$/database/src/lib.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/reference/configuration.md" beforeDir="false" afterPath="$PROJECT_DIR$/docs/reference/configuration.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/repo/src/main.rs" beforeDir="false" afterPath="$PROJECT_DIR$/repo/src/main.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/src/main.rs" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main.rs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -49,11 +46,15 @@
       <option value="repository" />
     </option>
   </component>
-  <component name="EmbeddingIndexingInfo">
-    <option name="cachedIndexableFilesCount" value="89" />
-    <option name="fileBasedEmbeddingIndicesEnabled" value="true" />
+  <component name="CopilotPersistence">
+    <persistenceIdMap>
+      <entry key="_/home/julian/projects/privat/aur-builder" value="3LsgXvtQvARK3C71hkAnLU16EQP" />
+    </persistenceIdMap>
   </component>
-  <component name="ExecutionTargetManager" SELECTED_TARGET="RsBuildProfile:dev" />
+  <component name="EmbeddingIndexingInfo">
+    <option name="cachedIndexableFilesCount" value="3078" />
+  </component>
+  <component name="ExecutionTargetManager" SELECTED_TARGET="RsBuildProfile:test" />
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
@@ -106,23 +107,23 @@
   </component>
   <component name="NextEditCompletionFeaturesState">
     <decayedCancelled>
-      <entry key="MS100" value="1.0961768912389325" />
-      <entry key="MS500" value="1.9626079150149884" />
-      <entry key="S2" value="4.238143960064045" />
-      <entry key="S5" value="5.6208625660770375" />
-      <entry key="S10" value="6.252732079760832" />
-      <entry key="S30" value="6.738490201114898" />
-      <entry key="S60" value="7.012844037656364" />
-      <entry key="M2" value="8.300573251074567" />
-      <entry key="M5" value="14.744782001987286" />
-      <entry key="M10" value="26.179082856974084" />
-      <entry key="M15" value="34.361251189219495" />
-      <entry key="M30" value="47.041680186342425" />
-      <entry key="H1" value="55.94395683295809" />
-      <entry key="H2" value="65.9794371718423" />
-      <entry key="H4" value="107.3760694249024" />
-      <entry key="D1" value="348.9397332239814" />
-      <entry key="W1" value="458.84662889354547" />
+      <entry key="MS100" value="1.0915425408407964" />
+      <entry key="MS500" value="2.4131659017212086" />
+      <entry key="S2" value="4.2453259278385715" />
+      <entry key="S5" value="5.12963287910867" />
+      <entry key="S10" value="5.76834612720272" />
+      <entry key="S30" value="9.121277583239495" />
+      <entry key="S60" value="12.768765782864376" />
+      <entry key="M2" value="17.0902540286406" />
+      <entry key="M5" value="25.623022572842775" />
+      <entry key="M10" value="37.81682577568613" />
+      <entry key="M15" value="46.75682677645279" />
+      <entry key="M30" value="61.15957568122972" />
+      <entry key="H1" value="71.6167517499962" />
+      <entry key="H2" value="82.60586136779733" />
+      <entry key="H4" value="124.27386019538139" />
+      <entry key="D1" value="366.3528119437421" />
+      <entry key="W1" value="476.7365453228963" />
     </decayedCancelled>
     <decayedSelected>
       <entry key="MS100" value="0.0" />
@@ -144,23 +145,23 @@
       <entry key="W1" value="0.0" />
     </decayedSelected>
     <decayedShown>
-      <entry key="MS100" value="1.0736179579827043" />
-      <entry key="MS500" value="1.954597720153056" />
-      <entry key="S2" value="4.2339334083844475" />
-      <entry key="S5" value="5.618635235764617" />
-      <entry key="S10" value="6.251493693341122" />
-      <entry key="S30" value="6.73804538004541" />
-      <entry key="S60" value="7.012612889564633" />
-      <entry key="M2" value="8.300437559755968" />
-      <entry key="M5" value="14.744682385609588" />
-      <entry key="M10" value="26.178988713644564" />
-      <entry key="M15" value="34.361166648568165" />
-      <entry key="M30" value="47.04162080630662" />
-      <entry key="H1" value="55.94392095235517" />
-      <entry key="H2" value="65.97941048027639" />
-      <entry key="H4" value="107.3760271175372" />
-      <entry key="D1" value="348.9396974376161" />
-      <entry key="W1" value="458.8466219513649" />
+      <entry key="MS100" value="1.0398056478005984" />
+      <entry key="MS500" value="2.2948639215408058" />
+      <entry key="S2" value="4.181240701255725" />
+      <entry key="S5" value="5.09953077230612" />
+      <entry key="S10" value="5.752410895573867" />
+      <entry key="S30" value="9.115570320288578" />
+      <entry key="S60" value="12.765770364785677" />
+      <entry key="M2" value="17.08868018595583" />
+      <entry key="M5" value="25.62233393101348" />
+      <entry key="M10" value="37.8164356311068" />
+      <entry key="M15" value="46.7565434107194" />
+      <entry key="M30" value="61.15941489787463" />
+      <entry key="H1" value="71.61666421401357" />
+      <entry key="H2" value="82.60580865400696" />
+      <entry key="H4" value="124.27380502878164" />
+      <entry key="D1" value="366.3527740029171" />
+      <entry key="W1" value="476.7365380660546" />
     </decayedShown>
   </component>
   <component name="ProjectColorInfo">{
@@ -168,12 +169,16 @@
   &quot;associatedIndex&quot;: 5
 }</component>
   <component name="ProjectId" id="2uB4LcFfwDCfgsFlS5olJyJqGUY" />
+  <component name="ProjectSessionTemplates">
+    <option name="version" value="1" />
+  </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
+    "Cargo.All Tests.executor": "Run",
     "Cargo.Build `Run notifier`.executor": "Run",
     "Cargo.Build `Run server`.executor": "Run",
     "Cargo.Run notifier.executor": "Run",
@@ -193,6 +198,7 @@
     "SHELLCHECK.PATH": "/home/julian/.local/share/JetBrains/RustRover2025.1/Shell Script/shellcheck",
     "codeWithMe.voiceChat.enabledByDefault": "false",
     "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
+    "copilot.chat.legacySessionMetadata.migrated": "true",
     "dart.analysis.tool.window.visible": "false",
     "git-widget-placeholder": "main",
     "junie.onboarding.icon.badge.shown": "true",
@@ -234,7 +240,25 @@
   <component name="RsExternalLinterProjectSettings">
     <option name="runOnTheFly" value="true" />
   </component>
-  <component name="RunManager" selected="npm.dev">
+  <component name="RunManager" selected="Cargo.All Tests">
+    <configuration name="All Tests" type="CargoCommandRunConfiguration" factoryName="Cargo Command" temporary="true">
+      <option name="buildProfileId" value="test" />
+      <option name="command" value="test" />
+      <option name="workingDirectory" value="file://$PROJECT_DIR$" />
+      <envs />
+      <option name="emulateTerminal" value="true" />
+      <option name="channel" value="DEFAULT" />
+      <option name="requiredFeatures" value="true" />
+      <option name="allFeatures" value="false" />
+      <option name="withSudo" value="false" />
+      <option name="buildTarget" value="REMOTE" />
+      <option name="backtrace" value="SHORT" />
+      <option name="isRedirectInput" value="false" />
+      <option name="redirectInputPath" value="" />
+      <method v="2">
+        <option name="CARGO.BUILD_TASK_PROVIDER" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="Run notifier" type="CargoCommandRunConfiguration" factoryName="Cargo Command">
       <option name="buildProfileId" value="dev" />
       <option name="command" value="run --package notifier --bin notifier" />
@@ -324,6 +348,13 @@
         <option name="CARGO.BUILD_TASK_PROVIDER" enabled="true" />
       </method>
     </configuration>
+    <configuration default="true" type="LATEX_RUN_CONFIGURATION" factoryName="LaTeX configuration factory">
+      <steps>
+        <latexmkCompile id="119e1803-d02c-409f-994e-2203bc475856" />
+        <pdfViewer id="676919bb-2d7e-47f2-84e9-bf038add1cd7" />
+      </steps>
+      <method v="2" />
+    </configuration>
     <configuration default="true" type="docker-deploy" factoryName="docker-compose.yml" temporary="true">
       <deployment type="docker-compose.yml">
         <settings />
@@ -357,9 +388,9 @@
       <list>
         <item itemvalue="npm.dev" />
         <item itemvalue="Docker.docker-compose.yaml.rabbitmq: Compose Deployment" />
+        <item itemvalue="Cargo.Run worker" />
         <item itemvalue="Cargo.Run web" />
-        <item itemvalue="Cargo.Run worker" />
-        <item itemvalue="Cargo.Run worker" />
+        <item itemvalue="Cargo.All Tests" />
       </list>
     </recent_temporary>
   </component>
@@ -395,6 +426,7 @@
       <workItem from="1749475709469" duration="296000" />
       <workItem from="1750695442889" duration="288000" />
       <workItem from="1767128749034" duration="1853000" />
+      <workItem from="1794248234175" duration="287000" />
     </task>
     <task id="LOCAL-00001" summary="ci">
       <option name="closed" value="true" />
@@ -566,7 +598,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="ci" />
     <MESSAGE value="fix docker build" />
     <MESSAGE value="improve docker build" />
     <MESSAGE value="ci: hopefully fix cosign" />
@@ -591,7 +622,8 @@
     <MESSAGE value="chore(docker-compose): update service images to version 2" />
     <MESSAGE value="feat: refactor build container into rust module" />
     <MESSAGE value="feat: add release approvals, AI reviews, and OIDC authentication&#10;&#10;- Gate builds on approval of pinned source revisions&#10;- Add review queue, source diffs, decision history, and email alerts&#10;- Support optional OpenAI feedback and automatic approval&#10;- Add OIDC login and admin-managed permissions with default-denied access&#10;- Harden sessions, token validation, CSRF protection, and logout&#10;- Handle source reverts safely and redact repository credentials&#10;- Add migrations, regression tests, and deployment documentation" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: add release approvals, AI reviews, and OIDC authentication&#10;&#10;- Gate builds on approval of pinned source revisions&#10;- Add review queue, source diffs, decision history, and email alerts&#10;- Support optional OpenAI feedback and automatic approval&#10;- Add OIDC login and admin-managed permissions with default-denied access&#10;- Harden sessions, token validation, CSRF protection, and logout&#10;- Handle source reverts safely and redact repository credentials&#10;- Add migrations, regression tests, and deployment documentation" />
+    <MESSAGE value="fix: approval" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix: approval" />
   </component>
   <component name="XDebuggerManager">
     <watches-manager>

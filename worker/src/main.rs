@@ -23,7 +23,7 @@ async fn main() {
     info!("Starting Aur-Builder Worker v{VERSION}");
 
     match pull_docker_image().await {
-        Err(_) => warn!("Builder image could not be pulled"),
+        Err(e) => warn!("Builder image could not be pulled: {e:?}"),
         _ => {}
     }
 
@@ -73,12 +73,13 @@ async fn main() {
         .await
         .unwrap();
 
+    info!("Worker ready; waiting for build tasks");
     while let Some(delivery) = consumer.next().await {
         let delivery = delivery.expect("error in consumer");
         let build_task: BuildTaskTransmissionFormat = match serde_json::from_slice(&delivery.data) {
             Ok(task) => task,
-            Err(_) => {
-                error!("Rejecting malformed build task");
+            Err(e) => {
+                error!("Rejecting malformed build task: {e:?}");
                 delivery
                     .reject(lapin::options::BasicRejectOptions { requeue: false })
                     .await
@@ -90,7 +91,7 @@ async fn main() {
         match db.valid_attempt(&build_task).await {
             Ok(true) => {}
             Ok(false) => {
-                error!("Rejecting unapproved or unpinned build task");
+                error!("Rejecting unapproved or unpinned build task: package={}, attempt={}", build_task.name, build_task.attempt);
                 delivery
                     .reject(lapin::options::BasicRejectOptions { requeue: false })
                     .await
@@ -127,6 +128,7 @@ async fn main() {
                 )
                 .await
                 .unwrap();
+            warn!("Build upload grant expired or missing; requesting renewal: package={}, attempt={}", build_task.name, build_task.attempt);
             let mut expired = build_task.clone();
             expired.upload = None;
             common::messaging::publish(
@@ -139,8 +141,11 @@ async fn main() {
             delivery.ack(BasicAckOptions::default()).await.unwrap();
             continue;
         }
+        let build_started = std::time::Instant::now();
+        info!("Starting build: package={}, version={}, attempt={}", build_task.name, build_task.version, build_task.attempt);
         match build_package(&build_task).await {
             Ok(results) => {
+                info!("Build completed: package={}, attempt={}, success={}, status_code={}, elapsed_ms={}", build_task.name, build_task.attempt, results.success, results.status_code, build_started.elapsed().as_millis());
                 if !results.success {
                     warn!(
                         "Failed to build package '{}': {}",
@@ -155,12 +160,13 @@ async fn main() {
                 )
                 .await
                 .unwrap();
+                debug!("Build result published: package={}, attempt={}", build_task.name, build_task.attempt);
                 delivery.ack(BasicAckOptions::default()).await.expect("ack");
             }
             Err(error) => {
                 error!(
-                    "System error while building package '{}':\n{:?}",
-                    build_task.name, error
+                    "System error while building package '{}', attempt={}: {:?}",
+                    build_task.name, build_task.attempt, error
                 );
                 delivery
                     .nack(BasicNackOptions::default())

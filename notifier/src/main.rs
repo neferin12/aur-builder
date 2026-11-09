@@ -26,7 +26,7 @@ async fn main() {
     let tera = match Tera::new("notifier/src/templates/**/*.html") {
         Ok(t) => t,
         Err(e) => {
-            error!("Parsing error(s): {}", e);
+            error!("Could not load email templates: {:?}", e);
             exit(1);
         }
     };
@@ -61,6 +61,7 @@ async fn main() {
         .await
         .unwrap();
 
+    info!("Notifier ready; waiting for notifications");
     while let Some(delivery) = consumer.next().await {
         let delivery = delivery.expect("error in consumer");
         let notification: Notification = match serde_json::from_slice(&delivery.data) {
@@ -79,7 +80,7 @@ async fn main() {
                 delivery.ack(BasicAckOptions::default()).await.unwrap();
             }
             Err(e) => {
-                error!("Error: {}", e);
+                error!("Notification delivery failed; requeuing for retry in 5s: {:?}", e);
                 delivery
                     .nack(BasicNackOptions {
                         requeue: true,
@@ -160,6 +161,10 @@ async fn receive_delivery(
         .build();
 
     mailer.send(&email)?;
+    match notification {
+        Notification::Build(result) => info!("Build notification sent: package={}, attempt={}", result.task.name, result.task.attempt),
+        Notification::Review(ReviewNotification::ReviewRequired { candidate_id, package_name, .. }) => info!("Review notification sent: package={package_name}, candidate={candidate_id}"),
+    }
 
     Ok(())
 }

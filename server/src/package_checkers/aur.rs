@@ -55,7 +55,13 @@ pub async fn get_aur_data(
     if !resp.status().is_success() {
         return Err(AurRequestError::new(package.name.clone(), resp.status().as_u16()).into());
     }
-    let resp_json = resp.json::<AurResponse>().await?;
+    let status = resp.status();
+    let content_type = resp.headers().get(reqwest::header::CONTENT_TYPE)
+        .and_then(|value| value.to_str().ok()).unwrap_or("unknown").to_owned();
+    let resp_json = resp.json::<AurResponse>().await.map_err(|error| {
+        log::error!("AUR metadata decoding failed: package={}, status={}, content_type={:?}, error={:?}", package.name, status, content_type, error);
+        error
+    })?;
 
     let package_info = resp_json
         .results

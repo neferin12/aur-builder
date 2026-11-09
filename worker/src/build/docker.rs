@@ -73,7 +73,7 @@ fn attach_logs(docker_for_logs: Docker, container_id_for_logs: String) {
                     debug!("{}", log_message_to_string("stderr", message));
                 }
                 Err(e) => {
-                    error!("Error reading log stream: {}", e);
+                    error!("Error reading build log stream: {:?}", e);
                     break;
                 }
                 _ => {}
@@ -88,7 +88,7 @@ pub async fn build(
     subfolder: &Option<String>,
 ) -> Result<BuildResultTransmissionFormat, Box<dyn std::error::Error>> {
     match pull_docker_image().await {
-        Err(_) => warn!("Builder image could not be pulled"),
+        Err(e) => warn!("Builder image could not be pulled: {e:?}"),
         _ => {}
     }
     info!("Building package {}", task.name);
@@ -179,7 +179,7 @@ pub async fn build(
                         logs_vec.push(log_message_to_string("stderr", message));
                     }
                     Err(e) => {
-                        error!("Error reading log stream: {}", e);
+                        error!("Error reading build log stream: {:?}", e);
                         break;
                     }
                     _ => {}
