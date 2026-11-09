@@ -789,7 +789,7 @@ dependencies = [
 
 [[package]]
 name = "common"
-version = "2.2.1"
+version = "2.2.2"
 dependencies = [
  "config",
  "dotenvy",
@@ -1151,7 +1151,7 @@ checksum = "4583a4551df46e2792f82ceeac45e850d2e2d5debba0b91f102385cda5b11f06"
 
 [[package]]
 name = "database"
-version = "2.2.1"
+version = "2.2.2"
 dependencies = [
  "common",
  "log",
@@ -3004,7 +3004,7 @@ dependencies = [
 
 [[package]]
 name = "notifier"
-version = "2.2.1"
+version = "2.2.2"
 dependencies = [
  "common",
  "css-inline",
@@ -4022,7 +4022,7 @@ checksum = "d6f6ff9a378485b298a5286656da665ba74413d36db0979633275d2e708145d4"
 
 [[package]]
 name = "repo"
-version = "2.2.1"
+version = "2.2.2"
 dependencies = [
  "axum",
  "base64 0.22.1",
@@ -4865,7 +4865,7 @@ dependencies = [
 
 [[package]]
 name = "server"
-version = "2.2.1"
+version = "2.2.2"
 dependencies = [
  "async-openai",
  "axum",
@@ -6108,7 +6108,7 @@ dependencies = [
 
 [[package]]
 name = "web"
-version = "2.2.1"
+version = "2.2.2"
 dependencies = [
  "axum",
  "base64 0.22.1",
@@ -6459,7 +6459,7 @@ checksum = "1ebf944e87a7c253233ad6766e082e3cd714b5d03812acc24c318f549614536e"
 
 [[package]]
 name = "worker"
-version = "2.2.1"
+version = "2.2.2"
 dependencies = [
  "bollard",
  "bytes",
