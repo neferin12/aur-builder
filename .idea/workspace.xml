@@ -29,10 +29,7 @@
     </cargoProject>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="30df73c6-6061-4a44-ad67-d8c0fc6fb8e8" name="Changes" comment="fix: approval">
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources.local.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources.local.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_02_11_26__00_05__Changes_.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+    <list default="true" id="30df73c6-6061-4a44-ad67-d8c0fc6fb8e8" name="Changes" comment="fix: improve logging">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -107,23 +104,23 @@
   </component>
   <component name="NextEditCompletionFeaturesState">
     <decayedCancelled>
-      <entry key="MS100" value="1.0915425408407964" />
-      <entry key="MS500" value="2.4131659017212086" />
-      <entry key="S2" value="4.2453259278385715" />
-      <entry key="S5" value="5.12963287910867" />
-      <entry key="S10" value="5.76834612720272" />
-      <entry key="S30" value="9.121277583239495" />
-      <entry key="S60" value="12.768765782864376" />
-      <entry key="M2" value="17.0902540286406" />
-      <entry key="M5" value="25.623022572842775" />
-      <entry key="M10" value="37.81682577568613" />
-      <entry key="M15" value="46.75682677645279" />
-      <entry key="M30" value="61.15957568122972" />
-      <entry key="H1" value="71.6167517499962" />
-      <entry key="H2" value="82.60586136779733" />
-      <entry key="H4" value="124.27386019538139" />
-      <entry key="D1" value="366.3528119437421" />
-      <entry key="W1" value="476.7365453228963" />
+      <entry key="MS100" value="1.0058039550230928" />
+      <entry key="MS500" value="1.576994953276135" />
+      <entry key="S2" value="2.4595805791501935" />
+      <entry key="S5" value="2.7626305505514264" />
+      <entry key="S10" value="2.880992197099626" />
+      <entry key="S30" value="3.7125926891830767" />
+      <entry key="S60" value="6.129923985582391" />
+      <entry key="M2" value="10.593081490560378" />
+      <entry key="M5" value="21.881029781986562" />
+      <entry key="M10" value="36.85744692714371" />
+      <entry key="M15" value="47.99054021551677" />
+      <entry key="M30" value="66.91553509822812" />
+      <entry key="H1" value="81.42683567331504" />
+      <entry key="H2" value="94.98649483152279" />
+      <entry key="H4" value="137.56292201781002" />
+      <entry key="D1" value="381.03489656118654" />
+      <entry key="W1" value="492.4917399777379" />
     </decayedCancelled>
     <decayedSelected>
       <entry key="MS100" value="0.0" />
@@ -145,23 +142,23 @@
       <entry key="W1" value="0.0" />
     </decayedSelected>
     <decayedShown>
-      <entry key="MS100" value="1.0398056478005984" />
-      <entry key="MS500" value="2.2948639215408058" />
-      <entry key="S2" value="4.181240701255725" />
-      <entry key="S5" value="5.09953077230612" />
-      <entry key="S10" value="5.752410895573867" />
-      <entry key="S30" value="9.115570320288578" />
-      <entry key="S60" value="12.765770364785677" />
-      <entry key="M2" value="17.08868018595583" />
-      <entry key="M5" value="25.62233393101348" />
-      <entry key="M10" value="37.8164356311068" />
-      <entry key="M15" value="46.7565434107194" />
-      <entry key="M30" value="61.15941489787463" />
-      <entry key="H1" value="71.61666421401357" />
-      <entry key="H2" value="82.60580865400696" />
-      <entry key="H4" value="124.27380502878164" />
-      <entry key="D1" value="366.3527740029171" />
-      <entry key="W1" value="476.7365380660546" />
+      <entry key="MS100" value="0.9709272202987087" />
+      <entry key="MS500" value="1.4433226247616304" />
+      <entry key="S2" value="2.333193583077985" />
+      <entry key="S5" value="2.696100610161657" />
+      <entry key="S10" value="2.844520123713302" />
+      <entry key="S30" value="3.699575333813055" />
+      <entry key="S60" value="6.1231595596087525" />
+      <entry key="M2" value="10.589466345349159" />
+      <entry key="M5" value="21.8793386231126" />
+      <entry key="M10" value="36.85648108886072" />
+      <entry key="M15" value="47.989848287785335" />
+      <entry key="M30" value="66.91515296886878" />
+      <entry key="H1" value="81.426631663443" />
+      <entry key="H2" value="94.98638241400998" />
+      <entry key="H4" value="137.56283704187" />
+      <entry key="D1" value="381.0348535895649" />
+      <entry key="W1" value="492.49173198653267" />
     </decayedShown>
   </component>
   <component name="ProjectColorInfo">{
@@ -426,7 +423,7 @@
       <workItem from="1749475709469" duration="296000" />
       <workItem from="1750695442889" duration="288000" />
       <workItem from="1767128749034" duration="1853000" />
-      <workItem from="1794248234175" duration="287000" />
+      <workItem from="1794248234175" duration="1507000" />
     </task>
     <task id="LOCAL-00001" summary="ci">
       <option name="closed" value="true" />
@@ -580,7 +577,15 @@
       <option name="project" value="LOCAL" />
       <updated>1767128532218</updated>
     </task>
-    <option name="localTasksCounter" value="20" />
+    <task id="LOCAL-00020" summary="fix: improve logging">
+      <option name="closed" value="true" />
+      <created>1794248750825</created>
+      <option name="number" value="00020" />
+      <option name="presentableId" value="LOCAL-00020" />
+      <option name="project" value="LOCAL" />
+      <updated>1794248750825</updated>
+    </task>
+    <option name="localTasksCounter" value="21" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -598,7 +603,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="fix docker build" />
     <MESSAGE value="improve docker build" />
     <MESSAGE value="ci: hopefully fix cosign" />
     <MESSAGE value="Release 1.0.0&#10;&#10;common@1.0.0&#10;database@1.0.0&#10;server@1.0.0&#10;web@1.0.0&#10;worker@1.0.0&#10;&#10;Generated by cargo-workspaces" />
@@ -623,7 +627,8 @@
     <MESSAGE value="feat: refactor build container into rust module" />
     <MESSAGE value="feat: add release approvals, AI reviews, and OIDC authentication&#10;&#10;- Gate builds on approval of pinned source revisions&#10;- Add review queue, source diffs, decision history, and email alerts&#10;- Support optional OpenAI feedback and automatic approval&#10;- Add OIDC login and admin-managed permissions with default-denied access&#10;- Harden sessions, token validation, CSRF protection, and logout&#10;- Handle source reverts safely and redact repository credentials&#10;- Add migrations, regression tests, and deployment documentation" />
     <MESSAGE value="fix: approval" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix: approval" />
+    <MESSAGE value="fix: improve logging" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix: improve logging" />
   </component>
   <component name="XDebuggerManager">
     <watches-manager>

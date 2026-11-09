@@ -51,7 +51,16 @@ pub async fn get_aur_data(
         "https://aur.archlinux.org/rpc/v5/info?arg[]={}",
         package.name
     );
-    let resp = reqwest::get(&url).await?;
+    // AUR's Anubis protection rejects requests without a User-Agent with HTML.
+    let resp = reqwest::Client::new()
+        .get(&url)
+        .header(
+            reqwest::header::USER_AGENT,
+            format!("aur-builder/{}", common::environment::VERSION),
+        )
+        .header(reqwest::header::ACCEPT, "application/json")
+        .send()
+        .await?;
     if !resp.status().is_success() {
         return Err(AurRequestError::new(package.name.clone(), resp.status().as_u16()).into());
     }
