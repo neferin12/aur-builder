@@ -20,16 +20,53 @@
       <package file="$PROJECT_DIR$/server">
         <feature name="default" enabled="true" />
       </package>
-      <package file="$PROJECT_DIR$/web">
-        <feature name="default" enabled="true" />
-      </package>
       <package file="$PROJECT_DIR$/worker">
         <feature name="default" enabled="true" />
       </package>
     </cargoProject>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="30df73c6-6061-4a44-ad67-d8c0fc6fb8e8" name="Changes" comment="feat: package status during queue and build" />
+    <list default="true" id="30df73c6-6061-4a44-ad67-d8c0fc6fb8e8" name="Changes" comment="fix: improve notification email styling">
+      <change beforePath="$PROJECT_DIR$/.dockerignore" beforeDir="false" afterPath="$PROJECT_DIR$/.dockerignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.github/workflows/docker.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.github/workflows/docker.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/aur-builder.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/aur-builder.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Cargo.lock" beforeDir="false" afterPath="$PROJECT_DIR$/Cargo.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Cargo.toml" beforeDir="false" afterPath="$PROJECT_DIR$/Cargo.toml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/Dockerfile" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/database/src/migrator/m20240624_000001_package_metadata_table.rs" beforeDir="false" afterPath="$PROJECT_DIR$/database/src/migrator/m20240624_000001_package_metadata_table.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/database/src/migrator/m20250120_205654_build_results.rs" beforeDir="false" afterPath="$PROJECT_DIR$/database/src/migrator/m20250120_205654_build_results.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/database/src/migrator/mod.rs" beforeDir="false" afterPath="$PROJECT_DIR$/database/src/migrator/mod.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docker-compose.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/guide/architecture.md" beforeDir="false" afterPath="$PROJECT_DIR$/docs/guide/architecture.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/guide/development.md" beforeDir="false" afterPath="$PROJECT_DIR$/docs/guide/development.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/test_setup.py" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/test_setup.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/setup.py" beforeDir="false" afterPath="$PROJECT_DIR$/setup.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/Cargo.toml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/assets/app.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/assets/bootstrap.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/assets/logo.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/assets/logo.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/assets/style.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/auth.rs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/bootstrap/custom-bootstrap.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/bootstrap/package-lock.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/bootstrap/package.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/main.rs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/reviews.rs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/templates/base.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/templates/build-log.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/templates/build-results.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/templates/force-rebuild.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/templates/index.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/templates/review-detail.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/templates/reviews.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/templates/users.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/tests/fixtures/oidc-test-key.pem" beforeDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -102,23 +139,23 @@
   </component>
   <component name="NextEditCompletionFeaturesState">
     <decayedCancelled>
-      <entry key="MS100" value="1.0259320715905593" />
-      <entry key="MS500" value="1.7322121789876657" />
-      <entry key="S2" value="3.3291889903137837" />
-      <entry key="S5" value="4.372853722188823" />
-      <entry key="S10" value="5.003536313081171" />
-      <entry key="S30" value="6.074153991266132" />
-      <entry key="S60" value="8.520311334006717" />
-      <entry key="M2" value="12.50417253691135" />
-      <entry key="M5" value="17.606585455800687" />
-      <entry key="M10" value="23.3016620121142" />
-      <entry key="M15" value="30.592923789719556" />
-      <entry key="M30" value="52.126503333250184" />
-      <entry key="H1" value="77.62768803280686" />
-      <entry key="H2" value="101.57260446249683" />
-      <entry key="H4" value="148.66627327744578" />
-      <entry key="D1" value="399.4200868561789" />
-      <entry key="W1" value="516.2631399902697" />
+      <entry key="MS100" value="1.0373390226304218" />
+      <entry key="MS500" value="1.8299808397348771" />
+      <entry key="S2" value="3.0906651648891845" />
+      <entry key="S5" value="3.5952311983459704" />
+      <entry key="S10" value="4.075694785581628" />
+      <entry key="S30" value="7.7536162413391585" />
+      <entry key="S60" value="13.328025777015341" />
+      <entry key="M2" value="25.988812490202907" />
+      <entry key="M5" value="65.99542684571355" />
+      <entry key="M10" value="106.06444452026535" />
+      <entry key="M15" value="126.83397286084893" />
+      <entry key="M30" value="153.8030008182827" />
+      <entry key="H1" value="178.36849623069182" />
+      <entry key="H2" value="218.0698742677273" />
+      <entry key="H4" value="283.8386235339305" />
+      <entry key="D1" value="585.6056879173998" />
+      <entry key="W1" value="740.4504009434493" />
     </decayedCancelled>
     <decayedSelected>
       <entry key="MS100" value="0.0" />
@@ -140,23 +177,23 @@
       <entry key="W1" value="0.0" />
     </decayedSelected>
     <decayedShown>
-      <entry key="MS100" value="0.9977036771211476" />
-      <entry key="MS500" value="1.708968329613133" />
-      <entry key="S2" value="3.0027850234231512" />
-      <entry key="S5" value="3.9073657171346845" />
-      <entry key="S10" value="4.62634954645972" />
-      <entry key="S30" value="5.897447921785794" />
-      <entry key="S60" value="8.423785141259204" />
-      <entry key="M2" value="12.453644940057018" />
-      <entry key="M5" value="17.58577325279178" />
-      <entry key="M10" value="23.291076479777008" />
-      <entry key="M15" value="30.58576423262438" />
-      <entry key="M30" value="52.12280994477408" />
-      <entry key="H1" value="77.62578650087045" />
-      <entry key="H2" value="101.57162879141036" />
-      <entry key="H4" value="148.66575429011132" />
-      <entry key="D1" value="399.4199708563762" />
-      <entry key="W1" value="516.2631214796994" />
+      <entry key="MS100" value="1.0159880383364284" />
+      <entry key="MS500" value="1.822094332828891" />
+      <entry key="S2" value="3.0872186907650865" />
+      <entry key="S5" value="3.593617428529493" />
+      <entry key="S10" value="4.074779598838707" />
+      <entry key="S30" value="7.753042220239516" />
+      <entry key="S60" value="13.327534409356637" />
+      <entry key="M2" value="25.988326140620458" />
+      <entry key="M5" value="65.99490729474809" />
+      <entry key="M10" value="106.0640151951389" />
+      <entry key="M15" value="126.83362690447852" />
+      <entry key="M30" value="153.80276995781483" />
+      <entry key="H1" value="178.36823855539652" />
+      <entry key="H2" value="218.06954460604638" />
+      <entry key="H4" value="283.83831741345983" />
+      <entry key="D1" value="585.6055770322639" />
+      <entry key="W1" value="740.4503817088186" />
     </decayedShown>
   </component>
   <component name="ProjectColorInfo">{
@@ -209,6 +246,7 @@
     "org.rust.first.attach.projects": "true",
     "settings.editor.selected.configurable": "com.intellij.air.settings",
     "to.speed.mode.migration.done": "true",
+    "ts.external.directory.path": "/home/julian/projects/privat/aur-builder/web/node_modules/typescript/lib",
     "vue.rearranger.settings.migration": "true"
   },
   "keyToStringList": {
@@ -235,25 +273,7 @@
   <component name="RsExternalLinterProjectSettings">
     <option name="runOnTheFly" value="true" />
   </component>
-  <component name="RunManager" selected="Cargo.Run web">
-    <configuration name="All Tests" type="CargoCommandRunConfiguration" factoryName="Cargo Command" temporary="true">
-      <option name="buildProfileId" value="test" />
-      <option name="command" value="test" />
-      <option name="workingDirectory" value="file://$PROJECT_DIR$" />
-      <envs />
-      <option name="emulateTerminal" value="true" />
-      <option name="channel" value="DEFAULT" />
-      <option name="requiredFeatures" value="true" />
-      <option name="allFeatures" value="false" />
-      <option name="withSudo" value="false" />
-      <option name="buildTarget" value="REMOTE" />
-      <option name="backtrace" value="SHORT" />
-      <option name="isRedirectInput" value="false" />
-      <option name="redirectInputPath" value="" />
-      <method v="2">
-        <option name="CARGO.BUILD_TASK_PROVIDER" enabled="true" />
-      </method>
-    </configuration>
+  <component name="RunManager" selected="npm.dev (1)">
     <configuration name="Run notifier" type="CargoCommandRunConfiguration" factoryName="Cargo Command">
       <option name="buildProfileId" value="dev" />
       <option name="command" value="run --package notifier --bin notifier" />
@@ -369,6 +389,16 @@
       </deployment>
       <method v="2" />
     </configuration>
+    <configuration name="dev (1)" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
+      <package-json value="$PROJECT_DIR$/web/package.json" />
+      <command value="run" />
+      <scripts>
+        <script value="dev" />
+      </scripts>
+      <node-interpreter value="project" />
+      <envs />
+      <method v="2" />
+    </configuration>
     <configuration name="dev" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
       <package-json value="$PROJECT_DIR$/docs/package.json" />
       <command value="run" />
@@ -381,11 +411,11 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="npm.dev (1)" />
         <item itemvalue="Cargo.Run web" />
         <item itemvalue="npm.dev" />
         <item itemvalue="Docker.docker-compose.yaml.rabbitmq: Compose Deployment" />
         <item itemvalue="Cargo.Run worker" />
-        <item itemvalue="Cargo.All Tests" />
       </list>
     </recent_temporary>
   </component>
@@ -421,7 +451,7 @@
       <workItem from="1749475709469" duration="296000" />
       <workItem from="1750695442889" duration="288000" />
       <workItem from="1767128749034" duration="1853000" />
-      <workItem from="1794248234175" duration="2882000" />
+      <workItem from="1794248234175" duration="8143000" />
     </task>
     <task id="LOCAL-00001" summary="ci">
       <option name="closed" value="true" />
@@ -599,7 +629,23 @@
       <option name="project" value="LOCAL" />
       <updated>1794250908750</updated>
     </task>
-    <option name="localTasksCounter" value="23" />
+    <task id="LOCAL-00023" summary="fix: dispatch approvals independently of polling">
+      <option name="closed" value="true" />
+      <created>1794251315068</created>
+      <option name="number" value="00023" />
+      <option name="presentableId" value="LOCAL-00023" />
+      <option name="project" value="LOCAL" />
+      <updated>1794251315068</updated>
+    </task>
+    <task id="LOCAL-00024" summary="fix: improve notification email styling">
+      <option name="closed" value="true" />
+      <created>1794264204112</created>
+      <option name="number" value="00024" />
+      <option name="presentableId" value="LOCAL-00024" />
+      <option name="project" value="LOCAL" />
+      <updated>1794264204112</updated>
+    </task>
+    <option name="localTasksCounter" value="25" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -617,8 +663,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Release 1.0.0&#10;&#10;common@1.0.0&#10;database@1.0.0&#10;server@1.0.0&#10;web@1.0.0&#10;worker@1.0.0&#10;&#10;Generated by cargo-workspaces" />
-    <MESSAGE value="make settings configurable via yaml" />
     <MESSAGE value="show error code meaning for builds in tooltip and log" />
     <MESSAGE value="fix: better error handling in aur connector" />
     <MESSAGE value="improve error handling" />
@@ -642,7 +686,9 @@
     <MESSAGE value="fix: improve logging" />
     <MESSAGE value="fix: add user agent to AUR requests" />
     <MESSAGE value="feat: package status during queue and build" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: package status during queue and build" />
+    <MESSAGE value="fix: dispatch approvals independently of polling" />
+    <MESSAGE value="fix: improve notification email styling" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix: improve notification email styling" />
   </component>
   <component name="XDebuggerManager">
     <watches-manager>

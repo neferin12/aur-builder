@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Interactive single-host Docker Compose setup. Requires Python 3.10+."""
 import argparse
+from contextlib import closing
 import getpass
 import json
 import os
@@ -360,10 +361,15 @@ class Setup:
         if not path.exists():
             return False
         try:
-            with sqlite3.connect(f"file:{path}?mode=ro", uri=True, timeout=1) as db:
+            with closing(sqlite3.connect(f"file:{path}?mode=ro", uri=True, timeout=1)) as db:
                 db.execute("SELECT catalog FROM repo_catalog LIMIT 1").fetchall()
                 db.execute("SELECT attempt FROM build_attempt LIMIT 1").fetchall()
-            return True
+                # Nuxt must not start while the timestamp compatibility migration
+                # is still running in the scheduler.
+                return db.execute(
+                    "SELECT 1 FROM seaql_migrations WHERE version=?",
+                    ("m20261109_000001_web_database_compatibility",),
+                ).fetchone() is not None
         except sqlite3.Error:
             return False
 

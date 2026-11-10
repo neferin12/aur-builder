@@ -27,7 +27,10 @@ services:
       - ./config.yaml:/config.yaml
       - ./server_tmp:/tmp
     depends_on:
-      - rabbitmq
+      rabbitmq:
+        condition: service_started
+      migrate:
+        condition: service_completed_successfully
     restart: always
   worker:
     image: ghcr.io/neferin12/aur-builder-worker:2
@@ -50,6 +53,18 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - ./db:/app/db
     restart: always
+  migrate:
+    image: ghcr.io/neferin12/aur-builder-server:2
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: server
+    env_file:
+      - .env
+    volumes:
+      - ./db:/app/db
+    command: ["/usr/local/bin/migrate"]
+    restart: "no"
   web:
     image: ghcr.io/neferin12/aur-builder-web:2
     build:
@@ -58,6 +73,9 @@ services:
       target: web
     ports:
       - "3000:3000"
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
     env_file:
       - .env
     restart: always
@@ -101,8 +119,12 @@ services:
       - ./db:/app/db
       - ./repo-gnupg:/run/signing-source:ro
     depends_on:
-      - rabbitmq
-      - garage
+      rabbitmq:
+        condition: service_started
+      garage:
+        condition: service_started
+      migrate:
+        condition: service_completed_successfully
     restart: always
 volumes:
     rabbitmq-data:

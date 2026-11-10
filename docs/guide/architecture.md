@@ -30,7 +30,7 @@ flowchart TB
 | `worker` | Runs Docker build containers and reports results |
 | `build-container` | Fetches sources, installs dependencies, runs `makepkg`, and uploads a bundle |
 | `repo` | Validates artifacts, signs packages/databases, publishes the catalog, and authenticates downloads |
-| `web` | OIDC login, permissions, source diffs, approval queue, history, logs, and rebuilds |
+| `web` (Nuxt/Nitro, PrimeVue, Prisma, oRPC) | OIDC login, permissions, source diffs, approval queue, history, logs, and rebuilds |
 | `notifier` | Optional SMTP notifications |
 | `database` | Shared SQL access and migrations |
 | `common` | Configuration, message types, S3 signing, and messaging helpers |

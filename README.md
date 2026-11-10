@@ -255,7 +255,10 @@ cargo test --workspace
 For a native web process connected to an already initialized database:
 
 ```sh
-DATABASE_URL='sqlite:./db/sqlite.db?mode=rwc' cargo run -p web
+DATABASE_URL='sqlite:./db/sqlite.db?mode=rwc' cargo run -p database --example migrate
+cd web
+npm ci
+DATABASE_URL='sqlite:../db/sqlite.db?mode=rwc' npm run dev -- --dotenv ../.env
 ```
 
 The server applies migrations at startup; initialize the database before starting

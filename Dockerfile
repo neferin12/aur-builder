@@ -13,23 +13,36 @@ COPY --from=planner /app/recipe.json recipe.json
 RUN cargo chef cook --release --recipe-path recipe.json --target x86_64-unknown-linux-musl
 # Build application
 COPY . .
-RUN cargo build --release --target x86_64-unknown-linux-musl
+RUN cargo build --release --target x86_64-unknown-linux-musl && cargo build --release -p database --example migrate --target x86_64-unknown-linux-musl
 
 FROM alpine AS server
 RUN apk add --no-cache ca-certificates
 WORKDIR /app
 COPY --from=builder /app/target/x86_64-unknown-linux-musl/release/server /usr/local/bin/server
+COPY --from=builder /app/target/x86_64-unknown-linux-musl/release/examples/migrate /usr/local/bin/migrate
 
 CMD ["/usr/local/bin/server"]
 
-FROM alpine AS web
-RUN apk add --no-cache ca-certificates
-WORKDIR /app
-COPY --from=builder /app/target/x86_64-unknown-linux-musl/release/web /usr/local/bin/web
-COPY web/src/templates /app/web/src/templates
-COPY web/src/assets /app/web/src/assets
+FROM node:24-bookworm-slim AS web-base
+RUN apt-get update && apt-get install -y --no-install-recommends openssl ca-certificates && rm -rf /var/lib/apt/lists/*
 
-CMD ["/usr/local/bin/web"]
+FROM web-base AS web-builder
+RUN apt-get update && apt-get install -y --no-install-recommends python3 make g++ && rm -rf /var/lib/apt/lists/*
+WORKDIR /app/web
+COPY web/package.json web/package-lock.json ./
+COPY web/prisma ./prisma
+COPY web/scripts ./scripts
+COPY web/nuxt.config.ts web/theme.ts web/tsconfig.json ./
+RUN npm ci
+COPY web .
+RUN npm run build
+
+FROM web-base AS web
+WORKDIR /app
+ENV NODE_ENV=production HOST=0.0.0.0 PORT=3000
+COPY --from=web-builder /app/web/.output ./.output
+EXPOSE 3000
+CMD ["node", ".output/server/index.mjs"]
 
 FROM docker AS worker
 WORKDIR /app

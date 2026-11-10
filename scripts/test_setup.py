@@ -1,8 +1,10 @@
 """Run with: python3 -m unittest discover -s scripts -p 'test_setup.py'."""
 import importlib.util
+from contextlib import closing
 from pathlib import Path
 import os
 import stat
+import sqlite3
 import subprocess
 import tempfile
 import unittest
@@ -29,6 +31,21 @@ class SetupTests(unittest.TestCase):
             self.assertEqual(stat.S_IMODE(path.stat().st_mode), 0o600)
             with self.assertRaises(setup.SetupError):
                 env.set("SECRET", "value\nINJECTED=true")
+
+    def test_database_readiness_waits_for_nuxt_compatibility_migration(self):
+        with tempfile.TemporaryDirectory() as directory:
+            wizard = setup.Setup(directory)
+            path = Path(directory) / "db" / "sqlite.db"
+            path.parent.mkdir()
+            with closing(sqlite3.connect(path)) as db:
+                db.execute("CREATE TABLE repo_catalog (catalog TEXT)")
+                db.execute("CREATE TABLE build_attempt (attempt TEXT)")
+                db.execute("CREATE TABLE seaql_migrations (version TEXT PRIMARY KEY)")
+                db.commit()
+                self.assertFalse(wizard.database_ready())
+                db.execute("INSERT INTO seaql_migrations VALUES (?)", ("m20261109_000001_web_database_compatibility",))
+                db.commit()
+                self.assertTrue(wizard.database_ready())
 
     def test_endpoints(self):
         self.assertEqual(setup.origin("https://storage.internal:9443/"), "https://storage.internal:9443")

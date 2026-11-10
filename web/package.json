@@ -1,0 +1,51 @@
+{
+  "name": "aur-builder-web",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "nuxt dev --host 0.0.0.0",
+    "build": "nuxt build",
+    "start": "node .output/server/index.mjs",
+    "postinstall": "npm run db:generate && nuxt prepare",
+    "db:generate": "node scripts/generate.mjs",
+    "db:introspect": "node scripts/schema.mjs",
+    "db:check": "node scripts/schema.mjs --check",
+    "typecheck": "nuxt typecheck",
+    "test": "vitest run",
+    "test:e2e": "playwright test"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.922.0",
+    "@aws-sdk/s3-request-presigner": "^3.922.0",
+    "@orpc/client": "^1.13.0",
+    "@orpc/server": "^1.13.0",
+    "@primevue/nuxt-module": "^4.4.1",
+    "@primeuix/themes": "^1.2.5",
+    "@prisma/client": "6.19.0",
+    "diff": "^8.0.2",
+    "nuxt": "^4.2.0",
+    "openid-client": "^6.8.1",
+    "primeicons": "^7.0.0",
+    "primevue": "^4.4.1",
+    "vue": "^3.5.24",
+    "zod": "^4.1.12",
+    "@prisma/adapter-better-sqlite3": "6.19.0",
+    "@prisma/adapter-pg": "6.19.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.56.1",
+    "@types/node": "^24.10.0",
+    "@vue/test-utils": "^2.4.6",
+    "@vitejs/plugin-vue": "^6.0.2",
+    "happy-dom": "^21.0.4",
+    "prisma": "6.19.0",
+    "typescript": "^5.9.3",
+    "vitest": "^5.1.0",
+    "vue-tsc": "^3.1.4",
+    "jose": "^6.1.2"
+  },
+  "overrides": {
+    "deepmerge-ts": "^8.0.0",
+    "effect": "^3.21.0"
+  }
+}

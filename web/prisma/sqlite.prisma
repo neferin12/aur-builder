@@ -1,0 +1,126 @@
+generator client {
+  provider   = "prisma-client-js"
+  output     = "../generated/sqlite"
+  engineType = "client"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("PRISMA_SQLITE_URL")
+}
+
+model access_audit {
+  id         String @id
+  actor      String
+  target     String
+  detail     String
+  created_at BigInt
+}
+
+model ai_review {
+  candidate_id String @id
+  result       String
+}
+
+model build_attempt {
+  attempt    String @id
+  package_id Int
+  object_key String
+  task       String
+  state      String @default("queued")
+  created_at BigInt
+}
+
+model build_results {
+  id          Int     @id @default(autoincrement())
+  package_id  BigInt
+  exit_code   Int
+  build_log   String?
+  success     Boolean @default(false)
+  started_at  String?
+  finished_at String?
+  version     String?
+}
+
+model oidc_login {
+  id         String @id
+  payload    String
+  expires_at BigInt
+}
+
+model package_metadata {
+  id            Int     @id @default(autoincrement())
+  name          String
+  version       String
+  maintainer    String
+  last_modified BigInt
+  source        String?
+  subfolder     String?
+}
+
+model release_candidate {
+  id          String  @id
+  package_id  Int
+  fingerprint String
+  revision    String
+  baseline    String?
+  payload     String
+  snapshot    String
+  state       String  @default("pending")
+  created_at  BigInt
+
+  @@unique([package_id, fingerprint], map: "sqlite_autoindex_release_candidate_2")
+  @@index([package_id, created_at], map: "candidate_package")
+}
+
+model release_observation {
+  package_id  Int    @id @default(autoincrement())
+  fingerprint String
+}
+
+model repo_catalog {
+  id      Int    @id @default(autoincrement())
+  catalog String
+}
+
+model review_event {
+  id           String @id
+  candidate_id String
+  actor        String
+  decision     String
+  comment      String
+  created_at   BigInt
+}
+
+model review_notification {
+  candidate_id String  @id
+  payload      String
+  sent         Boolean @default(false)
+}
+
+model seaql_migrations {
+  version    String @id
+  applied_at BigInt
+}
+
+model web_session {
+  id           String @id
+  user_id      String
+  csrf         String
+  expires_at   BigInt
+  auth_context String @default("")
+}
+
+model web_user {
+  id           String  @id
+  issuer       String
+  subject      String
+  display_name String
+  admin        Boolean @default(false)
+  disabled     Boolean @default(false)
+  can_view     Boolean @default(false)
+  can_rebuild  Boolean @default(false)
+  can_approve  Boolean @default(false)
+
+  @@unique([issuer, subject], map: "sqlite_autoindex_web_user_2")
+}
