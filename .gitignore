@@ -1,6 +1,7 @@
 /target
 sqlite.db
 .env
+.env.old
 config.yaml
 # Repository signing material
 /repo-gnupg/

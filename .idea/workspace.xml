@@ -27,12 +27,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="30df73c6-6061-4a44-ad67-d8c0fc6fb8e8" name="Changes" comment="feat: refactor into nuxt webapp">
-      <change beforePath="$PROJECT_DIR$/.dockerignore" beforeDir="false" afterPath="$PROJECT_DIR$/.dockerignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources.local.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources.local.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/guide/development.md" beforeDir="false" afterPath="$PROJECT_DIR$/docs/guide/development.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/server/utils/auth.ts" beforeDir="false" afterPath="$PROJECT_DIR$/web/server/utils/auth.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/tests/oidc.test.ts" beforeDir="false" afterPath="$PROJECT_DIR$/web/tests/oidc.test.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/app/assets/main.css" beforeDir="false" afterPath="$PROJECT_DIR$/web/app/assets/main.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/theme.ts" beforeDir="false" afterPath="$PROJECT_DIR$/web/theme.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -51,7 +50,8 @@
     </persistenceIdMap>
   </component>
   <component name="EmbeddingIndexingInfo">
-    <option name="cachedIndexableFilesCount" value="3078" />
+    <option name="cachedIndexableFilesCount" value="3362" />
+    <option name="fileBasedEmbeddingIndicesEnabled" value="true" />
   </component>
   <component name="ExecutionTargetManager" SELECTED_TARGET="RsBuildProfile:dev" />
   <component name="FileTemplateManagerImpl">
@@ -113,14 +113,13 @@
   </component>
   <component name="KubernetesApiPersistence">{}</component>
   <component name="KubernetesApiProvider">{
-  &quot;configuredContexts&quot;: [
+  &quot;configuredContextKeys&quot;: [
     {
       &quot;name&quot;: &quot;kubernetes-cx11-master1&quot;,
-      &quot;kubeConfigUrl&quot;: &quot;file:///home/julian/.kube/config&quot;,
-      &quot;originalNamespace&quot;: &quot;firefly&quot;
+      &quot;configFileUrl&quot;: &quot;file:///home/julian/.kube/config&quot;,
+      &quot;namespace&quot;: &quot;firefly&quot;
     }
-  ],
-  &quot;isMigrated&quot;: true
+  ]
 }</component>
   <component name="MacroExpansionManager">
     <option name="directoryName" value="wbmbS0Ju" />
@@ -131,23 +130,23 @@
   </component>
   <component name="NextEditCompletionFeaturesState">
     <decayedCancelled>
-      <entry key="MS100" value="1.0000048284782181" />
-      <entry key="MS500" value="1.087291017058103" />
-      <entry key="S2" value="2.0188460619237345" />
-      <entry key="S5" value="4.377305967269557" />
-      <entry key="S10" value="8.02186418911226" />
-      <entry key="S30" value="18.188606722200497" />
-      <entry key="S60" value="26.821261645109637" />
-      <entry key="M2" value="34.61916291653379" />
-      <entry key="M5" value="41.324466790144406" />
-      <entry key="M10" value="44.02320703242989" />
-      <entry key="M15" value="44.98302815976239" />
-      <entry key="M30" value="45.975148832321636" />
-      <entry key="H1" value="46.716273379705264" />
-      <entry key="H2" value="54.623242182860416" />
-      <entry key="H4" value="100.83489497019085" />
-      <entry key="D1" value="491.0419836584209" />
-      <entry key="W1" value="758.7514528183784" />
+      <entry key="MS100" value="1.0000246076240844" />
+      <entry key="MS500" value="1.455303258073912" />
+      <entry key="S2" value="9.666762567255166" />
+      <entry key="S5" value="24.558634118209213" />
+      <entry key="S10" value="36.50912390308731" />
+      <entry key="S30" value="48.92003576166684" />
+      <entry key="S60" value="54.417260606660065" />
+      <entry key="M2" value="65.44279069393205" />
+      <entry key="M5" value="91.67519114604823" />
+      <entry key="M10" value="110.89734609936966" />
+      <entry key="M15" value="119.45479782463423" />
+      <entry key="M30" value="129.40740469190283" />
+      <entry key="H1" value="135.19721164674343" />
+      <entry key="H2" value="145.5162620881647" />
+      <entry key="H4" value="192.3818772425628" />
+      <entry key="D1" value="583.3729865634199" />
+      <entry key="W1" value="852.3893235104536" />
     </decayedCancelled>
     <decayedSelected>
       <entry key="MS100" value="0.0" />
@@ -169,23 +168,23 @@
       <entry key="W1" value="0.0" />
     </decayedSelected>
     <decayedShown>
-      <entry key="MS100" value="0.9726596438555128" />
-      <entry key="MS500" value="1.0812795542323976" />
-      <entry key="S2" value="2.0161508506660164" />
-      <entry key="S5" value="4.375034857328427" />
-      <entry key="S10" value="8.019402740377481" />
-      <entry key="S30" value="18.178152734148057" />
-      <entry key="S60" value="26.807197935385897" />
-      <entry key="M2" value="34.60741159141869" />
-      <entry key="M5" value="41.318046302016654" />
-      <entry key="M10" value="44.019643423631244" />
-      <entry key="M15" value="44.98056814869601" />
-      <entry key="M30" value="45.97387516636884" />
-      <entry key="H1" value="46.715625000847304" />
-      <entry key="H2" value="54.62290340537545" />
-      <entry key="H4" value="100.83467262372832" />
-      <entry key="D1" value="491.041872117222" />
-      <entry key="W1" value="758.7514304042734" />
+      <entry key="MS100" value="0.9266063442505533" />
+      <entry key="MS500" value="1.4168572427673396" />
+      <entry key="S2" value="9.539498249648267" />
+      <entry key="S5" value="24.417617737038448" />
+      <entry key="S10" value="36.40233135595415" />
+      <entry key="S30" value="48.871923024929245" />
+      <entry key="S60" value="54.390556732246864" />
+      <entry key="M2" value="65.42656726303" />
+      <entry key="M5" value="91.66538928515861" />
+      <entry key="M10" value="110.89109568384865" />
+      <entry key="M15" value="119.45021462533887" />
+      <entry key="M30" value="129.40486615601998" />
+      <entry key="H1" value="135.19587189575688" />
+      <entry key="H2" value="145.51556219193228" />
+      <entry key="H4" value="192.38147110891344" />
+      <entry key="D1" value="583.3728438909874" />
+      <entry key="W1" value="852.3892966043547" />
     </decayedShown>
   </component>
   <component name="ProjectColorInfo">{
@@ -225,8 +224,9 @@
     &quot;copilot.chat.legacySessionMetadata.migrated&quot;: &quot;true&quot;,
     &quot;dart.analysis.tool.window.visible&quot;: &quot;false&quot;,
     &quot;git-widget-placeholder&quot;: &quot;feat/nuxt-webapp&quot;,
+    &quot;javascript.preferred.runtime.type.id&quot;: &quot;node&quot;,
     &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/home/julian/projects/privat/aur-builder&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/workspaces/aur-builder&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
@@ -250,6 +250,7 @@
 }</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$" />
       <recent name="$PROJECT_DIR$/web/src/assets" />
       <recent name="$PROJECT_DIR$/notifier" />
       <recent name="$PROJECT_DIR$/.github/workflows" />
@@ -405,15 +406,20 @@
     <recent_temporary>
       <list>
         <item itemvalue="npm.dev (1)" />
-        <item itemvalue="Cargo.Run web" />
         <item itemvalue="npm.dev" />
         <item itemvalue="Docker.docker-compose.yaml.rabbitmq: Compose Deployment" />
-        <item itemvalue="Cargo.Run worker" />
       </list>
     </recent_temporary>
   </component>
   <component name="RustProjectSettings">
     <option name="toolchainHomeDirectory" value="/usr/bin" />
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-js-predefined-d6986cc7102b-56aff7b04f6f-JavaScript-WS-263.7307.202" />
+      </set>
+    </attachedChunks>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
@@ -445,6 +451,9 @@
       <workItem from="1750695442889" duration="288000" />
       <workItem from="1767128749034" duration="1853000" />
       <workItem from="1794248234175" duration="9562000" />
+      <workItem from="1794422422313" duration="33000" />
+      <workItem from="1794422498376" duration="26000" />
+      <workItem from="1794422530368" duration="500000" />
     </task>
     <task id="LOCAL-00001" summary="ci">
       <option name="closed" value="true" />
@@ -656,8 +665,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="fix: better error handling in aur connector" />
-    <MESSAGE value="improve error handling" />
     <MESSAGE value="fix: improve notifier styling" />
     <MESSAGE value="ci: rename harbor image for builder container" />
     <MESSAGE value="fix: make sleep duration configurable" />
@@ -681,7 +688,9 @@
     <MESSAGE value="fix: dispatch approvals independently of polling" />
     <MESSAGE value="fix: improve notification email styling" />
     <MESSAGE value="feat: refactor into nuxt webapp" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: refactor into nuxt webapp" />
+    <MESSAGE value="feat: refactor into nuxt webapp&#10;&#10;- Add devcontainer documentation to development guide&#10;- Fix OIDC callback to preserve full authorization response query string&#10;  for issuer validation (RFC 9207)&#10;- Add test for mismatched authorization response issuer rejection&#10;- Ignore devcontainer state and cache directories in git and docker" />
+    <MESSAGE value="feat: add devcontainer setup with full local stack&#10;&#10;Add .devcontainer with Docker Compose services for Keycloak,  &#10;RabbitMQ, Mailpit, Garage S3, PostgreSQL, and Caddy reverse proxy  &#10;with local TLS certificates. Include bootstrap script, test users,  &#10;and OIDC realm configuration.&#10;&#10;Fix OIDC callback to preserve the full authorization response query  &#10;string so the issuer parameter required by RFC 9207 is passed through  &#10;to the token grant. Add a test for mismatched issuer rejection.&#10;&#10;Update .gitignore and .dockerignore to exclude devcontainer state  &#10;and cache directories. Add devcontainer section to development docs." />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: add devcontainer setup with full local stack&#10;&#10;Add .devcontainer with Docker Compose services for Keycloak,  &#10;RabbitMQ, Mailpit, Garage S3, PostgreSQL, and Caddy reverse proxy  &#10;with local TLS certificates. Include bootstrap script, test users,  &#10;and OIDC realm configuration.&#10;&#10;Fix OIDC callback to preserve the full authorization response query  &#10;string so the issuer parameter required by RFC 9207 is passed through  &#10;to the token grant. Add a test for mismatched issuer rejection.&#10;&#10;Update .gitignore and .dockerignore to exclude devcontainer state  &#10;and cache directories. Add devcontainer section to development docs." />
   </component>
   <component name="XDebuggerManager">
     <watches-manager>

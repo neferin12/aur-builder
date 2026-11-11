@@ -10,5 +10,5 @@ export default {
       },
     },
   }),
-  options: { darkModeSelector: '.dark' },
+  options: { darkModeSelector: 'system' },
 }
