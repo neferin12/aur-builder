@@ -29,7 +29,11 @@
     </cargoProject>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="30df73c6-6061-4a44-ad67-d8c0fc6fb8e8" name="Changes" comment="feat: package status during queue and build" />
+    <list default="true" id="30df73c6-6061-4a44-ad67-d8c0fc6fb8e8" name="Changes" comment="feat: package status during queue and build">
+      <change beforePath="$PROJECT_DIR$/database/src/lib.rs" beforeDir="false" afterPath="$PROJECT_DIR$/database/src/lib.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/main.rs" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/setup_rabbit_mq.rs" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/setup_rabbit_mq.rs" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -60,7 +64,7 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="main" />
+        <entry key="$PROJECT_DIR$" value="feat/nuxt-webapp" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -102,23 +106,23 @@
   </component>
   <component name="NextEditCompletionFeaturesState">
     <decayedCancelled>
-      <entry key="MS100" value="1.0259320715905593" />
-      <entry key="MS500" value="1.7322121789876657" />
-      <entry key="S2" value="3.3291889903137837" />
-      <entry key="S5" value="4.372853722188823" />
-      <entry key="S10" value="5.003536313081171" />
-      <entry key="S30" value="6.074153991266132" />
-      <entry key="S60" value="8.520311334006717" />
-      <entry key="M2" value="12.50417253691135" />
-      <entry key="M5" value="17.606585455800687" />
-      <entry key="M10" value="23.3016620121142" />
-      <entry key="M15" value="30.592923789719556" />
-      <entry key="M30" value="52.126503333250184" />
-      <entry key="H1" value="77.62768803280686" />
-      <entry key="H2" value="101.57260446249683" />
-      <entry key="H4" value="148.66627327744578" />
-      <entry key="D1" value="399.4200868561789" />
-      <entry key="W1" value="516.2631399902697" />
+      <entry key="MS100" value="1.0258004068554032" />
+      <entry key="MS500" value="1.633041170232866" />
+      <entry key="S2" value="3.1045701185932115" />
+      <entry key="S5" value="4.8089995262623955" />
+      <entry key="S10" value="6.221618889255867" />
+      <entry key="S30" value="10.240624885487819" />
+      <entry key="S60" value="16.223448216365348" />
+      <entry key="M2" value="25.591529042073066" />
+      <entry key="M5" value="40.35250021847614" />
+      <entry key="M10" value="51.81393400384125" />
+      <entry key="M15" value="61.02664353268473" />
+      <entry key="M30" value="84.67824908958472" />
+      <entry key="H1" value="112.32413632788908" />
+      <entry key="H2" value="138.17885475037997" />
+      <entry key="H4" value="186.25857148195388" />
+      <entry key="D1" value="438.39228493483006" />
+      <entry key="W1" value="556.0745666535284" />
     </decayedCancelled>
     <decayedSelected>
       <entry key="MS100" value="0.0" />
@@ -140,23 +144,23 @@
       <entry key="W1" value="0.0" />
     </decayedSelected>
     <decayedShown>
-      <entry key="MS100" value="0.9977036771211476" />
-      <entry key="MS500" value="1.708968329613133" />
-      <entry key="S2" value="3.0027850234231512" />
-      <entry key="S5" value="3.9073657171346845" />
-      <entry key="S10" value="4.62634954645972" />
-      <entry key="S30" value="5.897447921785794" />
-      <entry key="S60" value="8.423785141259204" />
-      <entry key="M2" value="12.453644940057018" />
-      <entry key="M5" value="17.58577325279178" />
-      <entry key="M10" value="23.291076479777008" />
-      <entry key="M15" value="30.58576423262438" />
-      <entry key="M30" value="52.12280994477408" />
-      <entry key="H1" value="77.62578650087045" />
-      <entry key="H2" value="101.57162879141036" />
-      <entry key="H4" value="148.66575429011132" />
-      <entry key="D1" value="399.4199708563762" />
-      <entry key="W1" value="516.2631214796994" />
+      <entry key="MS100" value="0.9977494162523589" />
+      <entry key="MS500" value="1.6238113359437243" />
+      <entry key="S2" value="3.099989613058491" />
+      <entry key="S5" value="4.806089009523167" />
+      <entry key="S10" value="6.219712911105933" />
+      <entry key="S30" value="10.239351204819673" />
+      <entry key="S60" value="16.219601667545184" />
+      <entry key="M2" value="25.582015948398777" />
+      <entry key="M5" value="40.341638659199475" />
+      <entry key="M10" value="51.80612243510314" />
+      <entry key="M15" value="61.02071261334429" />
+      <entry key="M30" value="84.67481611373148" />
+      <entry key="H1" value="112.32226493292092" />
+      <entry key="H2" value="138.17786711475807" />
+      <entry key="H4" value="186.25803969514936" />
+      <entry key="D1" value="438.3921657862093" />
+      <entry key="W1" value="556.074547657964" />
     </decayedShown>
   </component>
   <component name="ProjectColorInfo">{
@@ -171,52 +175,52 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Cargo.All Tests.executor": "Run",
-    "Cargo.Build `Run notifier`.executor": "Run",
-    "Cargo.Build `Run server`.executor": "Run",
-    "Cargo.Run notifier.executor": "Run",
-    "Cargo.Run server.executor": "Run",
-    "Cargo.Run web.executor": "Run",
-    "Cargo.Run worker.executor": "Run",
-    "CidrDebugProfileConversion": "true",
-    "Docker.docker-compose.yaml.rabbitmq: Compose Deployment.executor": "Run",
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "RunOnceActivity.MCP Project settings loaded": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager": "true",
-    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "RunOnceActivity.rust.reset.selective.auto.import": "true",
-    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
-    "SHELLCHECK.PATH": "/home/julian/.local/share/JetBrains/RustRover2025.1/Shell Script/shellcheck",
-    "codeWithMe.voiceChat.enabledByDefault": "false",
-    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
-    "copilot.chat.legacySessionMetadata.migrated": "true",
-    "dart.analysis.tool.window.visible": "false",
-    "git-widget-placeholder": "main",
-    "junie.onboarding.icon.badge.shown": "true",
-    "last_opened_file_path": "/home/julian/projects/privat/aur-builder",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "npm.dev.executor": "Run",
-    "org.rust.cargo.project.model.PROJECT_DISCOVERY": "true",
-    "org.rust.cargo.project.model.impl.CargoExternalSystemProjectAware.subscribe.first.balloon": "",
-    "org.rust.first.attach.projects": "true",
-    "settings.editor.selected.configurable": "com.intellij.air.settings",
-    "to.speed.mode.migration.done": "true",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Cargo.All Tests.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Build `Run notifier`.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Build `Run server`.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Run notifier.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Run server.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Run web.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Run worker.executor&quot;: &quot;Run&quot;,
+    &quot;CidrDebugProfileConversion&quot;: &quot;true&quot;,
+    &quot;Docker.docker-compose.yaml.rabbitmq: Compose Deployment.executor&quot;: &quot;Run&quot;,
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.MCP Project settings loaded&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.rust.reset.selective.auto.import&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
+    &quot;SHELLCHECK.PATH&quot;: &quot;/home/julian/.local/share/JetBrains/RustRover2025.1/Shell Script/shellcheck&quot;,
+    &quot;codeWithMe.voiceChat.enabledByDefault&quot;: &quot;false&quot;,
+    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
+    &quot;copilot.chat.legacySessionMetadata.migrated&quot;: &quot;true&quot;,
+    &quot;dart.analysis.tool.window.visible&quot;: &quot;false&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/home/julian/projects/privat/aur-builder&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;npm.dev.executor&quot;: &quot;Run&quot;,
+    &quot;org.rust.cargo.project.model.PROJECT_DISCOVERY&quot;: &quot;true&quot;,
+    &quot;org.rust.cargo.project.model.impl.CargoExternalSystemProjectAware.subscribe.first.balloon&quot;: &quot;&quot;,
+    &quot;org.rust.first.attach.projects&quot;: &quot;true&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;com.intellij.air.settings&quot;,
+    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   },
-  "keyToStringList": {
-    "DatabaseDriversLRU": [
-      "sqlite"
+  &quot;keyToStringList&quot;: {
+    &quot;DatabaseDriversLRU&quot;: [
+      &quot;sqlite&quot;
     ]
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/web/src/assets" />
