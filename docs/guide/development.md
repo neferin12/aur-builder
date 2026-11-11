@@ -1,5 +1,11 @@
 # Development & CI
 
+## Devcontainer
+
+For a preconfigured Node/Rust workspace with RabbitMQ, Keycloak test users,
+Mailpit, Garage, and PostgreSQL, see the [devcontainer setup](https://github.com/neferin12/aur-builder/tree/main/.devcontainer#readme).
+It uses isolated development databases and retains HTTPS/OIDC checks.
+
 ## Rust workspace
 
 Use a Rust toolchain supporting edition 2024, a C compiler, `pkg-config`, and the

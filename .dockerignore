@@ -28,3 +28,7 @@ web/.output
 web/generated
 web/test-results
 web/playwright-report
+
+.devcontainer/state
+
+.devcontainer/__pycache__

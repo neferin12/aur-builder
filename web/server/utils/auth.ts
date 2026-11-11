@@ -1,7 +1,7 @@
 import { createHash, randomUUID } from 'node:crypto'
 import * as oidc from 'openid-client'
 import { z } from 'zod'
-import { createError, deleteCookie, getCookie, getQuery, sendRedirect, setCookie, type H3Event } from 'h3'
+import { createError, deleteCookie, getCookie, getQuery, getRequestURL, sendRedirect, setCookie, type H3Event } from 'h3'
 import { authConfig, equal, hash, now, secureUrl } from './config'
 import { database, transaction, type Database } from './db'
 const sessionCookie = '__Host-aur-session', loginCookie = '__Host-aur-login'
@@ -57,7 +57,10 @@ export async function callback(event: H3Event) {
   let claims: oidc.IDToken
   try {
     const response = new URL(`${config.origin}/auth/callback`)
-    response.search = new URLSearchParams({ state: query.state, code: query.code }).toString()
+    // Keep RFC 9207's issuer parameter (and other provider response fields).
+    // Keycloak advertises issuer validation, so the OIDC client also needs `iss`
+    // when validating the response, even when state/code are otherwise valid.
+    response.search = getRequestURL(event).search
     const tokens = await oidc.authorizationCodeGrant(client, response, { pkceCodeVerifier: record.verifier, expectedNonce: record.nonce, expectedState: query.state, idTokenExpected: true })
     claims = tokens.claims()!
     if (!claims || (claims.azp && claims.azp !== config.clientId) || claims.iat > Number(now()) + 60) throw new Error('Invalid ID token')

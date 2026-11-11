@@ -26,7 +26,7 @@ beforeAll(async () => {
   vi.stubGlobal('fetch', async (input: string | URL | Request, init?: RequestInit) => {
     const address = String(input instanceof Request ? input.url : input)
     if (!address.startsWith('https://issuer.example/')) return actualFetch(input, init)
-    if (address.endsWith('/.well-known/openid-configuration')) return Response.json({ issuer: 'https://issuer.example', authorization_endpoint: 'https://issuer.example/authorize', token_endpoint: 'https://issuer.example/token', jwks_uri: 'https://issuer.example/keys', response_types_supported: ['code'], subject_types_supported: ['public'], id_token_signing_alg_values_supported: ['RS256'] })
+    if (address.endsWith('/.well-known/openid-configuration')) return Response.json({ issuer: 'https://issuer.example', authorization_response_iss_parameter_supported: true, authorization_endpoint: 'https://issuer.example/authorize', token_endpoint: 'https://issuer.example/token', jwks_uri: 'https://issuer.example/keys', response_types_supported: ['code'], subject_types_supported: ['public'], id_token_signing_alg_values_supported: ['RS256'] })
     if (address.endsWith('/keys')) return Response.json({ keys: [publicKey] })
     if (address.endsWith('/token')) {
       const body = new URLSearchParams(String(init?.body)), code = body.get('code')!
@@ -50,8 +50,8 @@ async function start(code = 'valid') {
   nonceByCode.set(code, authorization.searchParams.get('nonce')!)
   return { state: authorization.searchParams.get('state')!, cookie: response.headers.get('set-cookie')!.split(';')[0]!, code }
 }
-async function finish(record: Awaited<ReturnType<typeof start>>, cookie = record.cookie) {
-  return actualFetch(`${origin}/auth/callback?${new URLSearchParams({ code: record.code, state: record.state })}`, { redirect: 'manual', headers: { cookie } })
+async function finish(record: Awaited<ReturnType<typeof start>>, cookie = record.cookie, issuer = 'https://issuer.example') {
+  return actualFetch(`${origin}/auth/callback?${new URLSearchParams({ code: record.code, state: record.state, iss: issuer })}`, { redirect: 'manual', headers: { cookie } })
 }
 describe('OIDC code grant with signed mock provider responses', () => {
   it('creates a hashed, bound group-admin session and consumes state once', async () => {
@@ -83,6 +83,10 @@ describe('OIDC code grant with signed mock provider responses', () => {
   ])('rejects invalid %s', async (claim, value) => {
     claimsOverride = { [claim]: value }
     expect((await finish(await start())).status).toBe(401)
+  })
+  it('rejects a mismatched authorization response issuer', async () => {
+    claimsOverride = {}
+    expect((await finish(await start(), undefined, 'https://evil.example')).status).toBe(401)
   })
   it('rejects forged signatures, browser binding mismatch and changed config', async () => {
     claimsOverride = {}

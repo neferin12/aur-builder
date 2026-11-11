@@ -24,3 +24,7 @@ config.yaml
 /web/generated/
 /web/test-results/
 /web/playwright-report/
+
+# Local devcontainer databases and public CA export
+/.devcontainer/state/
+/.devcontainer/__pycache__/

@@ -1,0 +1,23 @@
+name: Devcontainer dependencies
+on:
+  push:
+    paths: ['.devcontainer/**', 'scripts/test_devcontainer.py', '.github/workflows/devcontainer.yml']
+  pull_request:
+    paths: ['.devcontainer/**', 'scripts/test_devcontainer.py', '.github/workflows/devcontainer.yml']
+jobs:
+  dependencies:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: python3 -m unittest discover -s scripts -p test_devcontainer.py
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - run: npx --yes @devcontainers/cli build --workspace-folder .
+      - run: docker compose -f .devcontainer/compose.yaml config --quiet
+      - run: docker compose -f .devcontainer/compose.yaml up -d --build certificates rabbitmq keycloak mailpit garage postgres proxy
+      - run: python3 .devcontainer/smoke.py
+      - if: failure()
+        run: docker compose -f .devcontainer/compose.yaml logs --tail 100
+      - if: always()
+        run: docker compose -f .devcontainer/compose.yaml down --volumes

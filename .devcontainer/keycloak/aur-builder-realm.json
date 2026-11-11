@@ -1,0 +1,143 @@
+{
+  "realm": "aur-builder",
+  "enabled": true,
+  "displayName": "AUR Builder Development",
+  "registrationAllowed": false,
+  "resetPasswordAllowed": true,
+  "sslRequired": "external",
+  "groups": [
+    {
+      "name": "aur-builder-admins"
+    }
+  ],
+  "smtpServer": {
+    "host": "mailpit",
+    "port": "465",
+    "from": "keycloak@example.test",
+    "auth": "true",
+    "user": "builder",
+    "password": "dev-mail-password",
+    "ssl": "true",
+    "starttls": "false"
+  },
+  "clients": [
+    {
+      "clientId": "aur-builder",
+      "name": "AUR Builder Development",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": false,
+      "secret": "dev-oidc-secret",
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": false,
+      "redirectUris": [
+        "https://aur.localhost:8443/auth/callback"
+      ],
+      "webOrigins": [
+        "https://aur.localhost:8443"
+      ],
+      "attributes": {
+        "pkce.code.challenge.method": "S256"
+      },
+      "defaultClientScopes": [
+        "web-origins",
+        "acr",
+        "roles",
+        "profile",
+        "email"
+      ],
+      "protocolMappers": [
+        {
+          "name": "groups",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-group-membership-mapper",
+          "consentRequired": false,
+          "config": {
+            "claim.name": "groups",
+            "full.path": "false",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "userinfo.token.claim": "true"
+          }
+        }
+      ]
+    }
+  ],
+  "users": [
+    {
+      "id": "10000000-0000-4000-8000-000000000001",
+      "username": "admin",
+      "firstName": "Admin",
+      "lastName": "Developer",
+      "email": "admin@example.test",
+      "emailVerified": true,
+      "enabled": true,
+      "requiredActions": [],
+      "groups": [
+        "/aur-builder-admins"
+      ],
+      "credentials": [
+        {
+          "type": "password",
+          "value": "dev-password",
+          "temporary": false
+        }
+      ]
+    },
+    {
+      "id": "10000000-0000-4000-8000-000000000002",
+      "username": "reviewer",
+      "firstName": "Reviewer",
+      "lastName": "Developer",
+      "email": "reviewer@example.test",
+      "emailVerified": true,
+      "enabled": true,
+      "requiredActions": [],
+      "groups": [],
+      "credentials": [
+        {
+          "type": "password",
+          "value": "dev-password",
+          "temporary": false
+        }
+      ]
+    },
+    {
+      "id": "10000000-0000-4000-8000-000000000003",
+      "username": "viewer",
+      "firstName": "Viewer",
+      "lastName": "Developer",
+      "email": "viewer@example.test",
+      "emailVerified": true,
+      "enabled": true,
+      "requiredActions": [],
+      "groups": [],
+      "credentials": [
+        {
+          "type": "password",
+          "value": "dev-password",
+          "temporary": false
+        }
+      ]
+    },
+    {
+      "id": "10000000-0000-4000-8000-000000000004",
+      "username": "pending",
+      "firstName": "Pending",
+      "lastName": "Developer",
+      "email": "pending@example.test",
+      "emailVerified": true,
+      "enabled": true,
+      "requiredActions": [],
+      "groups": [],
+      "credentials": [
+        {
+          "type": "password",
+          "value": "dev-password",
+          "temporary": false
+        }
+      ]
+    }
+  ]
+}

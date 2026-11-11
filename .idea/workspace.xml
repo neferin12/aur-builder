@@ -26,46 +26,13 @@
     </cargoProject>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="30df73c6-6061-4a44-ad67-d8c0fc6fb8e8" name="Changes" comment="fix: improve notification email styling">
+    <list default="true" id="30df73c6-6061-4a44-ad67-d8c0fc6fb8e8" name="Changes" comment="feat: refactor into nuxt webapp">
       <change beforePath="$PROJECT_DIR$/.dockerignore" beforeDir="false" afterPath="$PROJECT_DIR$/.dockerignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.github/workflows/docker.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.github/workflows/docker.yml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/aur-builder.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/aur-builder.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Cargo.lock" beforeDir="false" afterPath="$PROJECT_DIR$/Cargo.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Cargo.toml" beforeDir="false" afterPath="$PROJECT_DIR$/Cargo.toml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/Dockerfile" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/database/src/migrator/m20240624_000001_package_metadata_table.rs" beforeDir="false" afterPath="$PROJECT_DIR$/database/src/migrator/m20240624_000001_package_metadata_table.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/database/src/migrator/m20250120_205654_build_results.rs" beforeDir="false" afterPath="$PROJECT_DIR$/database/src/migrator/m20250120_205654_build_results.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/database/src/migrator/mod.rs" beforeDir="false" afterPath="$PROJECT_DIR$/database/src/migrator/mod.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docker-compose.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/guide/architecture.md" beforeDir="false" afterPath="$PROJECT_DIR$/docs/guide/architecture.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docs/guide/development.md" beforeDir="false" afterPath="$PROJECT_DIR$/docs/guide/development.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/test_setup.py" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/test_setup.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/setup.py" beforeDir="false" afterPath="$PROJECT_DIR$/setup.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/Cargo.toml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/assets/app.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/assets/bootstrap.css" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/assets/logo.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/assets/logo.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/assets/style.css" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/auth.rs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/bootstrap/custom-bootstrap.scss" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/bootstrap/package-lock.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/bootstrap/package.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/main.rs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/reviews.rs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/templates/base.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/templates/build-log.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/templates/build-results.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/templates/force-rebuild.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/templates/index.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/templates/review-detail.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/templates/reviews.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/templates/users.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/tests/fixtures/oidc-test-key.pem" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/server/utils/auth.ts" beforeDir="false" afterPath="$PROJECT_DIR$/web/server/utils/auth.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/tests/oidc.test.ts" beforeDir="false" afterPath="$PROJECT_DIR$/web/tests/oidc.test.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -109,6 +76,31 @@
     &quot;assignee&quot;: &quot;neferin12&quot;
   }
 }</component>
+  <component name="GitToolBoxStore">
+    <option name="recentBranches">
+      <RecentBranches>
+        <option name="branchesForRepo">
+          <list>
+            <RecentBranchesForRepo>
+              <option name="branches">
+                <list>
+                  <RecentBranch>
+                    <option name="branchName" value="feat/nuxt-webapp" />
+                    <option name="lastUsedInstant" value="1794298937" />
+                  </RecentBranch>
+                  <RecentBranch>
+                    <option name="branchName" value="main" />
+                    <option name="lastUsedInstant" value="1794298936" />
+                  </RecentBranch>
+                </list>
+              </option>
+              <option name="repositoryRootUrl" value="file://$PROJECT_DIR$" />
+            </RecentBranchesForRepo>
+          </list>
+        </option>
+      </RecentBranches>
+    </option>
+  </component>
   <component name="GithubPullRequestsUISettings">{
   &quot;selectedUrlAndAccountId&quot;: {
     &quot;url&quot;: &quot;git@github.com:neferin12/aur-builder.git&quot;,
@@ -139,23 +131,23 @@
   </component>
   <component name="NextEditCompletionFeaturesState">
     <decayedCancelled>
-      <entry key="MS100" value="1.0373390226304218" />
-      <entry key="MS500" value="1.8299808397348771" />
-      <entry key="S2" value="3.0906651648891845" />
-      <entry key="S5" value="3.5952311983459704" />
-      <entry key="S10" value="4.075694785581628" />
-      <entry key="S30" value="7.7536162413391585" />
-      <entry key="S60" value="13.328025777015341" />
-      <entry key="M2" value="25.988812490202907" />
-      <entry key="M5" value="65.99542684571355" />
-      <entry key="M10" value="106.06444452026535" />
-      <entry key="M15" value="126.83397286084893" />
-      <entry key="M30" value="153.8030008182827" />
-      <entry key="H1" value="178.36849623069182" />
-      <entry key="H2" value="218.0698742677273" />
-      <entry key="H4" value="283.8386235339305" />
-      <entry key="D1" value="585.6056879173998" />
-      <entry key="W1" value="740.4504009434493" />
+      <entry key="MS100" value="1.0000048284782181" />
+      <entry key="MS500" value="1.087291017058103" />
+      <entry key="S2" value="2.0188460619237345" />
+      <entry key="S5" value="4.377305967269557" />
+      <entry key="S10" value="8.02186418911226" />
+      <entry key="S30" value="18.188606722200497" />
+      <entry key="S60" value="26.821261645109637" />
+      <entry key="M2" value="34.61916291653379" />
+      <entry key="M5" value="41.324466790144406" />
+      <entry key="M10" value="44.02320703242989" />
+      <entry key="M15" value="44.98302815976239" />
+      <entry key="M30" value="45.975148832321636" />
+      <entry key="H1" value="46.716273379705264" />
+      <entry key="H2" value="54.623242182860416" />
+      <entry key="H4" value="100.83489497019085" />
+      <entry key="D1" value="491.0419836584209" />
+      <entry key="W1" value="758.7514528183784" />
     </decayedCancelled>
     <decayedSelected>
       <entry key="MS100" value="0.0" />
@@ -177,23 +169,23 @@
       <entry key="W1" value="0.0" />
     </decayedSelected>
     <decayedShown>
-      <entry key="MS100" value="1.0159880383364284" />
-      <entry key="MS500" value="1.822094332828891" />
-      <entry key="S2" value="3.0872186907650865" />
-      <entry key="S5" value="3.593617428529493" />
-      <entry key="S10" value="4.074779598838707" />
-      <entry key="S30" value="7.753042220239516" />
-      <entry key="S60" value="13.327534409356637" />
-      <entry key="M2" value="25.988326140620458" />
-      <entry key="M5" value="65.99490729474809" />
-      <entry key="M10" value="106.0640151951389" />
-      <entry key="M15" value="126.83362690447852" />
-      <entry key="M30" value="153.80276995781483" />
-      <entry key="H1" value="178.36823855539652" />
-      <entry key="H2" value="218.06954460604638" />
-      <entry key="H4" value="283.83831741345983" />
-      <entry key="D1" value="585.6055770322639" />
-      <entry key="W1" value="740.4503817088186" />
+      <entry key="MS100" value="0.9726596438555128" />
+      <entry key="MS500" value="1.0812795542323976" />
+      <entry key="S2" value="2.0161508506660164" />
+      <entry key="S5" value="4.375034857328427" />
+      <entry key="S10" value="8.019402740377481" />
+      <entry key="S30" value="18.178152734148057" />
+      <entry key="S60" value="26.807197935385897" />
+      <entry key="M2" value="34.60741159141869" />
+      <entry key="M5" value="41.318046302016654" />
+      <entry key="M10" value="44.019643423631244" />
+      <entry key="M15" value="44.98056814869601" />
+      <entry key="M30" value="45.97387516636884" />
+      <entry key="H1" value="46.715625000847304" />
+      <entry key="H2" value="54.62290340537545" />
+      <entry key="H4" value="100.83467262372832" />
+      <entry key="D1" value="491.041872117222" />
+      <entry key="W1" value="758.7514304042734" />
     </decayedShown>
   </component>
   <component name="ProjectColorInfo">{
@@ -208,53 +200,54 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Cargo.All Tests.executor": "Run",
-    "Cargo.Build `Run notifier`.executor": "Run",
-    "Cargo.Build `Run server`.executor": "Run",
-    "Cargo.Run notifier.executor": "Run",
-    "Cargo.Run server.executor": "Run",
-    "Cargo.Run web.executor": "Run",
-    "Cargo.Run worker.executor": "Run",
-    "CidrDebugProfileConversion": "true",
-    "Docker.docker-compose.yaml.rabbitmq: Compose Deployment.executor": "Run",
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "RunOnceActivity.MCP Project settings loaded": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager": "true",
-    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "RunOnceActivity.rust.reset.selective.auto.import": "true",
-    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
-    "SHELLCHECK.PATH": "/home/julian/.local/share/JetBrains/RustRover2025.1/Shell Script/shellcheck",
-    "codeWithMe.voiceChat.enabledByDefault": "false",
-    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
-    "copilot.chat.legacySessionMetadata.migrated": "true",
-    "dart.analysis.tool.window.visible": "false",
-    "git-widget-placeholder": "main",
-    "junie.onboarding.icon.badge.shown": "true",
-    "last_opened_file_path": "/home/julian/projects/privat/aur-builder",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "npm.dev.executor": "Run",
-    "org.rust.cargo.project.model.PROJECT_DISCOVERY": "true",
-    "org.rust.cargo.project.model.impl.CargoExternalSystemProjectAware.subscribe.first.balloon": "",
-    "org.rust.first.attach.projects": "true",
-    "settings.editor.selected.configurable": "com.intellij.air.settings",
-    "to.speed.mode.migration.done": "true",
-    "ts.external.directory.path": "/home/julian/projects/privat/aur-builder/web/node_modules/typescript/lib",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Cargo.All Tests.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Build `Run notifier`.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Build `Run server`.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Run notifier.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Run server.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Run web.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Run worker.executor&quot;: &quot;Run&quot;,
+    &quot;CidrDebugProfileConversion&quot;: &quot;true&quot;,
+    &quot;Docker.docker-compose.yaml.rabbitmq: Compose Deployment.executor&quot;: &quot;Run&quot;,
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.MCP Project settings loaded&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.rust.reset.selective.auto.import&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
+    &quot;SHELLCHECK.PATH&quot;: &quot;/home/julian/.local/share/JetBrains/RustRover2025.1/Shell Script/shellcheck&quot;,
+    &quot;codeWithMe.voiceChat.enabledByDefault&quot;: &quot;false&quot;,
+    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
+    &quot;copilot.chat.legacySessionMetadata.migrated&quot;: &quot;true&quot;,
+    &quot;dart.analysis.tool.window.visible&quot;: &quot;false&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;feat/nuxt-webapp&quot;,
+    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/home/julian/projects/privat/aur-builder&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;npm.dev (1).executor&quot;: &quot;Run&quot;,
+    &quot;npm.dev.executor&quot;: &quot;Run&quot;,
+    &quot;org.rust.cargo.project.model.PROJECT_DISCOVERY&quot;: &quot;true&quot;,
+    &quot;org.rust.cargo.project.model.impl.CargoExternalSystemProjectAware.subscribe.first.balloon&quot;: &quot;&quot;,
+    &quot;org.rust.first.attach.projects&quot;: &quot;true&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;com.intellij.air.settings&quot;,
+    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;/home/julian/projects/privat/aur-builder/web/node_modules/typescript/lib&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   },
-  "keyToStringList": {
-    "DatabaseDriversLRU": [
-      "sqlite"
+  &quot;keyToStringList&quot;: {
+    &quot;DatabaseDriversLRU&quot;: [
+      &quot;sqlite&quot;
     ]
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/web/src/assets" />
@@ -451,7 +444,7 @@
       <workItem from="1749475709469" duration="296000" />
       <workItem from="1750695442889" duration="288000" />
       <workItem from="1767128749034" duration="1853000" />
-      <workItem from="1794248234175" duration="8143000" />
+      <workItem from="1794248234175" duration="9562000" />
     </task>
     <task id="LOCAL-00001" summary="ci">
       <option name="closed" value="true" />
@@ -663,7 +656,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="show error code meaning for builds in tooltip and log" />
     <MESSAGE value="fix: better error handling in aur connector" />
     <MESSAGE value="improve error handling" />
     <MESSAGE value="fix: improve notifier styling" />
@@ -688,7 +680,8 @@
     <MESSAGE value="feat: package status during queue and build" />
     <MESSAGE value="fix: dispatch approvals independently of polling" />
     <MESSAGE value="fix: improve notification email styling" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix: improve notification email styling" />
+    <MESSAGE value="feat: refactor into nuxt webapp" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: refactor into nuxt webapp" />
   </component>
   <component name="XDebuggerManager">
     <watches-manager>

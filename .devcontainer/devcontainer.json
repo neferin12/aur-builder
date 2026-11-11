@@ -1,0 +1,26 @@
+{
+  "name": "AUR Builder",
+  "dockerComposeFile": "compose.yaml",
+  "service": "dev",
+  "workspaceFolder": "/workspaces/aur-builder",
+  "shutdownAction": "stopCompose",
+  "remoteUser": "node",
+  "features": {
+    "ghcr.io/devcontainers/features/rust:1": { "version": "stable" },
+    "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {}
+  },
+  "postCreateCommand": "bash .devcontainer/bootstrap.sh",
+  "postStartCommand": "sudo cp /dev-certs/ca.crt /usr/local/share/ca-certificates/aur-builder-dev.crt && sudo update-ca-certificates",
+  "customizations": {
+    "vscode": {
+      "extensions": ["rust-lang.rust-analyzer", "Vue.volar", "Prisma.prisma", "ms-azuretools.vscode-docker"],
+      "settings": { "terminal.integrated.cwd": "/workspaces/aur-builder" }
+    }
+  },
+  "portsAttributes": {
+    "3000": { "onAutoForward": "ignore" },
+    "8443": { "label": "Local HTTPS (use aur.localhost)", "onAutoForward": "ignore" },
+    "15672": { "label": "RabbitMQ management", "onAutoForward": "ignore" },
+    "8025": { "label": "Mailpit", "onAutoForward": "ignore" }
+  }
+}
