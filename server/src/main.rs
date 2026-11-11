@@ -39,6 +39,18 @@ async fn main() {
     let channels = setup_rabbit_mq::setup_rabbitmq(&db).await;
     let build_tx = channels.build_tx;
 
+    let cleanup_db = db.clone();
+    common::messaging::supervise(async move {
+        loop {
+            match cleanup_db.cleanup_orphan_waiting_attempts().await {
+                Ok(count) if count > 0 => info!("Retired {count} orphan waiting build attempts"),
+                Ok(_) => {},
+                Err(error) => error!("Failed to clean up orphan waiting build attempts: {error}"),
+            }
+            sleep(Duration::from_secs(60)).await;
+        }
+    });
+
     review_notifications::start(db.clone(), channels.notify_tx);
     ai::start(db.clone(), storage.clone());
     // Dispatch approvals independently of the package metadata polling interval.

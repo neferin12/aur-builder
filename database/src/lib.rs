@@ -382,6 +382,15 @@ impl Database {
         let q=self.storage_query("SELECT attempt FROM build_attempt WHERE attempt=? AND state IN ('queued','dispatched','building')",vec![task.attempt.clone().into()]).await?;
         Ok(self.db.query_one(q).await?.is_some())
     }
+    /// Retire waiting attempts replaced by a newer attempt for the same package.
+    pub async fn cleanup_orphan_waiting_attempts(&self) -> Result<u64, DbErr> {
+        use sea_orm::ConnectionTrait;
+        let query = self.storage_query(
+            "UPDATE build_attempt SET state='superseded' WHERE state IN ('queued','dispatched') AND EXISTS (SELECT 1 FROM build_attempt AS newer WHERE newer.package_id=build_attempt.package_id AND newer.created_at>build_attempt.created_at)",
+            vec![],
+        ).await?;
+        Ok(self.db.execute(query).await?.rows_affected())
+    }
     pub async fn finish_attempt(&self, attempt: &str) -> Result<(), DbErr> {
         use sea_orm::ConnectionTrait;
         let q=self.storage_query("UPDATE build_attempt SET state='finished' WHERE attempt=? AND state IN ('queued','dispatched','building')",vec![attempt.into()]).await?;
@@ -459,6 +468,38 @@ impl Database {
 #[cfg(test)]
 mod storage_tests {
     use super::*;
+    #[tokio::test]
+    async fn cleanup_only_retires_older_waiting_attempts() {
+        use sea_orm::ConnectionTrait;
+        let db = Database::new("sqlite::memory:".into()).await.unwrap();
+        db.migrate().await;
+        for (attempt, package, state, created) in [
+            ("old-queued", 1, "queued", 1),
+            ("old-dispatched", 1, "dispatched", 2),
+            ("running", 1, "building", 3),
+            ("finished", 1, "finished", 4),
+            ("latest", 1, "queued", 5),
+            ("other-package", 2, "dispatched", 1),
+        ] {
+            let query = db.storage_query(
+                "INSERT INTO build_attempt (attempt,package_id,object_key,task,state,created_at) VALUES (?,?,?,'{}',?,?)",
+                vec![attempt.into(), package.into(), attempt.into(), state.into(), created.into()],
+            ).await.unwrap();
+            db.db.execute(query).await.unwrap();
+        }
+        assert_eq!(db.cleanup_orphan_waiting_attempts().await.unwrap(), 2);
+        for (attempt, expected) in [
+            ("old-queued", "superseded"), ("old-dispatched", "superseded"),
+            ("running", "building"), ("finished", "finished"),
+            ("latest", "queued"), ("other-package", "dispatched"),
+        ] {
+            let query = db.storage_query("SELECT state FROM build_attempt WHERE attempt=?", vec![attempt.into()]).await.unwrap();
+            let row = db.db.query_one(query).await.unwrap().unwrap();
+            assert_eq!(row.try_get::<String>("", "state").unwrap(), expected);
+        }
+        assert_eq!(db.cleanup_orphan_waiting_attempts().await.unwrap(), 0);
+    }
+
     #[tokio::test]
     async fn latest_status_uses_build_start_order() {
         let db = Database::new("sqlite::memory:".into()).await.unwrap();

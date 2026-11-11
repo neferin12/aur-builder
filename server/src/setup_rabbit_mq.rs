@@ -114,8 +114,8 @@ pub async fn setup_rabbitmq(db: &Database) -> RabbitChannels {
                 && retry_db.latest_attempt(&task).await.unwrap()
                 && retry_db.attempt_needs_build(&task).await.unwrap()
             {
-                storage.grant(&mut task).unwrap();
-                retry_db.record_attempt(&task).await.unwrap();
+                // Preserve the attempt identity so renewal cannot orphan a queued entry.
+                storage.renew(&mut task).unwrap();
                 common::messaging::publish(
                     &retry_tx,
                     "pkg_build",
