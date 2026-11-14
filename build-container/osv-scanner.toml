@@ -1,0 +1,12 @@
+# Narrow applicability decisions reviewed 2026-11-12. All other findings remain fatal.
+# These decisions expire and must be reassessed rather than extended automatically.
+
+[[IgnoredVulns]]
+id = "RUSTSEC-2025-0134"
+ignoreUntil = 2026-12-12
+reason = "Unmaintained PEM parser is transitive through raur 7/reqwest 0.11. This advisory asserts maintenance status, not an exploitable parser flaw. Reassess AUR client upgrade before expiry."
+
+[[IgnoredVulns]]
+id = "RUSTSEC-2026-0258"
+ignoreUntil = 2026-12-12
+reason = "The sole raur HTTP client is constructed with http1_only(), disabling vulnerable HTTP/2 processing. h2 0.3 has no fixed release; follow a raur upgrade. The client also runs only in the memory/PID/time-limited untrusted build container. https://rustsec.org/advisories/RUSTSEC-2026-0258.html"

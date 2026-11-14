@@ -5,7 +5,7 @@ import { tmpdir } from 'node:os'
 import { join, resolve } from 'node:path'
 import type { PrismaClient as SQLiteClient } from '../generated/sqlite/index.js'
 import { assertSchema, createDatabase, createSQLiteClient, createPostgresClient } from '../server/utils/db'
-import { buildLog, decide, history, packages, rebuild, review, updateAccess } from '../server/utils/repository'
+import { buildLog, decide, history, packages, rebuild, review, reviews, updateAccess } from '../server/utils/repository'
 import { hash, now } from '../server/utils/config'
 import { identity } from '../server/utils/auth'
 import { router } from '../server/rpc/router'
@@ -98,6 +98,8 @@ for (const provider of providers) describe(provider.name, () => {
     expect(await identity(event('other-config'), db)).toBeNull()
     const admin = createRouterClient(router, { context: { db, event: event('admin', { origin: 'https://builder.example', 'x-csrf-token': 'csrf' }) } })
     const viewer = createRouterClient(router, { context: { db, event: event('viewer', { origin: 'https://builder.example', 'x-csrf-token': 'csrf' }) } })
+    await expect(viewer.buildLog({ id: 1 })).rejects.toMatchObject({ code: 'FORBIDDEN' })
+    await expect(viewer.revokeSessions({ id: 'admin' })).rejects.toMatchObject({ code: 'FORBIDDEN' })
     await expect(viewer.users()).rejects.toMatchObject({ code: 'FORBIDDEN' })
     await expect(viewer.rebuild({ id: 1 })).rejects.toMatchObject({ code: 'FORBIDDEN' })
     const unsafe = createRouterClient(router, { context: { db, event: event('admin', { origin: 'https://evil.example', 'x-csrf-token': 'csrf' }) } })
@@ -105,11 +107,36 @@ for (const provider of providers) describe(provider.name, () => {
     const noToken = createRouterClient(router, { context: { db, event: event('admin', { origin: 'https://builder.example' }) } })
     await expect(noToken.rebuild({ id: 1 })).rejects.toMatchObject({ code: 'FORBIDDEN' })
     await expect(admin.updateUser({ id: 'admin', can_view: true, can_approve: true, can_rebuild: true, disabled: true })).rejects.toMatchObject({ code: 'BAD_REQUEST' })
+    await admin.revokeSessions({ id: 'viewer' })
+    expect(await identity(event('viewer'), db)).toBeNull()
     await updateAccess(db, 'admin', { id: 'viewer', can_view: false, can_rebuild: false, can_approve: false, disabled: true })
     expect(await identity(event('viewer'), db)).toBeNull()
-    expect(await db.access_audit.findMany()).toHaveLength(1)
+    expect(await db.access_audit.findMany()).toHaveLength(2)
     await admin.logout()
+    expect((await db.access_audit.findMany()).some(a => a.detail === 'auth.logout')).toBe(true)
     expect(await identity(event('admin'), db)).toBeNull()
   })
+  it('paginates large histories and review lists without loading logs or snapshots', async () => {
+    const client = provider.name === 'sqlite' ? createSQLiteClient(provider.url) : createPostgresClient(provider.url)
+    try {
+      await client.package_metadata.create({ data: { id: 2, name: 'zz-pagination', version: '1', maintainer: 'Fixture', last_modified: 1n } })
+      await client.build_results.createMany({ data: Array.from({ length: 103 }, (_, i) => ({ id: 200 + i, package_id: 2n, exit_code: 0, success: true, build_log: 'sensitive-large-log' })) })
+      await client.release_candidate.createMany({ data: Array.from({ length: 103 }, (_, i) => ({ id: `page-${String(i).padStart(3, '0')}`, package_id: 2, fingerprint: `page-${i}`, revision: 'a'.repeat(40), payload: JSON.stringify({ ...payload, name: 'zz-pagination' }), snapshot: JSON.stringify(snapshot), created_at: BigInt(i) })) })
+      const first = await history(db, 2)
+      expect(first.results).toHaveLength(100)
+      const older = await history(db, 2, first.results.at(-1)!.id)
+      expect(older.results.map(row => row.id)).toEqual([202, 201, 200])
+      expect(await db.build_results.latestStatuses()).toHaveLength(2)
+      const rows = await db.build_results.findMany({ take: 1 })
+      expect(rows[0]).not.toHaveProperty('build_log')
+      const page = await reviews(db, 'all')
+      const next = await reviews(db, 'all', page.at(-1)!.id)
+      expect(page).toHaveLength(100)
+      expect(new Set([...page, ...next].map(row => row.id)).size).toBe(104)
+      const summaries = await db.release_candidate.findMany({ take: 1 })
+      expect(summaries[0]).not.toHaveProperty('snapshot')
+    } finally { await client.$disconnect() }
+  })
+
 })
 afterAll(() => rmSync(temp, { recursive: true, force: true }))

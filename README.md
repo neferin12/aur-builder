@@ -31,10 +31,11 @@ default-branch builds to GitHub Pages; first set **Settings → Pages → Source
 
 1. The server checks configured sources for changes and records build tasks in the
    database before publishing them to RabbitMQ.
-2. A worker starts an Arch Linux build container. Each task includes a presigned
-   URL for uploading its package bundle to Garage; workers need no S3 credentials.
+2. A worker starts a constrained, unprivileged Arch build container. After completion,
+   the worker collects its bundle and uploads it using a fresh short-lived grant.
+   Storage credentials and receipt keys stay outside the build container.
 3. The server records the result and forwards successful builds for publication.
-4. The repo service validates the bundle, signs packages and repository databases,
+4. The repo service verifies the worker receipt and bundle digest, signs packages and repository databases,
    uploads them to private storage, and switches the published catalog.
 5. Pacman clients authenticate with the repo service and download artifacts through
    short-lived presigned URLs.
@@ -44,9 +45,9 @@ Publication failures leave the previous repository available.
 
 | Component | Purpose |
 | --- | --- |
-| `server` | Source checks, task scheduling, upload grants, and result processing |
-| `worker` | Runs build containers and reports results |
-| `build-container` | Fetches sources, installs dependencies, runs `makepkg`, and uploads bundles |
+| `server` | Source checks, task scheduling, approvals, and result processing |
+| `worker` | Runs isolated builds, uploads bundles, and authenticates results |
+| `build-container` | Fetches sources, installs dependencies, runs `makepkg`, and writes a bundle |
 | `repo` | Package validation, GPG signing, repository publication, and authenticated downloads |
 | `web` | Package dashboard, build history, logs, and rebuild requests |
 | `notifier` | Optional SMTP build notifications |

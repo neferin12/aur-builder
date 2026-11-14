@@ -40,12 +40,16 @@ model build_results {
   started_at  String?
   finished_at String?
   version     String?
+
+  @@index([package_id, id(sort: Desc)], map: "build_results_package_page")
 }
 
 model oidc_login {
   id         String @id
   payload    String
   expires_at BigInt
+
+  @@index([expires_at], map: "oidc_login_expiry")
 }
 
 model package_metadata {
@@ -70,6 +74,8 @@ model release_candidate {
   created_at  BigInt
 
   @@unique([package_id, fingerprint], map: "sqlite_autoindex_release_candidate_2")
+  @@index([created_at(sort: Desc), id(sort: Desc)], map: "candidate_all_page")
+  @@index([state, created_at(sort: Desc), id(sort: Desc)], map: "candidate_state_page")
   @@index([package_id, created_at], map: "candidate_package")
 }
 
@@ -109,6 +115,8 @@ model web_session {
   csrf         String
   expires_at   BigInt
   auth_context String @default("")
+
+  @@index([expires_at], map: "web_session_expiry")
 }
 
 model web_user {

@@ -1,3 +1,5 @@
+// Rate limiting has a dedicated clock-controlled suite; these cases exercise OIDC failures.
+vi.mock('../server/utils/rate-limit', () => ({ limitAuthentication: () => {} }))
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
 import { createServer } from 'node:http'
 import type { Server } from 'node:http'
@@ -66,8 +68,13 @@ describe('OIDC code grant with signed mock provider responses', () => {
     expect(await db.web_session.findUnique({ where: { id: sid } })).toBeNull()
     const session = await db.web_session.findUnique({ where: { id: hash(sid) } })
     expect(session?.auth_context).toBe(authConfig().context)
+    expect(Number(session!.expires_at - BigInt(Math.floor(Date.now() / 1000)))).toBeLessThanOrEqual(300)
+    expect(await db.access_audit.findFirst({ where: { actor: session!.user_id, detail: 'auth.login' } })).not.toBeNull()
     expect((await db.web_user.findUnique({ where: { id: session!.user_id } }))?.admin).toBe(true)
     expect((await finish(record)).status).toBe(400)
+    const failure = await db.access_audit.findFirst({ where: { detail: 'auth.login_failed' } })
+    expect(failure?.actor).toBe('anonymous')
+    expect(failure?.detail).not.toContain(record.state)
   })
   it('revokes prior sessions when the OIDC administrator group changes', async () => {
     claimsOverride = {}

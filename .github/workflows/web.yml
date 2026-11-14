@@ -18,6 +18,11 @@ jobs:
       PRISMA_SQLITE_URL: file:/tmp/aur-web-schema.db
     steps:
       - uses: actions/checkout@v4
+      - name: Check Compose port bindings
+        run: |
+          printf 'RABBITMQ_DEFAULT_USER=ci-admin\nRABBITMQ_DEFAULT_PASS=ci-only\n' > .env
+          python3 scripts/provision_broker.py
+          GARAGE_RPC_SECRET=ci-only docker compose config --format json --no-interpolate | python3 scripts/check-compose-security.py
       - uses: actions/setup-node@v4
         with:
           node-version: 24
@@ -32,6 +37,8 @@ jobs:
           DATABASE_URL: postgresql://postgres:test@localhost:5432/aur_web_test
       - run: npm ci
         working-directory: web
+      - run: npm audit --omit=dev --audit-level=high
+        working-directory: web
       - run: npm run db:check && npm run typecheck && npm test && npm run build
         working-directory: web
       - run: npx playwright install --with-deps chromium
@@ -43,6 +50,7 @@ jobs:
         run: |
           mkdir -p /tmp/aur-web-container-db
           cp /tmp/aur-web-schema.db /tmp/aur-web-container-db/database.sqlite
+          sudo chown -R 10001:10001 /tmp/aur-web-container-db
           docker run -d --name aur-web-smoke -p 3000:3000 -v /tmp/aur-web-container-db:/data -e DATABASE_URL=sqlite:/data/database.sqlite -e AB_WEB_URL=https://builder.example -e AB_OIDC_ISSUER=https://issuer.example -e AB_OIDC_CLIENT_ID=test -e AB_OIDC_CLIENT_SECRET=test -e AB_OIDC_ADMIN_GROUP=admins aur-builder-web:test
           for attempt in $(seq 1 30); do
             if curl --fail http://localhost:3000/auth/signed-out; then exit 0; fi

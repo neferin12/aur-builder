@@ -8,7 +8,7 @@ import { sourceDiffs } from './diffs'
 import { validateUploadGrant } from './storage'
 const missing = () => new ORPCError('NOT_FOUND')
 const conflict = () => new ORPCError('CONFLICT', { message: 'This release is no longer pending or has no approved revision.' })
-function summary(candidate: release_candidate) {
+function summary(candidate: Pick<release_candidate, 'id' | 'payload' | 'revision' | 'state' | 'created_at'>) {
   const payload = payloadSchema.parse(JSON.parse(candidate.payload))
   return { id: candidate.id, name: payload.name, version: payload.version, revision: candidate.revision, state: candidate.state, created_at: Number(candidate.created_at / 1000000n) }
 }
@@ -30,10 +30,10 @@ export async function packages(db: Database) {
   }
 }
 function timestamp(value: string | Date | null) { return value instanceof Date ? value.toISOString() : value ? `${value.replace(' ', 'T').replace(/Z$/, '')}Z` : null }
-export async function history(db: Database, id: number) {
+export async function history(db: Database, id: number, before?: number) {
   const pkg = await db.package_metadata.findUnique({ where: { id } })
   if (!pkg) throw missing()
-  const results = await db.build_results.findMany({ where: { package_id: BigInt(id) }, orderBy: { id: 'desc' } })
+  const results = await db.build_results.findMany({ where: { package_id: BigInt(id), ...(before ? { id: { lt: before } } : {}) }, take: 100, orderBy: { id: 'desc' } })
   return { package: { ...pkg, last_modified: Number(pkg.last_modified), source: publicSource(pkg.source) }, results: results.map(r => ({ id: r.id, success: r.success, exit_code: r.exit_code, version: r.version, started_at: timestamp(r.started_at), finished_at: timestamp(r.finished_at) })) }
 }
 export async function buildLog(db: Database, id: number) {
@@ -43,8 +43,8 @@ export async function buildLog(db: Database, id: number) {
   if (!pkg) throw missing()
   return { package: { id: pkg.id, name: pkg.name }, result: { ...result, package_id: Number(result.package_id), started_at: timestamp(result.started_at), finished_at: timestamp(result.finished_at) } }
 }
-export async function reviews(db: Database, status: string) {
-  return (await db.release_candidate.findMany({ where: status === 'all' ? {} : { state: status }, orderBy: [{ created_at: 'desc' }, { id: 'desc' }] })).map(summary)
+export async function reviews(db: Database, status: string, before?: string) {
+  return (await db.release_candidate.findMany({ where: status === 'all' ? {} : { state: status }, ...(before ? { cursor: { id: before }, skip: 1 } : {}), take: 100, orderBy: [{ created_at: 'desc' }, { id: 'desc' }] })).map(summary)
 }
 export async function review(db: Database, id: string) {
   const candidate = await db.release_candidate.findUnique({ where: { id } })
@@ -114,4 +114,13 @@ export async function updateAccess(db: Database, actor: string, input: { id: str
     await tx.access_audit.create({ data: { id: randomUUID(), actor, target: id, detail: `view=${data.can_view},rebuild=${data.can_rebuild},approve=${data.can_approve},disabled=${data.disabled}`, created_at: now() } })
   })
   return { updated: true }
+}
+
+export async function revokeSessions(db: Database, actor: string, id: string) {
+  await transaction(db, async tx => {
+    if (!await tx.web_user.findUnique({ where: { id } })) throw missing()
+    await tx.web_session.deleteMany({ where: { user_id: id } })
+    await tx.access_audit.create({ data: { id: randomUUID(), actor, target: id, detail: 'auth.sessions_revoked', created_at: now() } })
+  })
+  return { revoked: true }
 }

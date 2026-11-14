@@ -26,12 +26,85 @@
     </cargoProject>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="30df73c6-6061-4a44-ad67-d8c0fc6fb8e8" name="Changes" comment="feat: refactor into nuxt webapp">
+    <list default="true" id="30df73c6-6061-4a44-ad67-d8c0fc6fb8e8" name="Changes" comment="fix: retire orphan waiting attempts and renew retried tasks&#10;&#10;Add cleanup_orphan_waiting_attempts to mark superseded queued and  &#10;dispatched attempts when a newer one exists, and run it every 60 s in  &#10;the server. Switch retry logic in setup_rabbit_mq to renew tasks instead  &#10;of granting them so the attempt identity is preserved.">
+      <change beforePath="$PROJECT_DIR$/.dockerignore" beforeDir="false" afterPath="$PROJECT_DIR$/.dockerignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.env.template" beforeDir="false" afterPath="$PROJECT_DIR$/.env.template" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.github/workflows/build_rust.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.github/workflows/build_rust.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.github/workflows/osv-scanner.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.github/workflows/osv-scanner.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.github/workflows/web.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.github/workflows/web.yml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources.local.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources.local.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/app/assets/main.css" beforeDir="false" afterPath="$PROJECT_DIR$/web/app/assets/main.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/theme.ts" beforeDir="false" afterPath="$PROJECT_DIR$/web/theme.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Cargo.lock" beforeDir="false" afterPath="$PROJECT_DIR$/Cargo.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/Dockerfile" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/STORAGE.md" beforeDir="false" afterPath="$PROJECT_DIR$/STORAGE.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build-container/Cargo.lock" beforeDir="false" afterPath="$PROJECT_DIR$/build-container/Cargo.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build-container/Cargo.toml" beforeDir="false" afterPath="$PROJECT_DIR$/build-container/Cargo.toml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build-container/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/build-container/Dockerfile" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build-container/src/main.rs" beforeDir="false" afterPath="$PROJECT_DIR$/build-container/src/main.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/Cargo.toml" beforeDir="false" afterPath="$PROJECT_DIR$/common/Cargo.toml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/src/error_codes.json" beforeDir="false" afterPath="$PROJECT_DIR$/common/src/error_codes.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/src/lib.rs" beforeDir="false" afterPath="$PROJECT_DIR$/common/src/lib.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/src/messaging.rs" beforeDir="false" afterPath="$PROJECT_DIR$/common/src/messaging.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/src/storage.rs" beforeDir="false" afterPath="$PROJECT_DIR$/common/src/storage.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/src/types.rs" beforeDir="false" afterPath="$PROJECT_DIR$/common/src/types.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/database/examples/verify_web_tasks.rs" beforeDir="false" afterPath="$PROJECT_DIR$/database/examples/verify_web_tasks.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/database/src/access.rs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/database/src/lib.rs" beforeDir="false" afterPath="$PROJECT_DIR$/database/src/lib.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/database/src/migrator/mod.rs" beforeDir="false" afterPath="$PROJECT_DIR$/database/src/migrator/mod.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docker-compose.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/.vitepress/config.mjs" beforeDir="false" afterPath="$PROJECT_DIR$/docs/.vitepress/config.mjs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/guide/architecture.md" beforeDir="false" afterPath="$PROJECT_DIR$/docs/guide/architecture.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/guide/development.md" beforeDir="false" afterPath="$PROJECT_DIR$/docs/guide/development.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/guide/getting-started.md" beforeDir="false" afterPath="$PROJECT_DIR$/docs/guide/getting-started.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/guide/nginx.md" beforeDir="false" afterPath="$PROJECT_DIR$/docs/guide/nginx.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/guide/reviews.md" beforeDir="false" afterPath="$PROJECT_DIR$/docs/guide/reviews.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/guide/signing.md" beforeDir="false" afterPath="$PROJECT_DIR$/docs/guide/signing.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/guide/storage.md" beforeDir="false" afterPath="$PROJECT_DIR$/docs/guide/storage.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/guide/troubleshooting.md" beforeDir="false" afterPath="$PROJECT_DIR$/docs/guide/troubleshooting.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/guide/upgrading.md" beforeDir="false" afterPath="$PROJECT_DIR$/docs/guide/upgrading.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/index.md" beforeDir="false" afterPath="$PROJECT_DIR$/docs/index.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/reference/configuration.md" beforeDir="false" afterPath="$PROJECT_DIR$/docs/reference/configuration.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/notifier/Cargo.toml" beforeDir="false" afterPath="$PROJECT_DIR$/notifier/Cargo.toml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/notifier/src/main.rs" beforeDir="false" afterPath="$PROJECT_DIR$/notifier/src/main.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/repo/Cargo.toml" beforeDir="false" afterPath="$PROJECT_DIR$/repo/Cargo.toml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/repo/src/main.rs" beforeDir="false" afterPath="$PROJECT_DIR$/repo/src/main.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/test_setup.py" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/test_setup.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/Cargo.toml" beforeDir="false" afterPath="$PROJECT_DIR$/server/Cargo.toml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/ai.rs" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/ai.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/main.rs" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/package_checkers/aur.rs" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/package_checkers/aur.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/package_checkers/git.rs" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/package_checkers/git.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/reviews.rs" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/reviews.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/setup_rabbit_mq.rs" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/setup_rabbit_mq.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/setup.py" beforeDir="false" afterPath="$PROJECT_DIR$/setup.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/app/components/RequestError.vue" beforeDir="false" afterPath="$PROJECT_DIR$/web/app/components/RequestError.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/app/pages/admin/users.vue" beforeDir="false" afterPath="$PROJECT_DIR$/web/app/pages/admin/users.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/app/pages/build-results/[id].vue" beforeDir="false" afterPath="$PROJECT_DIR$/web/app/pages/build-results/[id].vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/app/pages/reviews/[id].vue" beforeDir="false" afterPath="$PROJECT_DIR$/web/app/pages/reviews/[id].vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/app/pages/reviews/index.vue" beforeDir="false" afterPath="$PROJECT_DIR$/web/app/pages/reviews/index.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/web/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/web/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/prisma/postgresql.prisma" beforeDir="false" afterPath="$PROJECT_DIR$/web/prisma/postgresql.prisma" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/prisma/sqlite.prisma" beforeDir="false" afterPath="$PROJECT_DIR$/web/prisma/sqlite.prisma" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/server/middleware/security.ts" beforeDir="false" afterPath="$PROJECT_DIR$/web/server/middleware/security.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/server/plugins/database.ts" beforeDir="false" afterPath="$PROJECT_DIR$/web/server/plugins/database.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/server/rpc/router.ts" beforeDir="false" afterPath="$PROJECT_DIR$/web/server/rpc/router.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/server/utils/auth.ts" beforeDir="false" afterPath="$PROJECT_DIR$/web/server/utils/auth.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/server/utils/config.ts" beforeDir="false" afterPath="$PROJECT_DIR$/web/server/utils/config.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/server/utils/db.ts" beforeDir="false" afterPath="$PROJECT_DIR$/web/server/utils/db.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/server/utils/diffs.ts" beforeDir="false" afterPath="$PROJECT_DIR$/web/server/utils/diffs.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/server/utils/repository.ts" beforeDir="false" afterPath="$PROJECT_DIR$/web/server/utils/repository.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/server/utils/storage.ts" beforeDir="false" afterPath="$PROJECT_DIR$/web/server/utils/storage.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/tests/certs/localhost-key.pem" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/tests/certs/localhost.pem" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/tests/database.test.ts" beforeDir="false" afterPath="$PROJECT_DIR$/web/tests/database.test.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/tests/e2e-server.mjs" beforeDir="false" afterPath="$PROJECT_DIR$/web/tests/e2e-server.mjs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/tests/oidc.test.ts" beforeDir="false" afterPath="$PROJECT_DIR$/web/tests/oidc.test.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/worker/Cargo.toml" beforeDir="false" afterPath="$PROJECT_DIR$/worker/Cargo.toml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/worker/src/build/docker.rs" beforeDir="false" afterPath="$PROJECT_DIR$/worker/src/build/docker.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/worker/src/build/mod.rs" beforeDir="false" afterPath="$PROJECT_DIR$/worker/src/build/mod.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/worker/src/main.rs" beforeDir="false" afterPath="$PROJECT_DIR$/worker/src/main.rs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -50,7 +123,7 @@
     </persistenceIdMap>
   </component>
   <component name="EmbeddingIndexingInfo">
-    <option name="cachedIndexableFilesCount" value="3362" />
+    <option name="cachedIndexableFilesCount" value="3532" />
     <option name="fileBasedEmbeddingIndicesEnabled" value="true" />
   </component>
   <component name="ExecutionTargetManager" SELECTED_TARGET="RsBuildProfile:dev" />
@@ -130,23 +203,23 @@
   </component>
   <component name="NextEditCompletionFeaturesState">
     <decayedCancelled>
-      <entry key="MS100" value="1.0000246076240844" />
-      <entry key="MS500" value="1.455303258073912" />
-      <entry key="S2" value="9.666762567255166" />
-      <entry key="S5" value="24.558634118209213" />
-      <entry key="S10" value="36.50912390308731" />
-      <entry key="S30" value="48.92003576166684" />
-      <entry key="S60" value="54.417260606660065" />
-      <entry key="M2" value="65.44279069393205" />
-      <entry key="M5" value="91.67519114604823" />
-      <entry key="M10" value="110.89734609936966" />
-      <entry key="M15" value="119.45479782463423" />
-      <entry key="M30" value="129.40740469190283" />
-      <entry key="H1" value="135.19721164674343" />
-      <entry key="H2" value="145.5162620881647" />
-      <entry key="H4" value="192.3818772425628" />
-      <entry key="D1" value="583.3729865634199" />
-      <entry key="W1" value="852.3893235104536" />
+      <entry key="MS100" value="1.000002934902408" />
+      <entry key="MS500" value="1.1504830383389781" />
+      <entry key="S2" value="3.254363989803123" />
+      <entry key="S5" value="5.662732764983631" />
+      <entry key="S10" value="7.101599684458254" />
+      <entry key="S30" value="10.12305582259998" />
+      <entry key="S60" value="14.683131794822838" />
+      <entry key="M2" value="21.38571055274838" />
+      <entry key="M5" value="45.97966693029727" />
+      <entry key="M10" value="82.42903890661091" />
+      <entry key="M15" value="105.1465548193149" />
+      <entry key="M30" value="137.25017044328777" />
+      <entry key="H1" value="158.2713614806159" />
+      <entry key="H2" value="177.07149294721012" />
+      <entry key="H4" value="227.52441406983866" />
+      <entry key="D1" value="622.0300263164853" />
+      <entry key="W1" value="893.6954104650149" />
     </decayedCancelled>
     <decayedSelected>
       <entry key="MS100" value="0.0" />
@@ -168,23 +241,23 @@
       <entry key="W1" value="0.0" />
     </decayedSelected>
     <decayedShown>
-      <entry key="MS100" value="0.9266063442505533" />
-      <entry key="MS500" value="1.4168572427673396" />
-      <entry key="S2" value="9.539498249648267" />
-      <entry key="S5" value="24.417617737038448" />
-      <entry key="S10" value="36.40233135595415" />
-      <entry key="S30" value="48.871923024929245" />
-      <entry key="S60" value="54.390556732246864" />
-      <entry key="M2" value="65.42656726303" />
-      <entry key="M5" value="91.66538928515861" />
-      <entry key="M10" value="110.89109568384865" />
-      <entry key="M15" value="119.45021462533887" />
-      <entry key="M30" value="129.40486615601998" />
-      <entry key="H1" value="135.19587189575688" />
-      <entry key="H2" value="145.51556219193228" />
-      <entry key="H4" value="192.38147110891344" />
-      <entry key="D1" value="583.3728438909874" />
-      <entry key="W1" value="852.3892966043547" />
+      <entry key="MS100" value="0.959266915992918" />
+      <entry key="MS500" value="1.1407740078312183" />
+      <entry key="S2" value="3.246778414436779" />
+      <entry key="S5" value="5.65735544419921" />
+      <entry key="S10" value="7.098204310842115" />
+      <entry key="S30" value="10.120752834944732" />
+      <entry key="S60" value="14.680696776252189" />
+      <entry key="M2" value="21.383421132576984" />
+      <entry key="M5" value="45.976581403658514" />
+      <entry key="M10" value="82.42560185940468" />
+      <entry key="M15" value="105.14342519574926" />
+      <entry key="M30" value="137.2479921861864" />
+      <entry key="H1" value="158.27006794153345" />
+      <entry key="H2" value="177.0707765518297" />
+      <entry key="H4" value="227.52399014518053" />
+      <entry key="D1" value="622.0298792084283" />
+      <entry key="W1" value="893.6953828321763" />
     </decayedShown>
   </component>
   <component name="ProjectColorInfo">{
@@ -223,7 +296,7 @@
     &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
     &quot;copilot.chat.legacySessionMetadata.migrated&quot;: &quot;true&quot;,
     &quot;dart.analysis.tool.window.visible&quot;: &quot;false&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;feat/nuxt-webapp&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;#21 on feat/nuxt-webapp&quot;,
     &quot;javascript.preferred.runtime.type.id&quot;: &quot;node&quot;,
     &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
     &quot;last_opened_file_path&quot;: &quot;/workspaces/aur-builder&quot;,
@@ -454,6 +527,8 @@
       <workItem from="1794422422313" duration="33000" />
       <workItem from="1794422498376" duration="26000" />
       <workItem from="1794422530368" duration="500000" />
+      <workItem from="1794469934631" duration="3695000" />
+      <workItem from="1794652345893" duration="359000" />
     </task>
     <task id="LOCAL-00001" summary="ci">
       <option name="closed" value="true" />

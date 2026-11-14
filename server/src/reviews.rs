@@ -14,7 +14,10 @@ fn walk(
     complete: &mut bool,
 ) -> Result<(), Box<dyn Error>> {
     for entry in tree.iter() {
-        let path = format!("{prefix}{}", entry.name().ok_or("non UTF-8 source path")?);
+        let path = format!(
+            "{prefix}{}",
+            entry.name().map_err(|_| "non UTF-8 source path")?
+        );
         match entry.kind() {
             Some(ObjectType::Tree) => walk(
                 repo,

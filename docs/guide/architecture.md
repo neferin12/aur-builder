@@ -5,13 +5,14 @@ AUR Builder separates scheduling, execution, publication, and client downloads.
 ```mermaid
 flowchart TB
     accTitle: AUR Builder architecture
-    accDescr: The server schedules Docker builds through RabbitMQ. Build containers upload private bundles to Garage. The repo service validates, signs and publishes packages. Authenticated pacman clients receive signed redirects to Garage.
+    accDescr: The server schedules Docker builds through RabbitMQ. Workers collect completed bundles and upload them to Garage. The repo service validates, signs and publishes packages. Authenticated pacman clients receive signed redirects to Garage.
 
     sources["AUR / Git"] -->|Check for changes| server["Server"]
-    server -->|Tasks with upload URLs| tasks["RabbitMQ: pkg_build"]
+    server -->|Pinned tasks| tasks["RabbitMQ: pkg_build"]
     tasks --> worker["Worker"]
     worker -->|Start Docker build| builder["Build container"]
-    builder -->|Presigned PUT: bundle| storage[("Garage: private objects")]
+    builder -->|Stopped-container bundle| worker
+    worker -->|Short-lived PUT: bundle| storage[("Garage: private objects")]
     worker -.->|Results via RabbitMQ| server
     server -->|Successful results| ingest["RabbitMQ: repo_ingest"]
     ingest --> repo["Repo: validate and sign"]
@@ -26,9 +27,9 @@ flowchart TB
 
 | Module | Responsibility |
 | --- | --- |
-| `server` | Source checks, task persistence, upload grants, and result processing |
+| `server` | Source checks, task persistence, approvals, and result processing |
 | `worker` | Runs Docker build containers and reports results |
-| `build-container` | Fetches sources, installs dependencies, runs `makepkg`, and uploads a bundle |
+| `build-container` | Fetches sources, installs dependencies, runs `makepkg`, and writes a bundle |
 | `repo` | Validates artifacts, signs packages/databases, publishes the catalog, and authenticates downloads |
 | `web` (Nuxt/Nitro, PrimeVue, Prisma, oRPC) | OIDC login, permissions, source diffs, approval queue, history, logs, and rebuilds |
 | `notifier` | Optional SMTP notifications |
@@ -40,16 +41,20 @@ flowchart TB
 The server captures immutable packaging revisions as pending release candidates.
 Human approval or configured AI approval records a decision and a queued task in
 one database transaction. Each task pins the approved commit and has a
-unique attempt ID, private bundle object key, presigned PUT URL, and URL expiry.
+unique attempt ID and private bundle object key. No upload grant is queued.
 Pending task records allow recovery after a crash before broker confirmation.
 
-Workers receive no S3 access keys. A worker starts an Arch container with the
-approved source revision, build options, environment, and task upload URL. Successful outputs are
-bundled and uploaded before the result is published. Upload failure is a build
-failure. Logs remain in the SQL build-result flow.
+Workers hold storage credentials and a receipt-authentication key outside the sandbox.
+An Arch build container receives the approved revision, source, options, and safe
+package environment settings. It writes `/results/bundle.tar` and an atomic completion record. The worker
+exports bounded bytes into private storage, freezes the container, hashes the private copy, issues
+a PUT grant lasting at most 900 seconds, uploads it, and publishes an authenticated
+receipt. Ingestion verifies both the receipt and actual bundle bytes before signing.
+The receipt binds the attempt, candidate, revision, object key, byte count, and digest.
+Upload failures fail the build; logs remain in the SQL build-result flow.
 
-Expired queued tasks return through `expired_tasks`; the server validates them and
-can issue a new attempt. A build that exceeds its upload grant must be rebuilt.
+`expired_tasks` remains only for legacy task recovery during coordinated upgrades;
+normal dispatch no longer includes expiring capabilities.
 
 ## Repository publication
 

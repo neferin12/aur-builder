@@ -3,9 +3,11 @@
   "100": "Unable to change dir",
   "101": "Environment Variable missing",
   "102": "Git clone failed",
-  "103": "Failed to run `yay -Syu`",
+  "103": "Failed to update build dependencies",
   "104": "Failed to install dependency",
   "105": "Failed to build package",
   "106": "Failed to copy result files",
-  "107": "Failed to upload pkg file"
+  "107": "Artifact collection or authenticated upload failed",
+  "108": "Build exceeded its execution deadline",
+  "109": "Builder terminated or reported an invalid completion record"
 }

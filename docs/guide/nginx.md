@@ -9,7 +9,8 @@ If Nginx runs in a container, connect it to the services' Docker network and use
 
 ## Restrict backend ports
 
-In `docker-compose.yaml`, bind the Garage and repo host ports to loopback:
+The shipped `docker-compose.yaml` binds Garage, repo, and both RabbitMQ ports to
+loopback. Preserve those bindings in deployment overrides:
 
 ```yaml
 services:
@@ -21,9 +22,10 @@ services:
       - "127.0.0.1:3001:3001"
 ```
 
-These are changes to the existing services, not a replacement Compose file. Recreate
-the affected containers after editing their port mappings. Keep RabbitMQ's ports
-private as well. The web dashboard requires OIDC and an HTTPS reverse proxy; set
+This excerpt shows the existing services, not a replacement Compose file. Recreate
+affected containers after changing port mappings, and validate the rendered configuration
+with `docker compose config --format json | python3 scripts/check-compose-security.py`.
+The web dashboard requires OIDC and an HTTPS reverse proxy; set
 `AB_WEB_URL` to its external HTTPS origin and preserve the browser Origin header.
 
 ## Garage S3 API

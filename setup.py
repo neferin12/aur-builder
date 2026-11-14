@@ -185,7 +185,7 @@ class Setup:
         self.env.set("AB_S3_REGION", "garage")
         for key in ("AB_S3_ACCESS_KEY", "AB_S3_SECRET_KEY", "AB_REPO_GPG_KEY"):
             self.env.set(key, self.env.get(key))
-        for key, default in [("AB_UPLOAD_TTL", "86400"), ("AB_DOWNLOAD_TTL", "900"), ("AB_REPO_MAX_BYTES", "4294967296")]:
+        for key, default in [("AB_UPLOAD_TTL", "900"), ("AB_DOWNLOAD_TTL", "900"), ("AB_REPO_MAX_BYTES", "4294967296")]:
             value = self.env.get(key) or default
             if not value.isdigit() or int(value) < 1 or (key.endswith("TTL") and int(value) > 604800):
                 raise SetupError(f"Invalid {key}; URL lifetimes must be 1–604800 seconds and size limits positive.")
@@ -368,7 +368,7 @@ class Setup:
                 # is still running in the scheduler.
                 return db.execute(
                     "SELECT 1 FROM seaql_migrations WHERE version=?",
-                    ("m20261109_000001_web_database_compatibility",),
+                    ("m20261111_000001_security_indexes",),
                 ).fetchone() is not None
         except sqlite3.Error:
             return False
@@ -398,6 +398,11 @@ class Setup:
         if not yes("Build images and start Docker Compose services now?", False):
             print("Configuration saved. Rerun setup when ready to start services.")
             return
+        from scripts.provision_broker import provision
+        from scripts.provision_build_network import provision as provision_network
+        provision_network(self.root)
+        provision(self.root)
+        self.env = EnvFile(self.root / ".env")
         self.compose("config", "--quiet", capture=True)
         self.compose("up", "-d", "garage", "rabbitmq")
         self.wait("Garage", lambda: self.garage("status", check=False).returncode == 0)
@@ -411,10 +416,15 @@ class Setup:
             self.env.set("AB_BUILDER", image)
             self.env.set("AB_BUILDER_TAG", tag)
             self.env.save()
-        self.compose("build", "server", "worker", "web", "repo")
+        provision(self.root)
+        self.env = EnvFile(self.root / ".env")
+        self.compose("build", "server", "worker", "web", "repo", "build-egress")
+        from scripts.prepare_runtime import prepare
+        prepare(self.root, run)
         self.compose("up", "-d", "--no-deps", "server")
         self.wait("database migrations", self.database_ready)
         self.ensure_running("server")
+        self.compose("up", "-d", "build-egress")
         self.compose("up", "-d", "--no-deps", "worker", "repo", "web")
         for service in ("worker", "repo", "web"):
             self.ensure_running(service)
@@ -424,6 +434,8 @@ class Setup:
                                ("AB_SMTP_TO", "Recipient address"), ("AB_MAILLOGO", "Email logo URL")]:
                 self.env.set(key, ask(label, self.env.get(key), key == "AB_SMTP_PASS"))
             self.env.save()
+            provision(self.root)
+            self.env = EnvFile(self.root / ".env")
             self.compose("up", "-d", "--build", "notifier")
         print("Checking initial service startup…")
         time.sleep(5)

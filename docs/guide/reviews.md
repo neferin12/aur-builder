@@ -30,7 +30,9 @@ exactly, including any group path prefix. Restart `web` after configuration chan
 The UI fails startup if OIDC is missing or discovery fails. Use an HTTPS reverse
 proxy; session cookies are Secure and HttpOnly. HTTP access cannot establish a session.
 Sessions expire after one hour by default (configurable from 60 to 86400 seconds).
-Group membership is refreshed at login; it can remain effective for a session's lifetime.
+Group-derived administrator sessions are capped at five minutes. Group membership
+is refreshed at the next OIDC authorization. Saving access or revoking sessions in
+User management applies immediately.
 When a later login changes administrator membership, all of that user's previous
 sessions are revoked so an old cookie cannot inherit new admin privileges. Session
 IDs are stored as hashes. Sessions and pending login flows are bound to the issuer,
@@ -71,7 +73,7 @@ Sign in with an account in the configured administrator group. Other users appea
 in **User management** after their first login and initially have **no permissions**.
 Administrators can independently grant global permissions to:
 
-- View packages, logs, and reviews.
+- View packages, history, and reviews. Build logs require approval permission.
 - Rebuild approved releases (also requires view).
 - Approve or reject release candidates (also requires view).
 

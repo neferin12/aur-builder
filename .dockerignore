@@ -32,3 +32,15 @@ web/playwright-report
 .devcontainer/state
 
 .devcontainer/__pycache__
+
+.env.*
+rabbitmq-security
+
+repo-signing-runtime
+
+# Runtime state and local credentials must never enter build/cache layers.
+db
+server_tmp
+.aws
+.codex
+.agents

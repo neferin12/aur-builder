@@ -1,4 +1,3 @@
-mod m20261109_000001_web_database_compatibility;
 mod m20240624_000001_package_metadata_table;
 mod m20250120_205654_build_results;
 mod m20250120_223506_build_results_add_success;
@@ -11,6 +10,8 @@ mod m20261101_000001_storage;
 mod m20261102_000001_reviews;
 mod m20261102_000002_review_notifications;
 mod m20261102_000003_auth_and_observations;
+mod m20261109_000001_web_database_compatibility;
+mod m20261111_000001_security_indexes;
 
 use sea_orm_migration::prelude::*;
 
@@ -33,6 +34,7 @@ impl MigratorTrait for Migrator {
             Box::new(m20261102_000002_review_notifications::Migration),
             Box::new(m20261102_000003_auth_and_observations::Migration),
             Box::new(m20261109_000001_web_database_compatibility::Migration),
+            Box::new(m20261111_000001_security_indexes::Migration),
         ]
     }
 }

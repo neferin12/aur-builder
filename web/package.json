@@ -6,7 +6,7 @@
     "dev": "nuxt dev --host 0.0.0.0",
     "build": "nuxt build",
     "start": "node .output/server/index.mjs",
-    "postinstall": "npm run db:generate && nuxt prepare",
+    "postinstall": "node scripts/patch-deepmerge.mjs && npm run db:generate && nuxt prepare",
     "db:generate": "node scripts/generate.mjs",
     "db:introspect": "node scripts/schema.mjs",
     "db:check": "node scripts/schema.mjs --check",
@@ -17,18 +17,18 @@
   "dependencies": {
     "@aws-sdk/client-s3": "^3.922.0",
     "@aws-sdk/s3-request-presigner": "^3.922.0",
-    "@orpc/client": "^1.13.0",
-    "@orpc/server": "^1.13.0",
+    "@orpc/client": "1.16.2",
+    "@orpc/server": "1.16.2",
     "@primevue/nuxt-module": "^4.4.1",
     "@primeuix/themes": "^1.2.5",
     "@prisma/client": "6.19.0",
     "diff": "^8.0.2",
-    "nuxt": "^4.2.0",
+    "nuxt": "4.6.4",
     "openid-client": "^6.8.1",
     "primeicons": "^7.0.0",
     "primevue": "^4.4.1",
     "vue": "^3.5.24",
-    "zod": "^4.1.12",
+    "zod": "4.6.7",
     "@prisma/adapter-better-sqlite3": "6.19.0",
     "@prisma/adapter-pg": "6.19.0"
   },
@@ -46,6 +46,8 @@
   },
   "overrides": {
     "deepmerge-ts": "^8.0.0",
-    "effect": "^3.21.0"
+    "effect": "^3.21.0",
+    "glob@>=9 <14.0.2": "14.0.2",
+    "minimatch@>=7 <11.0.1": "11.0.1"
   }
 }

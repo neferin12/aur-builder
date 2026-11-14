@@ -299,14 +299,22 @@ async fn ingest(
         || !db.valid_attempt(task).await?
         || !db.latest_attempt(task).await?
     {
-        log::debug!("Skipping unsuccessful, unapproved, or superseded build result: package={}, attempt={}", task.name, task.attempt);
+        log::debug!(
+            "Skipping unsuccessful, unapproved, or superseded build result: package={:?}, attempt={:?}",
+            task.name,
+            task.attempt
+        );
         return Ok(());
     }
     let old = app.catalog.read().await.clone();
     if old.attempts.get(&task.name) == Some(&task.attempt) {
         return Ok(());
     }
-    log::info!("Ingesting build artifacts: package={}, attempt={}", task.name, task.attempt);
+    log::info!(
+        "Ingesting build artifacts: package={:?}, attempt={:?}",
+        task.name,
+        task.attempt
+    );
     let temp = tempfile::tempdir()?;
     let dir = temp.path();
     let bundle = dir.join("bundle.tar");
@@ -314,6 +322,12 @@ async fn ingest(
         .unwrap_or("4294967296".into())
         .parse::<u64>()?;
     download(&app.storage, &task.object_key, &bundle, limit).await?;
+    let receipt = result
+        .artifact
+        .as_ref()
+        .ok_or_else(|| invalid("missing worker artifact receipt"))?;
+    common::artifact::verify(&std::env::var("AB_ARTIFACT_KEY")?, task, &bundle, receipt)
+        .map_err(|_| invalid("invalid worker artifact receipt"))?;
     let mut archive = tar::Archive::new(std::fs::File::open(&bundle)?);
     let mut packages = Vec::new();
     let mut total = 0u64;
@@ -361,6 +375,9 @@ async fn ingest(
     }
     if packages.is_empty() {
         return Err(invalid("empty bundle"));
+    }
+    if std::env::var("AB_ARTIFACT_KEY")?.len() < 32 {
+        return Err("AB_ARTIFACT_KEY must contain at least 32 bytes".into());
     }
     let key = std::env::var("AB_REPO_GPG_KEY")?;
     let mut identities = std::collections::HashSet::new();
@@ -497,7 +514,12 @@ async fn ingest(
     }
     *app.catalog.write().await = next;
     db.attempt_state(&task.attempt, "published").await?;
-    log::info!("Repository release published: package={}, version={}, attempt={}", task.name, task.version, task.attempt);
+    log::info!(
+        "Repository release published: package={:?}, version={:?}, attempt={:?}",
+        task.name,
+        task.version,
+        task.attempt
+    );
     Ok(())
 }
 async fn serve(
@@ -585,7 +607,6 @@ async fn main() -> Result<(), Error> {
     }
     let conn = common::connect_to_rabbitmq().await;
     let channel = conn.create_channel().await?;
-    common::messaging::declare_repo_queue(&channel).await?;
     channel.basic_qos(1, BasicQosOptions::default()).await?;
     let mut consumer = channel
         .basic_consume(
@@ -624,11 +645,19 @@ async fn main() -> Result<(), Error> {
             match result {
                 Ok(result) => match ingest(&state, &db, &result).await {
                     Ok(()) => {
-                        log::debug!("Repository build result processed: package={}, attempt={}", result.task.name, result.task.attempt);
+                        log::debug!(
+                            "Repository build result processed: package={:?}, attempt={:?}",
+                            result.task.name,
+                            result.task.attempt
+                        );
                         delivery.ack(BasicAckOptions::default()).await.ok();
                     }
                     Err(e) => {
-                        log::error!("Repository ingestion failed: package={}, attempt={}, error={e}", result.task.name, result.task.attempt);
+                        log::error!(
+                            "Repository ingestion failed: package={:?}, attempt={:?}, error={e}",
+                            result.task.name,
+                            result.task.attempt
+                        );
                         if e.is::<InvalidArtifact>() {
                             delivery
                                 .reject(BasicRejectOptions { requeue: false })
@@ -827,7 +856,7 @@ mod integration_tests {
         .await?;
         let mut task = db.pending_attempts().await?.remove(0);
         app.storage.renew(&mut task)?;
-        let url = task.upload.take().unwrap().url;
+        let url = app.storage.sign("PUT", &task.object_key, 900, false)?;
         assert!(
             client
                 .put(url)
@@ -841,13 +870,49 @@ mod integration_tests {
             start: chrono::Utc::now().naive_utc(),
             end: chrono::Utc::now().naive_utc(),
         };
+        let receipt = common::artifact::issue(
+            &std::env::var("AB_ARTIFACT_KEY")?,
+            &task,
+            &dir.path().join("bundle.tar"),
+        )?;
         let result = BuildResultTransmissionFormat {
+            artifact: Some(receipt),
             task,
             status_code: 0,
             log_lines: vec![],
             success: true,
             timestamps: timestamp,
         };
+        let mut missing_receipt = result.clone();
+        missing_receipt.artifact = None;
+        assert!(
+            ingest(&app, &db, &missing_receipt)
+                .await
+                .unwrap_err()
+                .is::<InvalidArtifact>()
+        );
+        let replacement = app
+            .storage
+            .sign("PUT", &result.task.object_key, 900, false)?;
+        client
+            .put(&replacement)
+            .body("replaced after worker authentication")
+            .send()
+            .await?
+            .error_for_status()?;
+        assert!(
+            ingest(&app, &db, &result)
+                .await
+                .unwrap_err()
+                .is::<InvalidArtifact>()
+        );
+        assert!(app.catalog.read().await.files.is_empty());
+        client
+            .put(&replacement)
+            .body(std::fs::read(dir.path().join("bundle.tar"))?)
+            .send()
+            .await?
+            .error_for_status()?;
         ingest(&app, &db, &result).await?;
         let catalog = app.catalog.read().await.clone();
         assert!(catalog.files.contains_key("aur-builder.db"));
@@ -994,14 +1059,46 @@ mod integration_tests {
             &["-cf", "bundle.tar", "storage-test-2.0-1-any.pkg.tar.gz"],
             dir.path(),
         )?;
+        let mut upgrade_data = data.clone();
+        upgrade_data.version = "2.0-1".into();
+        db.observe_release(
+            &upgrade_data,
+            &"b".repeat(40),
+            "storage-test-v2",
+            &database::reviews::Snapshot {
+                files: vec![],
+                complete: true,
+            },
+        )
+        .await?;
+        let candidate = db
+            .candidates()
+            .await?
+            .into_iter()
+            .find(|c| c.state == "pending" && c.payload.name == upgrade_data.name)
+            .unwrap();
+        db.decide_release(&candidate.id, "reviewer", true, "", |t| {
+            app.storage.grant(t)
+        })
+        .await?;
         let mut upgraded = result.clone();
-        upgraded.task.version = "2.0-1".into();
-        app.storage.grant(&mut upgraded.task)?;
-        db.record_attempt(&upgraded.task).await?;
-        let grant = upgraded.task.upload.take().unwrap();
+        upgraded.task = db
+            .pending_attempts()
+            .await?
+            .into_iter()
+            .find(|t| t.candidate_id.as_deref() == Some(candidate.id.as_str()))
+            .unwrap();
+        upgraded.artifact = Some(common::artifact::issue(
+            &std::env::var("AB_ARTIFACT_KEY")?,
+            &upgraded.task,
+            &dir.path().join("bundle.tar"),
+        )?);
+        let grant = app
+            .storage
+            .sign("PUT", &upgraded.task.object_key, 900, false)?;
         assert!(
             client
-                .put(grant.url)
+                .put(grant)
                 .body(std::fs::read(dir.path().join("bundle.tar"))?)
                 .send()
                 .await?
@@ -1063,15 +1160,47 @@ mod integration_tests {
             &["-cf", "bundle.tar", "storage-test-3.0-1-any.pkg.tar.gz"],
             dir.path(),
         )?;
+        let mut conflict_data = data.clone();
+        conflict_data.name = "other-base".into();
+        conflict_data.version = "3.0-1".into();
+        db.observe_release(
+            &conflict_data,
+            &"c".repeat(40),
+            "other-base-v1",
+            &database::reviews::Snapshot {
+                files: vec![],
+                complete: true,
+            },
+        )
+        .await?;
+        let candidate = db
+            .candidates()
+            .await?
+            .into_iter()
+            .find(|c| c.state == "pending" && c.payload.name == conflict_data.name)
+            .unwrap();
+        db.decide_release(&candidate.id, "reviewer", true, "", |t| {
+            app.storage.grant(t)
+        })
+        .await?;
         let mut conflict = result.clone();
-        conflict.task.id = 2;
-        conflict.task.name = "other-base".into();
-        app.storage.grant(&mut conflict.task)?;
-        db.record_attempt(&conflict.task).await?;
-        let grant = conflict.task.upload.take().unwrap();
+        conflict.task = db
+            .pending_attempts()
+            .await?
+            .into_iter()
+            .find(|t| t.candidate_id.as_deref() == Some(candidate.id.as_str()))
+            .unwrap();
+        conflict.artifact = Some(common::artifact::issue(
+            &std::env::var("AB_ARTIFACT_KEY")?,
+            &conflict.task,
+            &dir.path().join("bundle.tar"),
+        )?);
+        let grant = app
+            .storage
+            .sign("PUT", &conflict.task.object_key, 900, false)?;
         assert!(
             client
-                .put(grant.url)
+                .put(grant)
                 .body(std::fs::read(dir.path().join("bundle.tar"))?)
                 .send()
                 .await?

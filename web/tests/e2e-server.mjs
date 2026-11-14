@@ -11,6 +11,8 @@ import { PrismaClient } from '../generated/sqlite/index.js'
 import { PrismaBetterSQLite3 } from '@prisma/adapter-better-sqlite3'
 const temp = mkdtempSync(join(tmpdir(), 'aur-e2e-')), database = `sqlite:${join(temp, 'db.sqlite')}?mode=rwc`
 const origin = 'https://localhost:3443'
+const keyPath = join(temp, 'localhost-key.pem'), certPath = join(temp, 'localhost.pem')
+execFileSync('openssl', ['req', '-x509', '-newkey', 'rsa:2048', '-nodes', '-keyout', keyPath, '-out', certPath, '-days', '1', '-subj', '/CN=localhost', '-addext', 'subjectAltName=DNS:localhost'], { stdio: 'ignore' })
 execFileSync('cargo', ['run', '-p', 'database', '--example', 'migrate'], { cwd: resolve('..'), env: { ...process.env, DATABASE_URL: database }, stdio: 'inherit' })
 const db = new PrismaClient({ adapter: new PrismaBetterSQLite3({ url: `file:${join(temp, 'db.sqlite')}` }) })
 await db.package_metadata.create({ data: { id: 1, name: 'example', version: '1.0-1', maintainer: 'Alice', last_modified: 1n } })
@@ -21,7 +23,7 @@ const { privateKey, publicKey } = await generateKeyPair('RS256')
 const jwk = { ...await exportJWK(publicKey), kid: 'test', alg: 'RS256', use: 'sig' }
 const codes = new Map()
 let child, stopping = false
-const server = createServer({ key: readFileSync('tests/certs/localhost-key.pem'), cert: readFileSync('tests/certs/localhost.pem') }, async (req, res) => {
+const server = createServer({ key: readFileSync(keyPath), cert: readFileSync(certPath) }, async (req, res) => {
   const url = new URL(req.url, origin)
   const json = value => { res.writeHead(200, { 'content-type': 'application/json' }); res.end(JSON.stringify(value)) }
   if (url.pathname === '/oidc/.well-known/openid-configuration') return json({ issuer: `${origin}/oidc`, authorization_endpoint: `${origin}/oidc/authorize`, token_endpoint: `${origin}/oidc/token`, jwks_uri: `${origin}/oidc/keys`, response_types_supported: ['code'], subject_types_supported: ['public'], id_token_signing_alg_values_supported: ['RS256'] })
@@ -46,7 +48,7 @@ const server = createServer({ key: readFileSync('tests/certs/localhost-key.pem')
 await new Promise(resolve => server.listen(3443, '127.0.0.1', resolve))
 child = spawn(process.execPath, ['.output/server/index.mjs'], { stdio: 'inherit', env: {
   ...process.env, PORT: '3444', HOST: '127.0.0.1', DATABASE_URL: database,
-  NODE_EXTRA_CA_CERTS: resolve('tests/certs/localhost.pem'),
+  NODE_EXTRA_CA_CERTS: certPath,
   AB_WEB_URL: origin, AB_OIDC_ISSUER: `${origin}/oidc`, AB_OIDC_CLIENT_ID: 'test', AB_OIDC_CLIENT_SECRET: 'secret', AB_OIDC_ADMIN_GROUP: 'admins',
   AB_S3_ENDPOINT: 'https://storage.example', AB_S3_BUCKET: 'private', AB_S3_ACCESS_KEY: 'test', AB_S3_SECRET_KEY: 'secret',
 } })

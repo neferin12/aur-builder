@@ -1,16 +1,20 @@
 import { diffLines } from 'diff'
 import type { Snapshot } from './payloads'
 export function sourceDiffs(old: Snapshot, next: Snapshot) {
+  let remaining = 256 * 1024
   const consumed = new Set<string>()
   type File = Snapshot['files'][number]
   function diff(before: File | undefined, after: File | undefined) {
-    const binary = before?.content === null || after?.content === null
+    const bytes = Buffer.byteLength(before?.content ?? '') + Buffer.byteLength(after?.content ?? '')
+    const oversized = bytes > 128 * 1024 || bytes > remaining
+    if (!oversized) remaining -= bytes
+    const binary = oversized || before?.content === null || after?.content === null
     return {
       path: (after ?? before)!.path, oldPath: before?.path,
       kind: !before ? 'added' : !after ? 'deleted' : before.path !== after.path ? 'renamed' : 'modified',
       message: binary ? `Binary, submodule, or oversized file. Old: ${before?.size ?? 0} bytes (${before?.hash ?? 'absent'}); new: ${after?.size ?? 0} bytes (${after?.hash ?? 'absent'}). Review outside the UI before approving.` : before && after && before.mode !== after.mode ? `File mode changed: ${before.mode.toString(8)} → ${after.mode.toString(8)}` : '',
       // Bound pathological diffs; show original text if the operation times out.
-      lines: binary ? [] : (diffLines(before?.content ?? '', after?.content ?? '', { timeout: 500 }) ?? []).map(c => ({ kind: c.added ? 'insert' : c.removed ? 'delete' : 'equal', text: c.value })),
+      lines: binary ? [] : (diffLines(before?.content ?? '', after?.content ?? '', { timeout: 50 }) ?? []).map(c => ({ kind: c.added ? 'insert' : c.removed ? 'delete' : 'equal', text: c.value })),
       oldText: binary ? null : before?.content ?? '', newText: binary ? null : after?.content ?? '',
     }
   }

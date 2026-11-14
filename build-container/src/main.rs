@@ -78,7 +78,9 @@ async fn dependencies(dir: &Path, opts: &[String]) -> Result<()> {
     let conf = alpm_utils::config::Config::new()?;
     let alpm = alpm_utils::alpm_with_conf(&conf)?;
     let mut cache = raur::Cache::new();
-    let raur = raur::Handle::new();
+    // raur 7 uses hyper 0.14/h2 0.3, which has no patched h2 release for
+    // RUSTSEC-2026-0258. Keep the AUR RPC client on HTTP/1 until it is upgraded.
+    let raur = raur::Handle::new_with_client(reqwest::Client::builder().http1_only().build()?);
     let ambiguous = Arc::new(Mutex::new(Vec::new()));
     let choices = ambiguous.clone();
     let actions = Resolver::new(
@@ -135,7 +137,8 @@ async fn dependencies(dir: &Path, opts: &[String]) -> Result<()> {
     drop(actions);
     drop(alpm);
     if !repo.is_empty() {
-        run(Command::new("sudo")
+        run(Command::new("proot")
+            .arg("-0")
             .args(["pacman", "-S", "--needed", "--noconfirm", "--"])
             .args(repo))?;
     }
@@ -189,7 +192,8 @@ async fn dependencies(dir: &Path, opts: &[String]) -> Result<()> {
         let (path, _) = pending.remove(i);
         run(&mut build_command(&path, &[], true))?;
         let packages = package_list(&path, &[])?;
-        run(Command::new("sudo")
+        run(Command::new("proot")
+            .arg("-0")
             .args(["pacman", "-U", "--needed", "--noconfirm", "--"])
             .args(packages))?;
     }
@@ -303,26 +307,6 @@ fn collect(dir: &Path, opts: &[String], log: &Path, results: &Path, bundle: &Pat
     Ok(())
 }
 
-fn upload(bundle: &Path, url: &str) -> Result<()> {
-    // reqwest errors can include the URL; discard them at this boundary.
-    let result = (|| {
-        let file = fs::File::open(bundle)?;
-        let len = file.metadata()?.len();
-        let response = reqwest::blocking::Client::builder()
-            .redirect(reqwest::redirect::Policy::none())
-            .build()?
-            .put(url)
-            .header(reqwest::header::CONTENT_LENGTH, len)
-            .body(file)
-            .send()?;
-        if !matches!(response.status().as_u16(), 200 | 201 | 204) {
-            bail!("upload rejected");
-        }
-        Ok::<_, anyhow::Error>(())
-    })();
-    result.map_err(|_| anyhow::anyhow!("bundle upload failed"))
-}
-
 fn checkout_approved_source(root: &Path, revision: &str) -> Result<()> {
     if revision.len() != 40 || !revision.bytes().all(|b| b.is_ascii_hexdigit()) {
         bail!("missing or invalid approved revision");
@@ -333,10 +317,6 @@ fn checkout_approved_source(root: &Path, revision: &str) -> Result<()> {
 }
 
 async fn execute() -> std::result::Result<(), (i32, anyhow::Error)> {
-    let url = env::var("AB_UPLOAD_URL")
-        .ok()
-        .filter(|s| !s.is_empty())
-        .ok_or_else(|| (107, anyhow::anyhow!("missing task upload URL")))?;
     let source = env::var("AB_SOURCE")
         .ok()
         .filter(|s| !s.is_empty())
@@ -364,7 +344,10 @@ async fn execute() -> std::result::Result<(), (i32, anyhow::Error)> {
     }
     let opts = options(&env::var("AB_OPTIONS").unwrap_or_default());
     println!("INFO: updating packages...");
-    run(Command::new("sudo").args(["pacman", "-Syu", "--noconfirm"])).map_err(|e| (103, e))?;
+    run(Command::new("proot")
+        .arg("-0")
+        .args(["pacman", "-Syu", "--noconfirm"]))
+    .map_err(|e| (103, e))?;
     println!("INFO: installing missing dependencies...");
     dependencies(&dir, &opts).await.map_err(|e| (104, e))?;
     let timestamp = SystemTime::now()
@@ -373,13 +356,9 @@ async fn execute() -> std::result::Result<(), (i32, anyhow::Error)> {
         .as_secs();
     let log = home.join(format!("{timestamp}-build.log"));
     build(&dir, &opts, &log).map_err(|e| (105, e))?;
-    let bundle = home.join("bundle.tar");
+    let bundle = PathBuf::from("/results/bundle.tar");
     collect(&dir, &opts, &log, Path::new("/results"), &bundle).map_err(|e| (106, e))?;
-    // Blocking HTTP runs outside the Tokio runtime.
-    std::thread::spawn(move || upload(&bundle, &url))
-        .join()
-        .map_err(|_| (107, anyhow::anyhow!("upload thread failed")))?
-        .map_err(|e| (107, e))
+    Ok(())
 }
 
 #[tokio::main(flavor = "current_thread")]
@@ -398,7 +377,6 @@ async fn main() {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::net::TcpListener;
 
     fn fixture() -> Srcinfo {
         Srcinfo::from_buf(&b"pkgbase = sample\npkgver = 2\npkgrel = 1\narch = x86_64\narch = aarch64\nmakedepends = cmake>=3\ncheckdepends = test-runner\ncheckdepends_x86_64 = arch-test\npkgname = sample\ndepends = sibling>=2\ndepends = virtual=2\ndepends_x86_64 = native>=1\ndepends_aarch64 = foreign\npkgname = sibling\nprovides = virtual=2\n"[..]).unwrap()
@@ -481,40 +459,6 @@ mod tests {
         let text = fs::read_to_string(log.path()).unwrap();
         assert!(text.contains("output"));
         assert!(text.contains("error"));
-    }
-
-    #[test]
-    fn upload_statuses_and_secret_redaction() {
-        for status in [200, 201, 204, 302, 403, 500] {
-            let listener = TcpListener::bind("127.0.0.1:0").unwrap();
-            let url = format!("http://{}/secret-grant", listener.local_addr().unwrap());
-            let server = std::thread::spawn(move || {
-                let (mut stream, _) = listener.accept().unwrap();
-                let mut request = Vec::new();
-                let mut byte = [0];
-                while !request.ends_with(b"\r\n\r\n") {
-                    stream.read_exact(&mut byte).unwrap();
-                    request.push(byte[0]);
-                }
-                let mut body = [0; 6];
-                stream.read_exact(&mut body).unwrap();
-                assert_eq!(&body, b"bundle");
-                assert!(request.starts_with(b"PUT /secret-grant HTTP/1.1"));
-                write!(
-                    stream,
-                    "HTTP/1.1 {status} Test\r\nContent-Length: 0\r\nConnection: close\r\n\r\n"
-                )
-                .unwrap();
-            });
-            let temp = tempfile::NamedTempFile::new().unwrap();
-            fs::write(temp.path(), b"bundle").unwrap();
-            let result = upload(temp.path(), &url);
-            assert_eq!(result.is_ok(), matches!(status, 200 | 201 | 204));
-            if let Err(e) = result {
-                assert!(!format!("{e:#}").contains("secret-grant"));
-            }
-            server.join().unwrap();
-        }
     }
 }
 

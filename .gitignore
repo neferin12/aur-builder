@@ -29,3 +29,15 @@ config.yaml
 # Local devcontainer databases and public CA export
 /.devcontainer/state/
 /.devcontainer/__pycache__/
+
+/.env.server
+/.env.worker
+/.env.repo
+/.env.notifier
+/.env.web
+/.env.migrate
+/rabbitmq-security/
+
+/build-egress/host-deny.acl
+
+/repo-signing-runtime/

@@ -1,3 +1,4 @@
+import { limitAuthentication } from './rate-limit'
 import { createHash, randomUUID } from 'node:crypto'
 import * as oidc from 'openid-client'
 import { z } from 'zod'
@@ -36,15 +37,25 @@ export async function identity(event: H3Event, db: Database = database()) {
   return { user, csrf: session.csrf, sessionId: sid }
 }
 export async function login(event: H3Event) {
+  limitAuthentication(event)
   const config = authConfig(), client = await oidcClient(), db = database()
   const verifier = oidc.randomPKCECodeVerifier(), nonce = oidc.randomNonce(), state = oidc.randomState(), browser = randomUUID()
-  await db.oidc_login.deleteMany({ where: { expires_at: { lte: now() } } })
   await db.oidc_login.create({ data: { id: state, payload: JSON.stringify({ verifier, nonce, browser, context: config.context }), expires_at: now() + 600n } })
   setCookie(event, loginCookie, browser, { ...cookieOptions, maxAge: 600 })
   const url = oidc.buildAuthorizationUrl(client, { redirect_uri: `${config.origin}/auth/callback`, scope: ['openid', ...config.scopes].join(' '), state, nonce, code_challenge: await oidc.calculatePKCECodeChallenge(verifier), code_challenge_method: 'S256' })
   return sendRedirect(event, url.href, 303)
 }
 export async function callback(event: H3Event) {
+  limitAuthentication(event)
+  try { return await completeCallback(event) }
+  catch (error) {
+    // Do not retain authorization codes, state, cookies, provider responses, or
+    // exception text. Failure records deliberately identify no unverified subject.
+    await database().access_audit.create({ data: { id: randomUUID(), actor: 'anonymous', target: 'authentication', detail: 'auth.login_failed', created_at: now() } })
+    throw error
+  }
+}
+async function completeCallback(event: H3Event) {
   const config = authConfig(), db = database(), query = getQuery(event)
   if (typeof query.state !== 'string' || typeof query.code !== 'string') throw createError({ statusCode: 400, message: 'Invalid OIDC response' })
   const row = await db.oidc_login.findFirst({ where: { id: query.state, expires_at: { gt: now() } } })
@@ -77,6 +88,7 @@ export async function callback(event: H3Event) {
   const groups = claims[config.groupClaim]
   const admin = Array.isArray(groups) && groups.includes(config.adminGroup)
   const subject = claims.sub, name = typeof claims.name === 'string' ? claims.name : subject
+  const ttl = admin ? Math.min(config.ttl, 300) : config.ttl
   const sid = randomUUID(), csrf = randomUUID()
   await transaction(db, async tx => {
     const existing = await tx.web_user.findUnique({ where: { issuer_subject: { issuer: config.issuer, subject } } })
@@ -89,14 +101,19 @@ export async function callback(event: H3Event) {
     const old = getCookie(event, sessionCookie)
     if (old) await tx.web_session.deleteMany({ where: { id: hash(old) } })
     await tx.web_session.deleteMany({ where: { expires_at: { lte: now() } } })
-    await tx.web_session.create({ data: { id: hash(sid), user_id: user.id, csrf, expires_at: now() + BigInt(config.ttl), auth_context: config.context } })
+    await tx.web_session.create({ data: { id: hash(sid), user_id: user.id, csrf, expires_at: now() + BigInt(ttl), auth_context: config.context } })
+    await tx.access_audit.create({ data: { id: randomUUID(), actor: user.id, target: user.id, detail: 'auth.login', created_at: now() } })
   })
-  setCookie(event, sessionCookie, sid, { ...cookieOptions, maxAge: config.ttl })
+  setCookie(event, sessionCookie, sid, { ...cookieOptions, maxAge: ttl })
   deleteCookie(event, loginCookie, cookieOptions)
   return sendRedirect(event, '/', 303)
 }
 export async function logout(event: H3Event, db: Database = database()) {
   const sid = getCookie(event, sessionCookie)
-  if (sid) await db.web_session.deleteMany({ where: { id: hash(sid) } })
+  if (sid) await transaction(db, async tx => {
+    const session = await tx.web_session.findFirst({ where: { id: hash(sid) } })
+    await tx.web_session.deleteMany({ where: { id: hash(sid) } })
+    if (session) await tx.access_audit.create({ data: { id: randomUUID(), actor: session.user_id, target: session.user_id, detail: 'auth.logout', created_at: now() } })
+  })
   deleteCookie(event, sessionCookie, cookieOptions)
 }

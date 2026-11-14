@@ -23,13 +23,14 @@ const candidateId = z.object({ id: z.string().min(1).max(200) })
 export const router = {
   session: authorized('session').handler(({ context }) => ({ user: context.session.user, csrf: context.session.csrf })),
   packages: authorized('view').handler(({ context }) => repository.packages(context.db)),
-  history: authorized('view').input(id).handler(({ context, input }) => repository.history(context.db, input.id)),
-  buildLog: authorized('view').input(id).handler(({ context, input }) => repository.buildLog(context.db, input.id)),
-  reviews: authorized('view').input(z.object({ status: z.enum(['pending', 'approved', 'rejected', 'superseded', 'all']).default('pending') })).handler(({ context, input }) => repository.reviews(context.db, input.status)),
+  history: authorized('view').input(id.extend({ before: z.number().int().positive().optional() })).handler(({ context, input }) => repository.history(context.db, input.id, input.before)),
+  buildLog: authorized('approve').input(id).handler(({ context, input }) => repository.buildLog(context.db, input.id)),
+  reviews: authorized('view').input(z.object({ before: z.string().max(200).optional(), status: z.enum(['pending', 'approved', 'rejected', 'superseded', 'all']).default('pending') })).handler(({ context, input }) => repository.reviews(context.db, input.status, input.before)),
   review: authorized('view').input(candidateId).handler(({ context, input }) => repository.review(context.db, input.id)),
   decide: authorized('approve', true).input(candidateId.extend({ decision: z.enum(['approve', 'reject']), comment: z.string().max(16000).default('') })).handler(({ context, input }) => repository.decide(context.db, input.id, context.session.user.id, input.decision, input.comment)),
   rebuild: authorized('rebuild', true).input(id).handler(({ context, input }) => repository.rebuild(context.db, input.id, context.session.user.id)),
   users: authorized('admin').handler(({ context }) => context.db.web_user.findMany({ orderBy: { display_name: 'asc' } })),
+  revokeSessions: authorized('admin', true).input(z.object({ id: z.string().min(1).max(200) })).handler(({ context, input }) => repository.revokeSessions(context.db, context.session.user.id, input.id)),
   updateUser: authorized('admin', true).input(z.object({ id: z.string().min(1), can_view: z.boolean(), can_rebuild: z.boolean(), can_approve: z.boolean(), disabled: z.boolean() })).handler(({ context, input }) => repository.updateAccess(context.db, context.session.user.id, input)),
   logout: authorized('session', true).handler(async ({ context }) => { await logout(context.event, context.db); return { redirect: '/auth/signed-out' } }),
 }

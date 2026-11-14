@@ -16,7 +16,7 @@ features:
     details: Track AUR packages and Git repositories, with per-package build options and environment variables.
     link: /reference/configuration
   - title: Keep storage private
-    details: Workers upload through task-specific presigned URLs. Garage credentials stay with server-side services.
+    details: Workers authenticate completed bundles and upload with short-lived grants. Build sandboxes receive no storage or signing credentials.
     link: /guide/storage
   - title: Publish signed packages
     details: Authenticate pacman clients, sign packages and databases with GPG, and serve temporary download URLs.

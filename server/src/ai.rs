@@ -57,7 +57,11 @@ fn policy() -> Policy {
 }
 pub fn start(db: Database, storage: common::storage::Storage) {
     let p = policy();
-    log::info!("AI review service configured: mode={}, model={}", p.mode, p.model);
+    log::info!(
+        "AI review service configured: mode={}, model={}",
+        p.mode,
+        p.model
+    );
     common::messaging::supervise(async move {
         loop {
             match db.candidates().await {
@@ -93,12 +97,28 @@ pub fn start(db: Database, storage: common::storage::Storage) {
                             }
                             _ => {}
                         }
-                        log::info!("Starting AI review: package={}, candidate={}", c.payload.name, c.id);
+                        log::info!(
+                            "Starting AI review: package={:?}, candidate={:?}",
+                            c.payload.name,
+                            c.id
+                        );
                         let result = review(&db, &c, &p).await;
-                        log::info!("AI review completed: package={}, candidate={}, recommends_approval={}, requires_human_review={}", c.payload.name, c.id, result.get("approve").and_then(Value::as_bool).unwrap_or(false), result.get("error").is_some());
+                        log::info!(
+                            "AI review completed: package={:?}, candidate={:?}, recommends_approval={}, requires_human_review={}",
+                            c.payload.name,
+                            c.id,
+                            result
+                                .get("approve")
+                                .and_then(Value::as_bool)
+                                .unwrap_or(false),
+                            result.get("error").is_some()
+                        );
                         let approve = can_auto_approve(&c, &p, &result);
                         if let Err(e) = db.store_ai(&c.id, &result).await {
-                            log::error!("Could not persist AI review: candidate={}, error={e}", c.id);
+                            log::error!(
+                                "Could not persist AI review: candidate={:?}, error={e}",
+                                c.id
+                            );
                             continue;
                         }
                         if approve {
@@ -112,9 +132,13 @@ pub fn start(db: Database, storage: common::storage::Storage) {
                                 )
                                 .await
                             {
-                                log::error!("AI approval failed: candidate={}, error={e}", c.id);
+                                log::error!("AI approval failed: candidate={:?}, error={e}", c.id);
                             } else {
-                                log::info!("Release approved by AI: package={}, candidate={}", c.payload.name, c.id);
+                                log::info!(
+                                    "Release approved by AI: package={:?}, candidate={:?}",
+                                    c.payload.name,
+                                    c.id
+                                );
                             }
                         }
                         if p.mode == "auto_approve" {

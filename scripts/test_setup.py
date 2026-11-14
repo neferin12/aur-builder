@@ -43,7 +43,7 @@ class SetupTests(unittest.TestCase):
                 db.execute("CREATE TABLE seaql_migrations (version TEXT PRIMARY KEY)")
                 db.commit()
                 self.assertFalse(wizard.database_ready())
-                db.execute("INSERT INTO seaql_migrations VALUES (?)", ("m20261109_000001_web_database_compatibility",))
+                db.execute("INSERT INTO seaql_migrations VALUES (?)", ("m20261111_000001_security_indexes",))
                 db.commit()
                 self.assertTrue(wizard.database_ready())
 
@@ -109,11 +109,14 @@ class SetupTests(unittest.TestCase):
     def test_deployment_starts_migrations_before_dependents(self):
         with tempfile.TemporaryDirectory() as directory:
             wizard = setup.Setup(directory)
+            wizard.env.set("RABBITMQ_DEFAULT_USER", "test-admin")
+            wizard.env.set("RABBITMQ_DEFAULT_PASS", "test-password")
+            wizard.env.save()
             calls=[]
             def compose(*args,**kwargs):
                 calls.append(args)
                 return subprocess.CompletedProcess(args,0,"","")
-            with patch.object(setup.shutil,"which",return_value="/bin/tool"), patch.object(setup,"run"), patch.object(setup,"yes",side_effect=[True,False,False]), patch.object(setup.time,"sleep"), patch.object(wizard,"compose",side_effect=compose), patch.object(wizard,"wait"), patch.object(wizard,"provision_garage"), patch.object(wizard,"signing"), patch.object(wizard,"ensure_running"):
+            with patch.object(setup.shutil,"which",return_value="/bin/tool"), patch.object(setup,"run"), patch.object(setup,"yes",side_effect=[True,False,False]), patch.object(setup.time,"sleep"), patch.object(wizard,"compose",side_effect=compose), patch.object(wizard,"wait"), patch.object(wizard,"provision_garage"), patch.object(wizard,"signing"), patch.object(wizard,"ensure_running"), patch("scripts.provision_build_network.provision"), patch("scripts.prepare_runtime.prepare"):
                 wizard.deploy()
             server=("up","-d","--no-deps","server")
             dependents=("up","-d","--no-deps","worker","repo","web")

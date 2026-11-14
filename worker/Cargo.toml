@@ -6,7 +6,7 @@ edition = "2024"
 [dependencies]
 common = { path = "../common" }
 futures-util = "~0.3.30"
-lapin = { version = "~2.5.0", features = ["native-tls"]}
+lapin = { version = "~2.5.0", default-features = false, features = ["native-tls"] }
 log = "~0.4"
 tokio = {version = "1.45", features = ["full"] }
 simple_logger = "~5.0.0"
@@ -16,3 +16,11 @@ sea-orm = "~1.1.4"
 bytes = "1.9.0"
 
 database = {path="../database"}
+
+reqwest = { version = "~0.12", features = ["stream"] }
+tokio-util = { version = "0.7", features = ["io"] }
+tempfile = "3"
+tar = "0.4"
+
+[dev-dependencies]
+axum = "~0.8.1"

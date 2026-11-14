@@ -25,5 +25,5 @@ export function authConfig() {
   const ttl = Number(process.env.AB_SESSION_SECONDS ?? 3600)
   if (!Number.isInteger(ttl) || ttl < 60 || ttl > 86400) throw new Error('AB_SESSION_SECONDS must be between 60 and 86400')
   return { issuer, origin, clientId, secret, groupClaim, adminGroup, scopes, ttl,
-    context: hash(JSON.stringify([issuer, origin, clientId, secret, groupClaim, adminGroup, scopes, ttl])) }
+    context: hash(JSON.stringify(['admin-session-cap-v1', issuer, origin, clientId, secret, groupClaim, adminGroup, scopes, ttl])) }
 }

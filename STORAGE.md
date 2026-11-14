@@ -3,9 +3,10 @@
 For the browsable VitePress guides, see [Garage storage](docs/guide/storage.md),
 [GPG signing](docs/guide/signing.md), and [operations](docs/guide/operations.md).
 
-Workers now upload one tar bundle using the PUT capability included in each task.
-They need RabbitMQ access and connectivity to `AB_S3_PUBLIC_ENDPOINT`, but no S3
-credentials. The server and repo service need S3 credentials. Package downloads
+Workers collect one bounded tar bundle after each build and issue the upload grant
+at that point. They need S3 credentials and an artifact-authentication key; neither
+enters the build container or task queue. Ingestion verifies the worker receipt and
+bundle digest before signing. Package downloads
 require Basic authentication at repo and receive a 15 minute signed redirect.
 Anyone holding that redirect can use it until expiry. Do not log query strings on
 the S3 reverse proxy, and use HTTPS for both externally reachable endpoints.
@@ -80,10 +81,12 @@ build-container image alongside workers and set `AB_BUILDER_TAG` accordingly.
 Existing Gitea packages are not imported; force rebuilds through the existing web
 interface to populate this repository.
 
-Upload grants last 24 hours by default (`AB_UPLOAD_TTL`, max seven days). Workers
-return expired queued tasks through `expired_tasks`; the server validates them and
-issues a new attempt. A build that runs beyond its grant fails upload and must be
-rebuilt. Configure the lifetime above expected queue time plus build duration.
+Upload grants last 900 seconds by default (`AB_UPLOAD_TTL`, range 60–900), issued
+after a build finishes. Queue wait and build duration do not consume the grant.
+Worker, build-container, and repo upgrades must be coordinated. Follow the
+[security migration guide](docs/guide/upgrading.md#security-hardening-migration)
+for scoped broker credentials, generated service env files, runtime key staging,
+isolated networks, and resource limits.
 
 The database persists issued attempts and the authoritative published catalog.
 The repo acknowledges ingestion only after uploading packages, detached signatures,

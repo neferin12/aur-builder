@@ -1,5 +1,5 @@
 //! Minimal S3 SigV4 query signing. URLs are capabilities; never log them.
-use crate::types::{BuildTaskTransmissionFormat, UploadGrant};
+use crate::types::BuildTaskTransmissionFormat;
 use hmac::{Hmac, Mac};
 use sea_orm::sqlx::types::chrono::Utc;
 use sha2::{Digest, Sha256};
@@ -70,6 +70,9 @@ impl Storage {
         seconds: u64,
         public: bool,
     ) -> Result<String, Error> {
+        if key.is_empty() || key.split('/').any(|part| matches!(part, "" | "." | "..")) {
+            return Err("invalid object key".into());
+        }
         if !(1..=604800).contains(&seconds) {
             return Err("invalid signing lifetime".into());
         }
@@ -126,13 +129,9 @@ impl Storage {
         self.renew(task)
     }
     pub fn renew(&self, task: &mut BuildTaskTransmissionFormat) -> Result<(), Error> {
-        let ttl = std::env::var("AB_UPLOAD_TTL")
-            .unwrap_or("86400".into())
-            .parse::<u64>()?;
-        task.upload = Some(UploadGrant {
-            url: self.sign("PUT", &task.object_key, ttl, true)?,
-            expires_at: Utc::now().timestamp() + ttl as i64,
-        });
+        // Uploads are issued by the worker only after artifact collection.
+        // Never persist a capability URL in the task queue.
+        task.upload = None;
         Ok(())
     }
 }
@@ -158,6 +157,9 @@ mod tests {
             access: "test".into(),
             secret: "secret".into(),
         };
+        for key in ["../file", "a/../file", "./file", "a//file", "/file", ""] {
+            assert!(storage.sign("GET", key, 60, true).is_err());
+        }
         assert!(
             storage
                 .sign("GET", "file", 60, true)

@@ -106,10 +106,12 @@ the same host used by workers. Configure `AB_BUILDER` and `AB_BUILDER_TAG` to ma
 | `AB_SOURCE` | Task Git URL |
 | `AB_SUBFOLDER` | Optional package subdirectory |
 | `AB_OPTIONS` | Optional `makepkg` arguments |
-| `AB_UPLOAD_URL` | Task-specific presigned PUT URL; never log it |
+| `AB_REVISION` | Exact approved commit |
 
-The container also receives per-package environment entries. It does not receive
-S3 credentials or signing keys. Deploy updated builder images alongside matching
+The container also receives allowed `AB_PKG_` per-package environment entries. It does not receive
+S3 credentials, upload grants, receipt keys, or signing keys. It writes a bounded
+bundle and completion record; the worker exports the bytes, freezes the sandbox,
+and uploads an authenticated result. Deploy updated builder images alongside matching
 workers.
 
 The builder is a standalone Rust crate under `build-container`, excluded from the

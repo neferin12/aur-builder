@@ -109,8 +109,9 @@ function adapt(sqlite: SQLite.TransactionClient, postgres: Postgres.TransactionC
   },
   release_candidate: {
    findMany: (args?: Omit<SQLite.release_candidateFindManyArgs, 'select' | 'include' | 'omit'>) => {
-    if (isPostgres) return postgres.release_candidate.findMany(args)
-    return sqlite.release_candidate.findMany(args)
+    const select = { id: true, payload: true, revision: true, state: true, created_at: true } as const
+    if (isPostgres) return postgres.release_candidate.findMany({ ...args, select })
+    return sqlite.release_candidate.findMany({ ...args, select })
    },
    findUnique: (args: Omit<SQLite.release_candidateFindUniqueArgs, 'select' | 'include' | 'omit'>) => {
     if (isPostgres) return postgres.release_candidate.findUnique(args)
@@ -149,10 +150,16 @@ function adapt(sqlite: SQLite.TransactionClient, postgres: Postgres.TransactionC
    },
   },
   build_results: {
-   latestStatuses: () => isPostgres
-     ? postgres.build_results.findMany({ orderBy: { id: 'desc' }, select: { package_id: true, success: true } })
-     : sqlite.build_results.findMany({ orderBy: { id: 'desc' }, select: { package_id: true, success: true } }),
-   findMany: (args?: { where?: Pick<SQLite.build_resultsWhereInput, 'package_id'>; orderBy?: Pick<SQLite.build_resultsOrderByWithRelationInput, 'id'> }) => isPostgres ? postgres.build_results.findMany(args) : sqlite.build_results.findMany(args),
+   latestStatuses: async () => {
+     const query = `SELECT b.package_id, b.success FROM build_results b JOIN (SELECT package_id, MAX(id) AS id FROM build_results GROUP BY package_id) latest ON b.id = latest.id`
+     return isPostgres
+       ? postgres.$queryRawUnsafe<{ package_id: bigint; success: boolean }[]>(query)
+       : sqlite.$queryRawUnsafe<{ package_id: bigint; success: boolean }[]>(query)
+   },
+   findMany: (args?: { take?: number; where?: Pick<SQLite.build_resultsWhereInput, 'package_id' | 'id'>; orderBy?: Pick<SQLite.build_resultsOrderByWithRelationInput, 'id'> }) => {
+     const select = { id: true, package_id: true, exit_code: true, success: true, version: true, started_at: true, finished_at: true } as const
+     return isPostgres ? postgres.build_results.findMany({ ...args, select }) : sqlite.build_results.findMany({ ...args, select })
+   },
    findUnique: (args: { where: { id: NonNullable<SQLite.build_resultsWhereUniqueInput['id']> } }) => isPostgres ? postgres.build_results.findUnique(args) : sqlite.build_results.findUnique(args),
   },
  }
@@ -166,14 +173,14 @@ export function createPostgresClient(url: string) {
 export function createDatabase(url: string) {
   const normalized = databaseUrl(url), isPostgres = !normalized.startsWith('file:')
   // Only the selected client connects; the other supplies its generated type contract.
-  const sqlite = createSQLiteClient(isPostgres ? 'file:/unused' : normalized)
-  const postgres = createPostgresClient(isPostgres ? normalized : 'postgresql://unused:unused@localhost/unused')
+  const sqlite = (isPostgres ? undefined : createSQLiteClient(normalized))!
+  const postgres = (isPostgres ? createPostgresClient(normalized) : undefined)!
   return {
     ...adapt(sqlite, postgres, isPostgres),
     transaction: <T>(work: (tx: Transaction) => Promise<T>) => isPostgres
       ? postgres.$transaction(tx => work(adapt(sqlite, tx, true)), { timeout: 15000 })
       : sqlite.$transaction(tx => work(adapt(tx, postgres, false)), { timeout: 15000 }),
-    $disconnect: async () => { await Promise.all([sqlite.$disconnect(), postgres.$disconnect()]) },
+    $disconnect: async () => { await Promise.all([sqlite?.$disconnect(), postgres?.$disconnect()]) },
   }
 }
 export type Database = ReturnType<typeof createDatabase>
@@ -190,5 +197,5 @@ export async function transaction<T>(db: Database, work: (tx: Transaction) => Pr
 }
 export async function assertSchema(db: Database) {
   const versions = await db.seaql_migrations.findMany()
-  if (!versions.some(v => v.version === 'm20261109_000001_web_database_compatibility')) throw new Error('Database schema is outdated; run Rust migrations before starting Nuxt')
+  if (!versions.some(v => v.version === 'm20261111_000001_security_indexes')) throw new Error('Database schema is outdated; run Rust migrations before starting Nuxt')
 }

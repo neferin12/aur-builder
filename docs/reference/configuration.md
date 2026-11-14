@@ -65,16 +65,17 @@ can also be supplied in a worker configuration file selected with `AB_CONFIG_PAT
 | --- | --- |
 | `GARAGE_RPC_SECRET` | 64-character hex cluster secret; setup generates it |
 | `AB_S3_ENDPOINT` | Internal S3 origin: `http://garage:3900` |
-| `AB_S3_PUBLIC_ENDPOINT` | HTTP(S) origin reachable by workers and clients; use HTTPS publicly |
+| `AB_S3_PUBLIC_ENDPOINT` | HTTP(S) origin reachable by pacman clients; use HTTPS publicly |
 | `AB_S3_BUCKET` | Private bucket; setup default `aur-builder` |
 | `AB_S3_REGION` | Garage region: `garage` |
 | `AB_S3_ACCESS_KEY` | Garage-issued S3 access key |
 | `AB_S3_SECRET_KEY` | Matching Garage-issued secret |
-| `AB_UPLOAD_TTL` | Upload URL lifetime: `86400` seconds (24 hours) |
+| `AB_ARTIFACT_KEY` | Generated receipt key shared only by worker and repo; minimum 32 bytes |
+| `AB_UPLOAD_TTL` | Worker-issued upload lifetime: `900` seconds (range 60–900) |
 | `AB_DOWNLOAD_TTL` | Download URL lifetime: `900` seconds (15 minutes) |
 | `AB_REPO_MAX_BYTES` | Bundle download/extracted package limit: `4294967296` bytes (4 GiB) |
 
-URL lifetimes must be between 1 and 604800 seconds. Endpoint URLs must be origins,
+Download lifetimes must be between 1 and 604800 seconds; uploads are limited to 60–900 seconds. Endpoint URLs must be origins,
 without credentials, query strings, fragments, or path prefixes. Internal and
 external origins may differ. If no public origin is supplied, signing falls back
 to the internal origin, which may not be reachable by clients.
@@ -103,7 +104,11 @@ material. Never give the signing key to workers.
 Setup can build `aur-builder-build-container:setup-local` and save those overrides.
 The build image must exist on the worker's Docker host or be pullable from a
 registry. Workers attempt a pull before each build and can use an existing local
-image if pulling fails. The worker needs the Docker socket but no storage credentials.
+image if pulling fails. The trusted worker needs its scoped RabbitMQ credentials, storage credentials,
+`AB_ARTIFACT_KEY`, and Docker socket group access. Build containers receive none
+of those credentials. See [resource budgets](../guide/upgrading.md#rootless-build-filesystem-and-resource-budgets)
+for `AB_BUILD_MEMORY_MIB`, `AB_BUILD_DISK_MIB`, `AB_BUILD_OUTPUT_MIB`, and
+`AB_BUILD_TIMEOUT_SECONDS`.
 
 ## Optional SMTP notifications
 
@@ -124,7 +129,8 @@ Leave the notifier stopped if you do not use email notifications.
 The web UI requires `AB_WEB_URL`, `AB_OIDC_ISSUER`, `AB_OIDC_CLIENT_ID`,
 `AB_OIDC_CLIENT_SECRET`, and `AB_OIDC_ADMIN_GROUP`. `AB_OIDC_GROUPS_CLAIM` defaults
 to `groups`; `AB_OIDC_SCOPES` defaults to `profile` (space-separated, with `openid`
-always included); `AB_SESSION_SECONDS` defaults to `3600` (range 60–86400). Both web URL
+always included); `AB_SESSION_SECONDS` defaults to `3600` (range 60–86400), with a
+five-minute cap for group-derived administrator sessions. Both web URL
 and issuer require HTTPS. OIDC discovery, authorization, token and signing-key
 endpoints must use HTTPS without URL credentials. The callback is `/auth/callback` on the configured web origin.
 
