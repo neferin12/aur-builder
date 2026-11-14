@@ -4,9 +4,7 @@ use common::errors::get_error_descriptions;
 use common::types::{Notification, ReviewNotification};
 use common::{connect_to_rabbitmq, get_rand_string};
 use futures_util::stream::StreamExt;
-use lapin::options::{
-    BasicAckOptions, BasicConsumeOptions, BasicNackOptions, BasicQosOptions, QueueDeclareOptions,
-};
+use lapin::options::{BasicAckOptions, BasicConsumeOptions, BasicNackOptions, BasicQosOptions};
 use lapin::types::FieldTable;
 use lettre::message::header::ContentType;
 use lettre::transport::smtp::authentication::Credentials;
@@ -40,17 +38,6 @@ async fn main() {
         .basic_qos(1, BasicQosOptions::default())
         .await
         .unwrap();
-    rx_channel
-        .queue_declare(
-            "notifications",
-            QueueDeclareOptions {
-                durable: true,
-                ..Default::default()
-            },
-            FieldTable::default(),
-        )
-        .await
-        .unwrap();
     let mut consumer = rx_channel
         .basic_consume(
             "notifications",
@@ -80,7 +67,10 @@ async fn main() {
                 delivery.ack(BasicAckOptions::default()).await.unwrap();
             }
             Err(e) => {
-                error!("Notification delivery failed; requeuing for retry in 5s: {:?}", e);
+                error!(
+                    "Notification delivery failed; requeuing for retry in 5s: {:?}",
+                    e
+                );
                 delivery
                     .nack(BasicNackOptions {
                         requeue: true,
@@ -136,6 +126,9 @@ fn render_notification(
             )
         }
     };
+    if subject.contains(['\r', '\n']) {
+        return Err("invalid email subject".into());
+    }
     Ok((
         subject,
         css_inline::inline(&tera.render(template, &context)?)?,
@@ -162,8 +155,15 @@ async fn receive_delivery(
 
     mailer.send(&email)?;
     match notification {
-        Notification::Build(result) => info!("Build notification sent: package={}, attempt={}", result.task.name, result.task.attempt),
-        Notification::Review(ReviewNotification::ReviewRequired { candidate_id, package_name, .. }) => info!("Review notification sent: package={package_name}, candidate={candidate_id}"),
+        Notification::Build(result) => info!(
+            "Build notification sent: package={}, attempt={}",
+            result.task.name, result.task.attempt
+        ),
+        Notification::Review(ReviewNotification::ReviewRequired {
+            candidate_id,
+            package_name,
+            ..
+        }) => info!("Review notification sent: package={package_name}, candidate={candidate_id}"),
     }
 
     Ok(())
@@ -206,5 +206,9 @@ mod tests {
         assert_eq!(subject, "Updated example");
         assert!(body.contains("successfully updated"));
         assert!(serde_json::from_str::<Notification>(r#"{"type":"unknown"}"#).is_err());
+        if let Notification::Build(mut malicious) = message {
+            malicious.task.name = "fixture\r\nBcc: attacker@example.com".into();
+            assert!(render_notification(&Notification::Build(malicious), &tera, "").is_err());
+        }
     }
 }

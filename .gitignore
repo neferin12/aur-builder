@@ -1,6 +1,7 @@
 /target
 sqlite.db
 .env
+.env.old
 config.yaml
 # Repository signing material
 /repo-gnupg/
@@ -16,3 +17,27 @@ config.yaml
 /docs/node_modules/
 /docs/.vitepress/cache/
 /docs/.vitepress/dist/
+
+# Nuxt application
+/web/node_modules/
+/web/.nuxt/
+/web/.output/
+/web/generated/
+/web/test-results/
+/web/playwright-report/
+
+# Local devcontainer databases and public CA export
+/.devcontainer/state/
+/.devcontainer/__pycache__/
+
+/.env.server
+/.env.worker
+/.env.repo
+/.env.notifier
+/.env.web
+/.env.migrate
+/rabbitmq-security/
+
+/build-egress/host-deny.acl
+
+/repo-signing-runtime/

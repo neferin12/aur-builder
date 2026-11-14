@@ -90,4 +90,7 @@ from older signing keys; keep the public keys needed to verify them.
 `repo-gnupg/` is excluded from Git and Docker build contexts. Keep its permissions
 restricted and back it up securely. The generated key is unencrypted for unattended
 operation, so possession of its files grants signing capability. Never mount this
-home into workers or distribute its secret-key export to clients.
+home into workers or distribute its secret-key export to clients. Run
+`python3 scripts/prepare_runtime.py` after key changes: repo reads the generated,
+service-owned `repo-signing-runtime` copy, while the operator retains ownership of
+the original home. Protect both directories and back up the original.

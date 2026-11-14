@@ -7,9 +7,7 @@ use common::errors::get_error_descriptions;
 use common::types::BuildTaskTransmissionFormat;
 use common::{connect_to_rabbitmq, get_rand_string};
 use futures_util::stream::StreamExt;
-use lapin::options::{
-    BasicAckOptions, BasicConsumeOptions, BasicNackOptions, BasicQosOptions, QueueDeclareOptions,
-};
+use lapin::options::{BasicAckOptions, BasicConsumeOptions, BasicNackOptions, BasicQosOptions};
 use lapin::types::FieldTable;
 
 #[macro_use]
@@ -21,6 +19,14 @@ async fn main() {
     simple_logger::init_with_env().unwrap();
 
     info!("Starting Aur-Builder Worker v{VERSION}");
+    assert!(
+        std::env::var("AB_ARTIFACT_KEY")
+            .expect("AB_ARTIFACT_KEY is required")
+            .len()
+            >= 32,
+        "AB_ARTIFACT_KEY must contain at least 32 bytes"
+    );
+    common::storage::Storage::from_env().expect("worker storage configuration is required");
 
     match pull_docker_image().await {
         Err(e) => warn!("Builder image could not be pulled: {e:?}"),
@@ -33,17 +39,6 @@ async fn main() {
     let rx_channel = conn.create_channel().await.unwrap();
     rx_channel
         .basic_qos(1, BasicQosOptions::default())
-        .await
-        .unwrap();
-    rx_channel
-        .queue_declare(
-            "pkg_build",
-            QueueDeclareOptions {
-                durable: true,
-                ..Default::default()
-            },
-            FieldTable::default(),
-        )
         .await
         .unwrap();
     let mut consumer = rx_channel
@@ -59,17 +54,6 @@ async fn main() {
     let tx_results = conn.create_channel().await.unwrap();
     tx_results
         .confirm_select(lapin::options::ConfirmSelectOptions::default())
-        .await
-        .unwrap();
-    tx_results
-        .queue_declare(
-            "build_results",
-            QueueDeclareOptions {
-                durable: true,
-                ..Default::default()
-            },
-            FieldTable::default(),
-        )
         .await
         .unwrap();
 
@@ -88,10 +72,19 @@ async fn main() {
             }
         };
 
-        match db.valid_attempt(&build_task).await {
+        let authorized: Result<bool, sea_orm::DbErr> = async {
+            Ok(db.valid_attempt(&build_task).await?
+                && db.latest_attempt(&build_task).await?
+                && db.attempt_needs_build(&build_task).await?)
+        }
+        .await;
+        match authorized {
             Ok(true) => {}
             Ok(false) => {
-                error!("Rejecting unapproved or unpinned build task: package={}, attempt={}", build_task.name, build_task.attempt);
+                error!(
+                    "Rejecting unapproved or unpinned build task: package={:?}, attempt={:?}",
+                    build_task.name, build_task.attempt
+                );
                 delivery
                     .reject(lapin::options::BasicRejectOptions { requeue: false })
                     .await
@@ -111,47 +104,27 @@ async fn main() {
                 continue;
             }
         }
-        if build_task
-            .upload
-            .as_ref()
-            .map(|g| g.expires_at <= sea_orm::sqlx::types::chrono::Utc::now().timestamp())
-            .unwrap_or(true)
-        {
-            tx_results
-                .queue_declare(
-                    "expired_tasks",
-                    QueueDeclareOptions {
-                        durable: true,
-                        ..Default::default()
-                    },
-                    FieldTable::default(),
-                )
-                .await
-                .unwrap();
-            warn!("Build upload grant expired or missing; requesting renewal: package={}, attempt={}", build_task.name, build_task.attempt);
-            let mut expired = build_task.clone();
-            expired.upload = None;
-            common::messaging::publish(
-                &tx_results,
-                "expired_tasks",
-                serde_json::to_vec(&expired).unwrap().as_slice(),
-            )
-            .await
-            .unwrap();
-            delivery.ack(BasicAckOptions::default()).await.unwrap();
-            continue;
-        }
         db.attempt_state(&build_task.attempt, "building")
             .await
             .expect("record build start");
         let build_started = std::time::Instant::now();
-        info!("Starting build: package={}, version={}, attempt={}", build_task.name, build_task.version, build_task.attempt);
+        info!(
+            "Starting build: package={:?}, version={:?}, attempt={:?}",
+            build_task.name, build_task.version, build_task.attempt
+        );
         match build_package(&build_task).await {
             Ok(results) => {
-                info!("Build completed: package={}, attempt={}, success={}, status_code={}, elapsed_ms={}", build_task.name, build_task.attempt, results.success, results.status_code, build_started.elapsed().as_millis());
+                info!(
+                    "Build completed: package={:?}, attempt={:?}, success={}, status_code={}, elapsed_ms={}",
+                    build_task.name,
+                    build_task.attempt,
+                    results.success,
+                    results.status_code,
+                    build_started.elapsed().as_millis()
+                );
                 if !results.success {
                     warn!(
-                        "Failed to build package '{}': {}",
+                        "Failed to build package {:?}: {}",
                         results.task.name,
                         get_error_descriptions(results.status_code)
                     );
@@ -163,7 +136,10 @@ async fn main() {
                 )
                 .await
                 .unwrap();
-                debug!("Build result published: package={}, attempt={}", build_task.name, build_task.attempt);
+                debug!(
+                    "Build result published: package={:?}, attempt={:?}",
+                    build_task.name, build_task.attempt
+                );
                 delivery.ack(BasicAckOptions::default()).await.expect("ack");
             }
             Err(error) => {
@@ -171,13 +147,17 @@ async fn main() {
                     .await
                     .expect("reset build state");
                 error!(
-                    "System error while building package '{}', attempt={}: {:?}",
+                    "System error while building package {:?}, attempt={:?}: {:?}",
                     build_task.name, build_task.attempt, error
                 );
                 delivery
-                    .nack(BasicNackOptions::default())
+                    .nack(BasicNackOptions {
+                        requeue: true,
+                        ..Default::default()
+                    })
                     .await
                     .expect("nack");
+                tokio::time::sleep(std::time::Duration::from_secs(2)).await;
             }
         }
     }

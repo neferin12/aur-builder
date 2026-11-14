@@ -1,5 +1,11 @@
 # Development & CI
 
+## Devcontainer
+
+For a preconfigured Node/Rust workspace with RabbitMQ, Keycloak test users,
+Mailpit, Garage, and PostgreSQL, see the [devcontainer setup](https://github.com/neferin12/aur-builder/tree/main/.devcontainer#readme).
+It uses isolated development databases and retains HTTPS/OIDC checks.
+
 ## Rust workspace
 
 Use a Rust toolchain supporting edition 2024, a C compiler, `pkg-config`, and the
@@ -14,12 +20,74 @@ cargo test --workspace
 The full test command includes database doctests using in-memory SQLite. External
 service integration tests are ignored unless explicitly enabled.
 
-The server applies migrations at startup. To run the web process against an
-already initialized local database:
+## Nuxt web application
+
+Use Node.js 24 and npm. The UI uses PrimeVue and oRPC; Nitro implements all web
+server behavior in TypeScript. The scheduler and other services remain Rust.
+
+Apply the Rust-owned migrations before starting Nuxt. For a database under the
+repository root:
 
 ```sh
-DATABASE_URL='sqlite:./db/sqlite.db?mode=rwc' cargo run -p web
+DATABASE_URL='sqlite:./db/sqlite.db?mode=rwc' cargo run -p database --example migrate
+cd web
+npm ci
+# Load the existing OIDC/storage settings from ../.env. SQLite paths are resolved
+# relative to the process working directory, so point back to the root's db/.
+DATABASE_URL='sqlite:../db/sqlite.db?mode=rwc' npm run dev -- --dotenv ../.env
 ```
+
+OIDC still requires the configured HTTPS origin. Put the development server behind
+an HTTPS reverse proxy and configure `AB_WEB_URL` accordingly. Production runs
+`npm run build` followed by `npm start`; use the existing Docker `web` target for
+container deployments. Compose runs the one-shot `migrate` service before web.
+Nuxt fails startup if the compatibility migration has not been applied.
+
+```sh
+cd web
+npm run typecheck
+npm test
+npm run build
+npx playwright install chromium
+npm run test:e2e
+```
+
+Vitest creates temporary SQLite fixtures using the Rust migrations. Set
+`TEST_POSTGRESQL_URL` to a **disposable database** to run the same integration
+suite against PostgreSQL; its fixture tables are cleared. Browser tests start an
+isolated HTTPS Nuxt deployment and a signed local OIDC provider. The committed
+localhost key/certificate are public test fixtures only.
+
+### Schema-derived database client
+
+Prisma 6 generates separate SQLite and PostgreSQL clients with `engineType = "client"`.
+JavaScript database adapters perform queries; Prisma’s query compiler runs as
+WebAssembly. The web service contains no native Rust query engine. Rust migrations are the
+schema authority: never run `prisma migrate` or `prisma db push` against the shared
+database. To refresh the committed Prisma schemas, first migrate disposable databases,
+then run:
+
+```sh
+cd web
+PRISMA_SQLITE_URL='file:/absolute/path/to/disposable.db' \
+PRISMA_POSTGRESQL_URL='postgresql://user:password@localhost/disposable' \
+  npm run db:introspect
+npm run db:generate
+```
+
+`npm run db:check` uses the same variables and fails on schema drift. CI runs it
+against fresh Rust-migrated databases. The introspection script makes existing
+SQLite text primary keys required for Prisma (application writers always supply
+UUIDs), and omits a relation whose legacy foreign-key scalar width differs from
+its target. Scalar column types remain schema-derived. The typed database adapter
+normalizes provider delegate interfaces without handwritten row types. The
+SQLite compatibility migration changes timestamp column declarations to TEXT
+without changing stored timestamps, so both Prisma and SeaORM can read them.
+
+Application requests use the inferred oRPC client. Authentication redirects are
+ordinary Nitro routes. Mutations require POST, the configured origin, a current
+session, the required permission, and the session's CSRF token. Upload grants,
+environment secrets, and full task payloads never enter frontend responses.
 
 Native repo processes need `gpg`, `bsdtar`, and `repo-add`; the repo Docker image
 includes these tools.
@@ -38,10 +106,12 @@ the same host used by workers. Configure `AB_BUILDER` and `AB_BUILDER_TAG` to ma
 | `AB_SOURCE` | Task Git URL |
 | `AB_SUBFOLDER` | Optional package subdirectory |
 | `AB_OPTIONS` | Optional `makepkg` arguments |
-| `AB_UPLOAD_URL` | Task-specific presigned PUT URL; never log it |
+| `AB_REVISION` | Exact approved commit |
 
-The container also receives per-package environment entries. It does not receive
-S3 credentials or signing keys. Deploy updated builder images alongside matching
+The container also receives allowed `AB_PKG_` per-package environment entries. It does not receive
+S3 credentials, upload grants, receipt keys, or signing keys. It writes a bounded
+bundle and completion record; the worker exports the bytes, freezes the sandbox,
+and uploads an authenticated result. Deploy updated builder images alongside matching
 workers.
 
 The builder is a standalone Rust crate under `build-container`, excluded from the

@@ -1,0 +1,4 @@
+Docker default seccomp profile from moby/profiles, Apache-2.0.
+Revision: 6049e40058759e8a1673ac1090ec6a7e36b9c9bd
+Source: https://github.com/moby/profiles/blob/6049e40058759e8a1673ac1090ec6a7e36b9c9bd/seccomp/default.json
+Retain seccomp.LICENSE when updating this file. Test rootless builds after updates.

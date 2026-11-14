@@ -1,0 +1,23 @@
+{
+    auto_https off
+    admin off
+}
+(tls) {
+    tls /certs/server.crt /certs/server.key
+}
+https://aur.localhost:8443 {
+    import tls
+    reverse_proxy dev:3000
+}
+https://auth.localhost:8443 {
+    import tls
+    reverse_proxy keycloak:8080
+}
+https://mail.localhost:8443 {
+    import tls
+    reverse_proxy mailpit:8025
+}
+https://s3.localhost:8443 {
+    import tls
+    reverse_proxy garage:3900
+}

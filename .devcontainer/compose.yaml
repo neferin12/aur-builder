@@ -1,0 +1,135 @@
+name: aur-builder-dev
+services:
+  dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: sleep infinity
+    init: true
+    volumes:
+      - ..:/workspaces/aur-builder:cached
+      - dev-certs:/dev-certs:ro
+      - cargo-registry:/usr/local/cargo/registry
+      - cargo-git:/usr/local/cargo/git
+    env_file: dev.env
+    environment:
+      AUR_DEVCONTAINER: "1"
+      NODE_EXTRA_CA_CERTS: /dev-certs/ca.crt
+      SSL_CERT_FILE: /etc/ssl/certs/ca-certificates.crt
+      CARGO_TARGET_DIR: /workspaces/aur-builder/target
+    depends_on:
+      certificates:
+        condition: service_completed_successfully
+      rabbitmq:
+        condition: service_healthy
+      keycloak:
+        condition: service_started
+      mailpit:
+        condition: service_started
+      garage:
+        condition: service_started
+      postgres:
+        condition: service_healthy
+      proxy:
+        condition: service_started
+  certificates:
+    build: ./certs
+    volumes:
+      - dev-certs:/certs
+    restart: "no"
+  proxy:
+    image: caddy:2.10.2-alpine
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - dev-certs:/certs:ro
+    ports:
+      - "127.0.0.1:8443:8443"
+    networks:
+      default:
+        aliases: [aur.localhost, auth.localhost, mail.localhost, s3.localhost]
+    depends_on:
+      certificates:
+        condition: service_completed_successfully
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    environment:
+      RABBITMQ_DEFAULT_USER: builder
+      RABBITMQ_DEFAULT_PASS: dev-rabbitmq-password
+      RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS: "-rabbit consumer_timeout 36000000"
+    ports:
+      - "127.0.0.1:15672:15672"
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+    healthcheck:
+      test: [CMD, rabbitmq-diagnostics, -q, check_running]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.8.2
+    command: [start-dev, --import-realm]
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: keycloak-admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: dev-keycloak-password
+      KC_HOSTNAME: https://auth.localhost:8443
+      KC_HTTP_ENABLED: "true"
+      KC_PROXY_HEADERS: xforwarded
+      KC_HEALTH_ENABLED: "true"
+      KC_TRUSTSTORE_PATHS: /certs/ca.crt
+    volumes:
+      - ./keycloak/aur-builder-realm.json:/opt/keycloak/data/import/aur-builder-realm.json:ro
+      - keycloak-data:/opt/keycloak/data
+      - dev-certs:/certs:ro
+    depends_on:
+      certificates:
+        condition: service_completed_successfully
+  mailpit:
+    image: axllent/mailpit:v1.27.10
+    environment:
+      MP_SMTP_BIND_ADDR: 0.0.0.0:465
+      MP_SMTP_TLS_CERT: /certs/server.crt
+      MP_SMTP_TLS_KEY: /certs/server.key
+      MP_SMTP_REQUIRE_TLS: "true"
+      MP_SMTP_AUTH: builder:dev-mail-password
+      MP_DATABASE: /data/mailpit.db
+      MP_DISABLE_VERSION_CHECK: "true"
+    volumes:
+      - dev-certs:/certs:ro
+      - mailpit-data:/data
+    ports:
+      - "127.0.0.1:8025:8025"
+      - "127.0.0.1:1465:465"
+    depends_on:
+      certificates:
+        condition: service_completed_successfully
+  garage:
+    image: dxflrs/garage:v2.1.0
+    environment:
+      GARAGE_RPC_SECRET: 0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
+    volumes:
+      - ../garage.toml:/etc/garage.toml:ro
+      - garage-meta:/var/lib/garage/meta
+      - garage-data:/var/lib/garage/data
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: builder
+      POSTGRES_PASSWORD: dev-postgres-password
+      POSTGRES_DB: aur_builder_test
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: [CMD-SHELL, pg_isready -U builder -d aur_builder_test]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+volumes:
+  dev-certs:
+  cargo-registry:
+  cargo-git:
+  rabbitmq-data:
+  keycloak-data:
+  mailpit-data:
+  garage-meta:
+  garage-data:
+  postgres-data:

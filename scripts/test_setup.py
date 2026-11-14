@@ -1,8 +1,10 @@
 """Run with: python3 -m unittest discover -s scripts -p 'test_setup.py'."""
 import importlib.util
+from contextlib import closing
 from pathlib import Path
 import os
 import stat
+import sqlite3
 import subprocess
 import tempfile
 import unittest
@@ -29,6 +31,21 @@ class SetupTests(unittest.TestCase):
             self.assertEqual(stat.S_IMODE(path.stat().st_mode), 0o600)
             with self.assertRaises(setup.SetupError):
                 env.set("SECRET", "value\nINJECTED=true")
+
+    def test_database_readiness_waits_for_nuxt_compatibility_migration(self):
+        with tempfile.TemporaryDirectory() as directory:
+            wizard = setup.Setup(directory)
+            path = Path(directory) / "db" / "sqlite.db"
+            path.parent.mkdir()
+            with closing(sqlite3.connect(path)) as db:
+                db.execute("CREATE TABLE repo_catalog (catalog TEXT)")
+                db.execute("CREATE TABLE build_attempt (attempt TEXT)")
+                db.execute("CREATE TABLE seaql_migrations (version TEXT PRIMARY KEY)")
+                db.commit()
+                self.assertFalse(wizard.database_ready())
+                db.execute("INSERT INTO seaql_migrations VALUES (?)", ("m20261111_000001_security_indexes",))
+                db.commit()
+                self.assertTrue(wizard.database_ready())
 
     def test_endpoints(self):
         self.assertEqual(setup.origin("https://storage.internal:9443/"), "https://storage.internal:9443")
@@ -92,11 +109,14 @@ class SetupTests(unittest.TestCase):
     def test_deployment_starts_migrations_before_dependents(self):
         with tempfile.TemporaryDirectory() as directory:
             wizard = setup.Setup(directory)
+            wizard.env.set("RABBITMQ_DEFAULT_USER", "test-admin")
+            wizard.env.set("RABBITMQ_DEFAULT_PASS", "test-password")
+            wizard.env.save()
             calls=[]
             def compose(*args,**kwargs):
                 calls.append(args)
                 return subprocess.CompletedProcess(args,0,"","")
-            with patch.object(setup.shutil,"which",return_value="/bin/tool"), patch.object(setup,"run"), patch.object(setup,"yes",side_effect=[True,False,False]), patch.object(setup.time,"sleep"), patch.object(wizard,"compose",side_effect=compose), patch.object(wizard,"wait"), patch.object(wizard,"provision_garage"), patch.object(wizard,"signing"), patch.object(wizard,"ensure_running"):
+            with patch.object(setup.shutil,"which",return_value="/bin/tool"), patch.object(setup,"run"), patch.object(setup,"yes",side_effect=[True,False,False]), patch.object(setup.time,"sleep"), patch.object(wizard,"compose",side_effect=compose), patch.object(wizard,"wait"), patch.object(wizard,"provision_garage"), patch.object(wizard,"signing"), patch.object(wizard,"ensure_running"), patch("scripts.provision_build_network.provision"), patch("scripts.prepare_runtime.prepare"):
                 wizard.deploy()
             server=("up","-d","--no-deps","server")
             dependents=("up","-d","--no-deps","worker","repo","web")

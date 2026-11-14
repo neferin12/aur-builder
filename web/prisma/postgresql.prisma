@@ -1,0 +1,134 @@
+generator client {
+  provider   = "prisma-client-js"
+  output     = "../generated/postgresql"
+  engineType = "client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("PRISMA_POSTGRESQL_URL")
+}
+
+model access_audit {
+  id         String @id
+  actor      String
+  target     String
+  detail     String
+  created_at BigInt
+}
+
+model ai_review {
+  candidate_id String @id
+  result       String
+}
+
+model build_attempt {
+  attempt    String @id
+  package_id Int
+  object_key String
+  task       String
+  state      String @default("queued")
+  created_at BigInt
+}
+
+model build_results {
+  id          Int       @id @default(autoincrement())
+  package_id  BigInt
+  exit_code   Int
+  build_log   String?
+  success     Boolean   @default(false)
+  started_at  DateTime? @db.Timestamp(6)
+  finished_at DateTime? @db.Timestamp(6)
+  version     String?   @db.VarChar
+
+  @@index([package_id, id(sort: Desc)], map: "build_results_package_page")
+}
+
+model oidc_login {
+  id         String @id
+  payload    String
+  expires_at BigInt
+
+  @@index([expires_at], map: "oidc_login_expiry")
+}
+
+model package_metadata {
+  id            Int     @id @default(autoincrement())
+  name          String  @db.VarChar
+  version       String  @db.VarChar
+  maintainer    String  @db.VarChar
+  last_modified BigInt
+  source        String? @db.VarChar
+  subfolder     String? @db.VarChar
+}
+
+model release_candidate {
+  id          String  @id
+  package_id  Int
+  fingerprint String
+  revision    String
+  baseline    String?
+  payload     String
+  snapshot    String
+  state       String  @default("pending")
+  created_at  BigInt
+
+  @@unique([package_id, fingerprint])
+  @@index([created_at(sort: Desc), id(sort: Desc)], map: "candidate_all_page")
+  @@index([package_id, created_at], map: "candidate_package")
+  @@index([state, created_at(sort: Desc), id(sort: Desc)], map: "candidate_state_page")
+}
+
+model release_observation {
+  package_id  Int    @id
+  fingerprint String
+}
+
+model repo_catalog {
+  id      Int    @id
+  catalog String
+}
+
+model review_event {
+  id           String @id
+  candidate_id String
+  actor        String
+  decision     String
+  comment      String
+  created_at   BigInt
+}
+
+model review_notification {
+  candidate_id String  @id
+  payload      String
+  sent         Boolean @default(false)
+}
+
+model seaql_migrations {
+  version    String @id @db.VarChar
+  applied_at BigInt
+}
+
+model web_session {
+  id           String @id
+  user_id      String
+  csrf         String
+  expires_at   BigInt
+  auth_context String @default("")
+
+  @@index([expires_at], map: "web_session_expiry")
+}
+
+model web_user {
+  id           String  @id
+  issuer       String
+  subject      String
+  display_name String
+  admin        Boolean @default(false)
+  disabled     Boolean @default(false)
+  can_view     Boolean @default(false)
+  can_rebuild  Boolean @default(false)
+  can_approve  Boolean @default(false)
+
+  @@unique([issuer, subject])
+}

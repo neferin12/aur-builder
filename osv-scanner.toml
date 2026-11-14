@@ -1,0 +1,27 @@
+# Narrow applicability decisions reviewed 2026-11-12. All other findings remain fatal.
+# These decisions expire and must be reassessed rather than extended automatically.
+
+[[IgnoredVulns]]
+id = "RUSTSEC-2025-0012"
+ignoreUntil = 2026-12-12
+reason = "Unmaintained backoff 0.4 is transitive through async-openai 0.28. No exploit is asserted by this advisory; reassess the SDK upgrade before expiry."
+
+[[IgnoredVulns]]
+id = "RUSTSEC-2024-0384"
+ignoreUntil = 2026-12-12
+reason = "Unmaintained instant is transitive through backoff/async-openai. No exploit is asserted by this advisory; reassess the SDK upgrade before expiry."
+
+[[IgnoredVulns]]
+id = "RUSTSEC-2025-0134"
+ignoreUntil = 2026-12-12
+reason = "Unmaintained PEM parser is transitive through tcp-stream/Lapin. This advisory asserts maintenance status, not an exploitable parser flaw. Reassess the broker client upgrade before expiry."
+
+[[IgnoredVulns]]
+id = "RUSTSEC-2023-0071"
+ignoreUntil = 2026-12-12
+reason = "rsa is optional sqlx-mysql lock metadata and is not compiled: cargo tree --locked --target all -i rsa prints no dependencies. No Rust RSA private-key operation exists in this application. Recheck on feature changes."
+
+[[IgnoredVulns]]
+id = "RUSTSEC-2026-0459"
+ignoreUntil = 2026-12-12
+reason = "Requires opening an attacker-written SQLite database plus sibling WAL with mismatched page size. Application databases are operator-created and service-owned; no database/WAL upload or restore from package content exists, and build containers have no DB mount. Never open untrusted DB/WAL files. Reassess SQLx/SeaORM upgrade before expiry. https://rustsec.org/advisories/RUSTSEC-2026-0459.html"

@@ -20,19 +20,91 @@
       <package file="$PROJECT_DIR$/server">
         <feature name="default" enabled="true" />
       </package>
-      <package file="$PROJECT_DIR$/web">
-        <feature name="default" enabled="true" />
-      </package>
       <package file="$PROJECT_DIR$/worker">
         <feature name="default" enabled="true" />
       </package>
     </cargoProject>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="30df73c6-6061-4a44-ad67-d8c0fc6fb8e8" name="Changes" comment="feat: package status during queue and build">
+    <list default="true" id="30df73c6-6061-4a44-ad67-d8c0fc6fb8e8" name="Changes" comment="fix: retire orphan waiting attempts and renew retried tasks&#10;&#10;Add cleanup_orphan_waiting_attempts to mark superseded queued and  &#10;dispatched attempts when a newer one exists, and run it every 60 s in  &#10;the server. Switch retry logic in setup_rabbit_mq to renew tasks instead  &#10;of granting them so the attempt identity is preserved.">
+      <change beforePath="$PROJECT_DIR$/.dockerignore" beforeDir="false" afterPath="$PROJECT_DIR$/.dockerignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.env.template" beforeDir="false" afterPath="$PROJECT_DIR$/.env.template" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.github/workflows/build_rust.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.github/workflows/build_rust.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.github/workflows/osv-scanner.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.github/workflows/osv-scanner.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.github/workflows/web.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.github/workflows/web.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Cargo.lock" beforeDir="false" afterPath="$PROJECT_DIR$/Cargo.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/Dockerfile" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/STORAGE.md" beforeDir="false" afterPath="$PROJECT_DIR$/STORAGE.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build-container/Cargo.lock" beforeDir="false" afterPath="$PROJECT_DIR$/build-container/Cargo.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build-container/Cargo.toml" beforeDir="false" afterPath="$PROJECT_DIR$/build-container/Cargo.toml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build-container/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/build-container/Dockerfile" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build-container/src/main.rs" beforeDir="false" afterPath="$PROJECT_DIR$/build-container/src/main.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/Cargo.toml" beforeDir="false" afterPath="$PROJECT_DIR$/common/Cargo.toml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/src/error_codes.json" beforeDir="false" afterPath="$PROJECT_DIR$/common/src/error_codes.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/src/lib.rs" beforeDir="false" afterPath="$PROJECT_DIR$/common/src/lib.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/src/messaging.rs" beforeDir="false" afterPath="$PROJECT_DIR$/common/src/messaging.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/src/storage.rs" beforeDir="false" afterPath="$PROJECT_DIR$/common/src/storage.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/src/types.rs" beforeDir="false" afterPath="$PROJECT_DIR$/common/src/types.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/database/examples/verify_web_tasks.rs" beforeDir="false" afterPath="$PROJECT_DIR$/database/examples/verify_web_tasks.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/database/src/access.rs" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/database/src/lib.rs" beforeDir="false" afterPath="$PROJECT_DIR$/database/src/lib.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/database/src/migrator/mod.rs" beforeDir="false" afterPath="$PROJECT_DIR$/database/src/migrator/mod.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docker-compose.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/.vitepress/config.mjs" beforeDir="false" afterPath="$PROJECT_DIR$/docs/.vitepress/config.mjs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/guide/architecture.md" beforeDir="false" afterPath="$PROJECT_DIR$/docs/guide/architecture.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/guide/development.md" beforeDir="false" afterPath="$PROJECT_DIR$/docs/guide/development.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/guide/getting-started.md" beforeDir="false" afterPath="$PROJECT_DIR$/docs/guide/getting-started.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/guide/nginx.md" beforeDir="false" afterPath="$PROJECT_DIR$/docs/guide/nginx.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/guide/reviews.md" beforeDir="false" afterPath="$PROJECT_DIR$/docs/guide/reviews.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/guide/signing.md" beforeDir="false" afterPath="$PROJECT_DIR$/docs/guide/signing.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/guide/storage.md" beforeDir="false" afterPath="$PROJECT_DIR$/docs/guide/storage.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/guide/troubleshooting.md" beforeDir="false" afterPath="$PROJECT_DIR$/docs/guide/troubleshooting.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/guide/upgrading.md" beforeDir="false" afterPath="$PROJECT_DIR$/docs/guide/upgrading.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/index.md" beforeDir="false" afterPath="$PROJECT_DIR$/docs/index.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/reference/configuration.md" beforeDir="false" afterPath="$PROJECT_DIR$/docs/reference/configuration.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/notifier/Cargo.toml" beforeDir="false" afterPath="$PROJECT_DIR$/notifier/Cargo.toml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/notifier/src/main.rs" beforeDir="false" afterPath="$PROJECT_DIR$/notifier/src/main.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/repo/Cargo.toml" beforeDir="false" afterPath="$PROJECT_DIR$/repo/Cargo.toml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/repo/src/main.rs" beforeDir="false" afterPath="$PROJECT_DIR$/repo/src/main.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/test_setup.py" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/test_setup.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/Cargo.toml" beforeDir="false" afterPath="$PROJECT_DIR$/server/Cargo.toml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/ai.rs" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/ai.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server/src/main.rs" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/package_checkers/aur.rs" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/package_checkers/aur.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/package_checkers/git.rs" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/package_checkers/git.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/reviews.rs" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/reviews.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server/src/setup_rabbit_mq.rs" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/setup_rabbit_mq.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/setup.py" beforeDir="false" afterPath="$PROJECT_DIR$/setup.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/app/components/RequestError.vue" beforeDir="false" afterPath="$PROJECT_DIR$/web/app/components/RequestError.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/app/pages/admin/users.vue" beforeDir="false" afterPath="$PROJECT_DIR$/web/app/pages/admin/users.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/app/pages/build-results/[id].vue" beforeDir="false" afterPath="$PROJECT_DIR$/web/app/pages/build-results/[id].vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/app/pages/reviews/[id].vue" beforeDir="false" afterPath="$PROJECT_DIR$/web/app/pages/reviews/[id].vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/app/pages/reviews/index.vue" beforeDir="false" afterPath="$PROJECT_DIR$/web/app/pages/reviews/index.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/web/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/web/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/prisma/postgresql.prisma" beforeDir="false" afterPath="$PROJECT_DIR$/web/prisma/postgresql.prisma" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/prisma/sqlite.prisma" beforeDir="false" afterPath="$PROJECT_DIR$/web/prisma/sqlite.prisma" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/server/middleware/security.ts" beforeDir="false" afterPath="$PROJECT_DIR$/web/server/middleware/security.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/server/plugins/database.ts" beforeDir="false" afterPath="$PROJECT_DIR$/web/server/plugins/database.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/server/rpc/router.ts" beforeDir="false" afterPath="$PROJECT_DIR$/web/server/rpc/router.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/server/utils/auth.ts" beforeDir="false" afterPath="$PROJECT_DIR$/web/server/utils/auth.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/server/utils/config.ts" beforeDir="false" afterPath="$PROJECT_DIR$/web/server/utils/config.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/server/utils/db.ts" beforeDir="false" afterPath="$PROJECT_DIR$/web/server/utils/db.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/server/utils/diffs.ts" beforeDir="false" afterPath="$PROJECT_DIR$/web/server/utils/diffs.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/server/utils/repository.ts" beforeDir="false" afterPath="$PROJECT_DIR$/web/server/utils/repository.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/server/utils/storage.ts" beforeDir="false" afterPath="$PROJECT_DIR$/web/server/utils/storage.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/tests/certs/localhost-key.pem" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/tests/certs/localhost.pem" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/tests/database.test.ts" beforeDir="false" afterPath="$PROJECT_DIR$/web/tests/database.test.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/tests/e2e-server.mjs" beforeDir="false" afterPath="$PROJECT_DIR$/web/tests/e2e-server.mjs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/tests/oidc.test.ts" beforeDir="false" afterPath="$PROJECT_DIR$/web/tests/oidc.test.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/worker/Cargo.toml" beforeDir="false" afterPath="$PROJECT_DIR$/worker/Cargo.toml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/worker/src/build/docker.rs" beforeDir="false" afterPath="$PROJECT_DIR$/worker/src/build/docker.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/worker/src/build/mod.rs" beforeDir="false" afterPath="$PROJECT_DIR$/worker/src/build/mod.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/worker/src/main.rs" beforeDir="false" afterPath="$PROJECT_DIR$/worker/src/main.rs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -51,7 +123,8 @@
     </persistenceIdMap>
   </component>
   <component name="EmbeddingIndexingInfo">
-    <option name="cachedIndexableFilesCount" value="3078" />
+    <option name="cachedIndexableFilesCount" value="3532" />
+    <option name="fileBasedEmbeddingIndicesEnabled" value="true" />
   </component>
   <component name="ExecutionTargetManager" SELECTED_TARGET="RsBuildProfile:dev" />
   <component name="FileTemplateManagerImpl">
@@ -64,7 +137,7 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="feat/nuxt-webapp" />
+        <entry key="$PROJECT_DIR$" value="main" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -76,6 +149,31 @@
     &quot;assignee&quot;: &quot;neferin12&quot;
   }
 }</component>
+  <component name="GitToolBoxStore">
+    <option name="recentBranches">
+      <RecentBranches>
+        <option name="branchesForRepo">
+          <list>
+            <RecentBranchesForRepo>
+              <option name="branches">
+                <list>
+                  <RecentBranch>
+                    <option name="branchName" value="feat/nuxt-webapp" />
+                    <option name="lastUsedInstant" value="1794298937" />
+                  </RecentBranch>
+                  <RecentBranch>
+                    <option name="branchName" value="main" />
+                    <option name="lastUsedInstant" value="1794298936" />
+                  </RecentBranch>
+                </list>
+              </option>
+              <option name="repositoryRootUrl" value="file://$PROJECT_DIR$" />
+            </RecentBranchesForRepo>
+          </list>
+        </option>
+      </RecentBranches>
+    </option>
+  </component>
   <component name="GithubPullRequestsUISettings">{
   &quot;selectedUrlAndAccountId&quot;: {
     &quot;url&quot;: &quot;git@github.com:neferin12/aur-builder.git&quot;,
@@ -88,14 +186,13 @@
   </component>
   <component name="KubernetesApiPersistence">{}</component>
   <component name="KubernetesApiProvider">{
-  &quot;configuredContexts&quot;: [
+  &quot;configuredContextKeys&quot;: [
     {
       &quot;name&quot;: &quot;kubernetes-cx11-master1&quot;,
-      &quot;kubeConfigUrl&quot;: &quot;file:///home/julian/.kube/config&quot;,
-      &quot;originalNamespace&quot;: &quot;firefly&quot;
+      &quot;configFileUrl&quot;: &quot;file:///home/julian/.kube/config&quot;,
+      &quot;namespace&quot;: &quot;firefly&quot;
     }
-  ],
-  &quot;isMigrated&quot;: true
+  ]
 }</component>
   <component name="MacroExpansionManager">
     <option name="directoryName" value="wbmbS0Ju" />
@@ -106,23 +203,23 @@
   </component>
   <component name="NextEditCompletionFeaturesState">
     <decayedCancelled>
-      <entry key="MS100" value="1.0258004068554032" />
-      <entry key="MS500" value="1.633041170232866" />
-      <entry key="S2" value="3.1045701185932115" />
-      <entry key="S5" value="4.8089995262623955" />
-      <entry key="S10" value="6.221618889255867" />
-      <entry key="S30" value="10.240624885487819" />
-      <entry key="S60" value="16.223448216365348" />
-      <entry key="M2" value="25.591529042073066" />
-      <entry key="M5" value="40.35250021847614" />
-      <entry key="M10" value="51.81393400384125" />
-      <entry key="M15" value="61.02664353268473" />
-      <entry key="M30" value="84.67824908958472" />
-      <entry key="H1" value="112.32413632788908" />
-      <entry key="H2" value="138.17885475037997" />
-      <entry key="H4" value="186.25857148195388" />
-      <entry key="D1" value="438.39228493483006" />
-      <entry key="W1" value="556.0745666535284" />
+      <entry key="MS100" value="1.000002934902408" />
+      <entry key="MS500" value="1.1504830383389781" />
+      <entry key="S2" value="3.254363989803123" />
+      <entry key="S5" value="5.662732764983631" />
+      <entry key="S10" value="7.101599684458254" />
+      <entry key="S30" value="10.12305582259998" />
+      <entry key="S60" value="14.683131794822838" />
+      <entry key="M2" value="21.38571055274838" />
+      <entry key="M5" value="45.97966693029727" />
+      <entry key="M10" value="82.42903890661091" />
+      <entry key="M15" value="105.1465548193149" />
+      <entry key="M30" value="137.25017044328777" />
+      <entry key="H1" value="158.2713614806159" />
+      <entry key="H2" value="177.07149294721012" />
+      <entry key="H4" value="227.52441406983866" />
+      <entry key="D1" value="622.0300263164853" />
+      <entry key="W1" value="893.6954104650149" />
     </decayedCancelled>
     <decayedSelected>
       <entry key="MS100" value="0.0" />
@@ -144,23 +241,23 @@
       <entry key="W1" value="0.0" />
     </decayedSelected>
     <decayedShown>
-      <entry key="MS100" value="0.9977494162523589" />
-      <entry key="MS500" value="1.6238113359437243" />
-      <entry key="S2" value="3.099989613058491" />
-      <entry key="S5" value="4.806089009523167" />
-      <entry key="S10" value="6.219712911105933" />
-      <entry key="S30" value="10.239351204819673" />
-      <entry key="S60" value="16.219601667545184" />
-      <entry key="M2" value="25.582015948398777" />
-      <entry key="M5" value="40.341638659199475" />
-      <entry key="M10" value="51.80612243510314" />
-      <entry key="M15" value="61.02071261334429" />
-      <entry key="M30" value="84.67481611373148" />
-      <entry key="H1" value="112.32226493292092" />
-      <entry key="H2" value="138.17786711475807" />
-      <entry key="H4" value="186.25803969514936" />
-      <entry key="D1" value="438.3921657862093" />
-      <entry key="W1" value="556.074547657964" />
+      <entry key="MS100" value="0.959266915992918" />
+      <entry key="MS500" value="1.1407740078312183" />
+      <entry key="S2" value="3.246778414436779" />
+      <entry key="S5" value="5.65735544419921" />
+      <entry key="S10" value="7.098204310842115" />
+      <entry key="S30" value="10.120752834944732" />
+      <entry key="S60" value="14.680696776252189" />
+      <entry key="M2" value="21.383421132576984" />
+      <entry key="M5" value="45.976581403658514" />
+      <entry key="M10" value="82.42560185940468" />
+      <entry key="M15" value="105.14342519574926" />
+      <entry key="M30" value="137.2479921861864" />
+      <entry key="H1" value="158.27006794153345" />
+      <entry key="H2" value="177.0707765518297" />
+      <entry key="H4" value="227.52399014518053" />
+      <entry key="D1" value="622.0298792084283" />
+      <entry key="W1" value="893.6953828321763" />
     </decayedShown>
   </component>
   <component name="ProjectColorInfo">{
@@ -199,20 +296,23 @@
     &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
     &quot;copilot.chat.legacySessionMetadata.migrated&quot;: &quot;true&quot;,
     &quot;dart.analysis.tool.window.visible&quot;: &quot;false&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;#21 on feat/nuxt-webapp&quot;,
+    &quot;javascript.preferred.runtime.type.id&quot;: &quot;node&quot;,
     &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/home/julian/projects/privat/aur-builder&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/workspaces/aur-builder&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
     &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
     &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;npm.dev (1).executor&quot;: &quot;Run&quot;,
     &quot;npm.dev.executor&quot;: &quot;Run&quot;,
     &quot;org.rust.cargo.project.model.PROJECT_DISCOVERY&quot;: &quot;true&quot;,
     &quot;org.rust.cargo.project.model.impl.CargoExternalSystemProjectAware.subscribe.first.balloon&quot;: &quot;&quot;,
     &quot;org.rust.first.attach.projects&quot;: &quot;true&quot;,
     &quot;settings.editor.selected.configurable&quot;: &quot;com.intellij.air.settings&quot;,
     &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;/home/julian/projects/privat/aur-builder/web/node_modules/typescript/lib&quot;,
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   },
   &quot;keyToStringList&quot;: {
@@ -223,6 +323,7 @@
 }</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$" />
       <recent name="$PROJECT_DIR$/web/src/assets" />
       <recent name="$PROJECT_DIR$/notifier" />
       <recent name="$PROJECT_DIR$/.github/workflows" />
@@ -239,25 +340,7 @@
   <component name="RsExternalLinterProjectSettings">
     <option name="runOnTheFly" value="true" />
   </component>
-  <component name="RunManager" selected="Cargo.Run web">
-    <configuration name="All Tests" type="CargoCommandRunConfiguration" factoryName="Cargo Command" temporary="true">
-      <option name="buildProfileId" value="test" />
-      <option name="command" value="test" />
-      <option name="workingDirectory" value="file://$PROJECT_DIR$" />
-      <envs />
-      <option name="emulateTerminal" value="true" />
-      <option name="channel" value="DEFAULT" />
-      <option name="requiredFeatures" value="true" />
-      <option name="allFeatures" value="false" />
-      <option name="withSudo" value="false" />
-      <option name="buildTarget" value="REMOTE" />
-      <option name="backtrace" value="SHORT" />
-      <option name="isRedirectInput" value="false" />
-      <option name="redirectInputPath" value="" />
-      <method v="2">
-        <option name="CARGO.BUILD_TASK_PROVIDER" enabled="true" />
-      </method>
-    </configuration>
+  <component name="RunManager" selected="npm.dev (1)">
     <configuration name="Run notifier" type="CargoCommandRunConfiguration" factoryName="Cargo Command">
       <option name="buildProfileId" value="dev" />
       <option name="command" value="run --package notifier --bin notifier" />
@@ -373,6 +456,16 @@
       </deployment>
       <method v="2" />
     </configuration>
+    <configuration name="dev (1)" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
+      <package-json value="$PROJECT_DIR$/web/package.json" />
+      <command value="run" />
+      <scripts>
+        <script value="dev" />
+      </scripts>
+      <node-interpreter value="project" />
+      <envs />
+      <method v="2" />
+    </configuration>
     <configuration name="dev" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
       <package-json value="$PROJECT_DIR$/docs/package.json" />
       <command value="run" />
@@ -385,16 +478,21 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Cargo.Run web" />
+        <item itemvalue="npm.dev (1)" />
         <item itemvalue="npm.dev" />
         <item itemvalue="Docker.docker-compose.yaml.rabbitmq: Compose Deployment" />
-        <item itemvalue="Cargo.Run worker" />
-        <item itemvalue="Cargo.All Tests" />
       </list>
     </recent_temporary>
   </component>
   <component name="RustProjectSettings">
     <option name="toolchainHomeDirectory" value="/usr/bin" />
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-js-predefined-d6986cc7102b-56aff7b04f6f-JavaScript-WS-263.7307.202" />
+      </set>
+    </attachedChunks>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
@@ -425,7 +523,12 @@
       <workItem from="1749475709469" duration="296000" />
       <workItem from="1750695442889" duration="288000" />
       <workItem from="1767128749034" duration="1853000" />
-      <workItem from="1794248234175" duration="2882000" />
+      <workItem from="1794248234175" duration="9562000" />
+      <workItem from="1794422422313" duration="33000" />
+      <workItem from="1794422498376" duration="26000" />
+      <workItem from="1794422530368" duration="500000" />
+      <workItem from="1794469934631" duration="3695000" />
+      <workItem from="1794652345893" duration="359000" />
     </task>
     <task id="LOCAL-00001" summary="ci">
       <option name="closed" value="true" />
@@ -603,7 +706,23 @@
       <option name="project" value="LOCAL" />
       <updated>1794250908750</updated>
     </task>
-    <option name="localTasksCounter" value="23" />
+    <task id="LOCAL-00023" summary="fix: dispatch approvals independently of polling">
+      <option name="closed" value="true" />
+      <created>1794251315068</created>
+      <option name="number" value="00023" />
+      <option name="presentableId" value="LOCAL-00023" />
+      <option name="project" value="LOCAL" />
+      <updated>1794251315068</updated>
+    </task>
+    <task id="LOCAL-00024" summary="fix: improve notification email styling">
+      <option name="closed" value="true" />
+      <created>1794264204112</created>
+      <option name="number" value="00024" />
+      <option name="presentableId" value="LOCAL-00024" />
+      <option name="project" value="LOCAL" />
+      <updated>1794264204112</updated>
+    </task>
+    <option name="localTasksCounter" value="25" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -621,11 +740,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Release 1.0.0&#10;&#10;common@1.0.0&#10;database@1.0.0&#10;server@1.0.0&#10;web@1.0.0&#10;worker@1.0.0&#10;&#10;Generated by cargo-workspaces" />
-    <MESSAGE value="make settings configurable via yaml" />
-    <MESSAGE value="show error code meaning for builds in tooltip and log" />
-    <MESSAGE value="fix: better error handling in aur connector" />
-    <MESSAGE value="improve error handling" />
     <MESSAGE value="fix: improve notifier styling" />
     <MESSAGE value="ci: rename harbor image for builder container" />
     <MESSAGE value="fix: make sleep duration configurable" />
@@ -646,7 +760,12 @@
     <MESSAGE value="fix: improve logging" />
     <MESSAGE value="fix: add user agent to AUR requests" />
     <MESSAGE value="feat: package status during queue and build" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: package status during queue and build" />
+    <MESSAGE value="fix: dispatch approvals independently of polling" />
+    <MESSAGE value="fix: improve notification email styling" />
+    <MESSAGE value="feat: refactor into nuxt webapp" />
+    <MESSAGE value="feat: refactor into nuxt webapp&#10;&#10;- Add devcontainer documentation to development guide&#10;- Fix OIDC callback to preserve full authorization response query string&#10;  for issuer validation (RFC 9207)&#10;- Add test for mismatched authorization response issuer rejection&#10;- Ignore devcontainer state and cache directories in git and docker" />
+    <MESSAGE value="feat: add devcontainer setup with full local stack&#10;&#10;Add .devcontainer with Docker Compose services for Keycloak,  &#10;RabbitMQ, Mailpit, Garage S3, PostgreSQL, and Caddy reverse proxy  &#10;with local TLS certificates. Include bootstrap script, test users,  &#10;and OIDC realm configuration.&#10;&#10;Fix OIDC callback to preserve the full authorization response query  &#10;string so the issuer parameter required by RFC 9207 is passed through  &#10;to the token grant. Add a test for mismatched issuer rejection.&#10;&#10;Update .gitignore and .dockerignore to exclude devcontainer state  &#10;and cache directories. Add devcontainer section to development docs." />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: add devcontainer setup with full local stack&#10;&#10;Add .devcontainer with Docker Compose services for Keycloak,  &#10;RabbitMQ, Mailpit, Garage S3, PostgreSQL, and Caddy reverse proxy  &#10;with local TLS certificates. Include bootstrap script, test users,  &#10;and OIDC realm configuration.&#10;&#10;Fix OIDC callback to preserve the full authorization response query  &#10;string so the issuer parameter required by RFC 9207 is passed through  &#10;to the token grant. Add a test for mismatched issuer rejection.&#10;&#10;Update .gitignore and .dockerignore to exclude devcontainer state  &#10;and cache directories. Add devcontainer section to development docs." />
   </component>
   <component name="XDebuggerManager">
     <watches-manager>

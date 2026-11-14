@@ -15,9 +15,9 @@ alpm-utils = "=5.0.0"
 aur-depends = "=5.0.0"
 aur-fetch = "=0.11.3"
 raur = "=7.0.0"
+reqwest = { version = "0.11", default-features = false, features = ["native-tls"] }
 srcinfo = "=2.1.0"
 tokio = { version = "1", features = ["macros", "rt"] }
-reqwest = { version = "0.12", default-features = false, features = ["blocking", "rustls-tls"] }
 tar = "0.4"
 
 [dev-dependencies]

@@ -17,7 +17,9 @@ Set `GARAGE_RPC_SECRET` in `.env` using a generated 32-byte hex value:
 openssl rand -hex 32
 ```
 
-Start Garage and inspect its node ID:
+Before Compose commands, generate the service env files and host inventory as
+shown in [manual setup](./getting-started.md#build-and-start-services). Then start
+Garage and inspect its node ID:
 
 ```sh
 docker compose up -d garage
@@ -43,7 +45,8 @@ docker compose exec garage /garage bucket allow --read --write --key aur-builder
 ```
 
 Save the returned key ID and secret in `AB_S3_ACCESS_KEY` and `AB_S3_SECRET_KEY`.
-Keep `AB_S3_BUCKET=aur-builder` and `AB_S3_REGION=garage` unless you intentionally
+Rerun `python3 scripts/provision_broker.py` after saving credentials to refresh the
+service env files. Keep `AB_S3_BUCKET=aur-builder` and `AB_S3_REGION=garage` unless you intentionally
 change the corresponding resources. Do not enable website access for the bucket.
 
 ## Internal and external endpoints
@@ -64,15 +67,17 @@ admin HTTP endpoint or website endpoint.
 
 ## Access and lifetimes
 
-The example deployment shares storage credentials between server and repo. More
-restricted deployments can use separate environments and Garage keys: the server
-needs build-object write access; repo needs build-object read access and published
-object read/write access. Workers receive neither key.
+Trusted application services receive the configured storage credentials in their
+separate service environment files. The worker writes completed build bundles;
+repo reads them and publishes signed objects. Build containers receive no storage
+credentials or upload capability. The receipt key is shared only by worker and repo.
 
-Upload URLs expire after 24 hours by default; downloads after 15 minutes. Anyone
-with a signed URL can use it until expiry. Do not log signed query strings.
-Configure upload lifetime above expected queue wait plus build time. A build that
-runs beyond its grant fails upload and needs rebuilding.
+Upload and download URLs expire after 15 minutes by default. Anyone with a signed
+URL can use it until expiry. Do not log signed query strings.
+Set `AB_UPLOAD_TTL` between 60 and 900 seconds. The trusted worker issues the grant
+after the build finishes, so queue wait and build time do not consume its lifetime.
+Build containers receive no upload capability. Ingestion requires the worker receipt
+and verifies the bundle digest before signing.
 
 ## Persistent state
 

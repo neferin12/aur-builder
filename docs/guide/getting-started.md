@@ -4,13 +4,13 @@ Run all commands from the project root unless stated otherwise.
 
 ## Prerequisites
 
-- An x86_64 Linux Docker host with Docker Compose.
+- An x86_64 Linux Docker host with Docker Engine 28+, Compose, cgroup memory/PID/CPU controls, and seccomp.
 - Python 3.10 or newer for the setup wizard.
-- `gpg` and `gpgconf` for repository signing.
+- `gpg`, `gpgconf`, and `ip` (iproute2) for signing and host-network inventory.
 - Network access to Arch package mirrors and your configured package sources.
 - An OIDC provider with a confidential web client and an administrator group.
 - An HTTPS hostname for the web UI, registered with callback `/auth/callback`.
-- An S3 hostname reachable from build containers **and** pacman clients.
+- An S3 hostname reachable from pacman clients; trusted services also need the internal S3 endpoint.
 - HTTPS reverse proxies for the repo and S3 APIs before using them over the internet.
 
 The default setup uses a shared SQLite database and one Garage node. Initial image
@@ -42,7 +42,7 @@ exits before the signing prompt. Rerun the wizard to continue.
 :::
 
 Existing files, Garage access keys, and signing keys are reused. The wizard never
-deletes queues or volumes. Existing RabbitMQ users are not changed by editing `.env`.
+deletes queues or volumes. Scoped RabbitMQ accounts and service environment files are generated during deployment; existing unrelated broker users are preserved.
 If the wizard offers to switch your database URL to Compose's SQLite path, it does
 not move the contents of an existing database.
 
@@ -81,8 +81,21 @@ to provision storage and the signing home.
 
 ### Build and start services
 
+Before any Compose command, configure real web/storage hostnames and generate the
+service env files, broker definitions, and Docker-host network/socket inventory:
+
 ```sh
-docker compose build server worker web repo
+python3 scripts/provision_broker.py
+python3 scripts/provision_build_network.py
+```
+
+Provision Garage and signing as linked above, then refresh service settings and
+stage runtime ownership before building and starting applications:
+
+```sh
+python3 scripts/provision_broker.py
+python3 scripts/prepare_runtime.py
+docker compose build server worker web repo build-egress
 docker compose up -d garage rabbitmq
 docker compose up -d server
 docker compose logs -f server
@@ -92,11 +105,11 @@ Wait for migrations to finish, then leave the log viewer with Ctrl+C and start t
 remaining services:
 
 ```sh
-docker compose up -d worker repo web
+docker compose up -d build-egress worker repo web
 ```
 
 Workers also need a matching [build-container image](./development.md#build-container).
-For v2 use the v2 image or a local image built by setup. SMTP notifications are
+Use matching worker and rootless build-container versions or a local image built by setup. SMTP notifications are
 optional; leave `notifier` stopped until its environment is configured.
 
 ## After startup

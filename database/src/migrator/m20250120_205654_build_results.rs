@@ -13,7 +13,7 @@ impl MigrationTrait for Migration {
                     .table(BuildResults::Table)
                     .col(
                         ColumnDef::new(BuildResults::Id)
-                            .big_integer()
+                            .integer()
                             .not_null()
                             .primary_key()
                             .auto_increment(),

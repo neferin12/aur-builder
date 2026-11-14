@@ -47,7 +47,8 @@ export default defineConfig({
           { text: 'Operations & database reset', link: '/guide/operations' },
           { text: 'Upgrade to v2', link: '/guide/upgrading' },
           { text: 'Troubleshooting', link: '/guide/troubleshooting' },
-          { text: 'Development & CI', link: '/guide/development' }
+          { text: 'Development & CI', link: '/guide/development' },
+          { text: 'Security verification', link: '/guide/security-verification' }
         ]
       }
     ],

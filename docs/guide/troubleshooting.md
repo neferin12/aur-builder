@@ -30,14 +30,18 @@ Never include complete signed URLs or storage secrets in shared diagnostic outpu
 
 ## Upload fails after a long queue wait or build
 
-`AB_UPLOAD_TTL` defaults to 24 hours. Workers return already-expired queued tasks
-for renewal, but builds that outlive their grant fail upload. Increase lifetime
-within the supported limit or reduce queue wait/build time, then request a rebuild.
+`AB_UPLOAD_TTL` defaults to 900 seconds and is issued by the worker after the build
+finishes. Queue wait and build time no longer consume the grant. Check worker S3
+connectivity and the upload deadline rather than increasing the lifetime above 900.
+Use matching worker, build-container, and repo images and rerun provisioning after
+changing storage settings.
 
 ## Worker cannot reach S3
 
-`localhost` inside a build container refers to that container. The public S3 origin
-must resolve and be reachable from worker containers as well as pacman clients.
+`localhost` inside the worker refers to that worker container. The internal
+`AB_S3_ENDPOINT` must be reachable from trusted services; pacman clients use
+`AB_S3_PUBLIC_ENDPOINT`. The isolated build sandbox uploads nothing and intentionally
+cannot reach Garage directly.
 Check DNS, routing, TLS trust, proxy upload limits, and transfer timeouts.
 
 ## Signing fails or clients reject signatures

@@ -12,7 +12,7 @@ pub fn check_confirmation(confirmation: Confirmation) -> Result<(), Error> {
 pub async fn publish(channel: &Channel, queue: &str, payload: &[u8]) -> Result<(), Error> {
     let confirmation = channel
         .basic_publish(
-            "",
+            &format!("ab.{queue}"),
             queue,
             BasicPublishOptions {
                 mandatory: true,
@@ -46,102 +46,121 @@ pub fn supervise(future: impl std::future::Future<Output = ()> + Send + 'static)
     });
 }
 
-pub fn repo_queue_arguments() -> lapin::types::FieldTable {
-    use lapin::types::{AMQPValue, FieldTable};
-    let mut args = FieldTable::default();
-    args.insert(
-        "x-dead-letter-exchange".into(),
-        AMQPValue::LongString("".into()),
-    );
-    args.insert(
-        "x-dead-letter-routing-key".into(),
-        AMQPValue::LongString("repo_ingest_failed".into()),
-    );
-    args
-}
-pub async fn declare_repo_queue(channel: &Channel) -> Result<(), Error> {
-    use lapin::{options::QueueDeclareOptions, types::FieldTable};
-    let options = QueueDeclareOptions {
-        durable: true,
-        ..Default::default()
-    };
-    channel
-        .queue_declare("repo_ingest_failed", options, FieldTable::default())
-        .await?;
-    channel
-        .queue_declare("repo_ingest", options, repo_queue_arguments())
-        .await?;
-    Ok(())
-}
-
-#[cfg(test)]
-mod broker_tests {
-    use super::*;
-    #[tokio::test]
-    #[ignore = "requires a disposable RabbitMQ instance via AMQP_ADDR"]
-    async fn routed_confirmations() -> Result<(), Error> {
-        let connection = crate::connect_to_rabbitmq().await;
-        let channel = connection.create_channel().await?;
-        channel
-            .confirm_select(lapin::options::ConfirmSelectOptions::default())
-            .await?;
-        let name = format!("confirmation-test-{}", uuid::Uuid::new_v4());
-        assert!(publish(&channel, &name, b"unroutable").await.is_err());
-        channel
-            .queue_declare(
-                &name,
-                lapin::options::QueueDeclareOptions {
-                    exclusive: true,
-                    auto_delete: true,
-                    ..Default::default()
-                },
-                lapin::types::FieldTable::default(),
-            )
-            .await?;
-        publish(&channel, &name, b"routed").await?;
-        declare_repo_queue(&channel).await?;
-        let message = channel
-            .basic_get(&name, lapin::options::BasicGetOptions::default())
-            .await?
-            .expect("confirmed delivery");
-        assert_eq!(message.data, b"routed");
-        message
-            .ack(lapin::options::BasicAckOptions::default())
-            .await?;
-        publish(&channel, "repo_ingest", b"invalid artifact").await?;
-        let message = channel
-            .basic_get("repo_ingest", lapin::options::BasicGetOptions::default())
-            .await?
-            .expect("ingestion delivery");
-        message
-            .reject(lapin::options::BasicRejectOptions { requeue: false })
-            .await?;
-        let mut dead_letter = None;
-        for _ in 0..20 {
-            dead_letter = channel
-                .basic_get(
-                    "repo_ingest_failed",
-                    lapin::options::BasicGetOptions::default(),
-                )
-                .await?;
-            if dead_letter.is_some() {
-                break;
-            }
-            tokio::time::sleep(std::time::Duration::from_millis(50)).await;
-        }
-        let message = dead_letter.expect("invalid artifact must be preserved in dead-letter queue");
-        assert_eq!(message.data, b"invalid artifact");
-        message
-            .ack(lapin::options::BasicAckOptions::default())
-            .await?;
-        connection.close(200, "test complete").await?;
-        Ok(())
-    }
-}
-
 /// Periodic repository maintenance, serialized with ingestion.
 #[derive(serde::Serialize, serde::Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct RetentionRequest {
     pub keep_versions: std::num::NonZeroUsize,
+}
+
+#[cfg(test)]
+mod broker_tests {
+    use super::*;
+    use lapin::{Connection, ConnectionProperties, options::*, types::FieldTable};
+    async fn channel(role: &str) -> Channel {
+        let url = std::env::var(format!("AB_TEST_AMQP_{}", role.to_uppercase())).unwrap();
+        let connection = Connection::connect(&url, ConnectionProperties::default())
+            .await
+            .unwrap();
+        let channel = connection.create_channel().await.unwrap();
+        channel
+            .confirm_select(ConfirmSelectOptions::default())
+            .await
+            .unwrap();
+        channel
+    }
+    #[tokio::test]
+    #[ignore = "requires disposable provisioned broker via scripts/test_broker_integration.py"]
+    async fn service_permissions() {
+        let server = channel("server").await;
+        publish(&server, "pkg_build", b"approved task")
+            .await
+            .unwrap();
+        let worker = channel("worker").await;
+        let task = worker
+            .basic_get("pkg_build", BasicGetOptions::default())
+            .await
+            .unwrap()
+            .unwrap();
+        assert_eq!(task.data, b"approved task");
+        task.ack(BasicAckOptions::default()).await.unwrap();
+        publish(&worker, "build_results", b"result").await.unwrap();
+        let result = server
+            .basic_get("build_results", BasicGetOptions::default())
+            .await
+            .unwrap()
+            .unwrap();
+        result.ack(BasicAckOptions::default()).await.unwrap();
+        publish(&server, "notifications", b"notification")
+            .await
+            .unwrap();
+        let notifier = channel("notifier").await;
+        let notice = notifier
+            .basic_get("notifications", BasicGetOptions::default())
+            .await
+            .unwrap()
+            .unwrap();
+        notice.ack(BasicAckOptions::default()).await.unwrap();
+        publish(&server, "repo_ingest", b"invalid artifact")
+            .await
+            .unwrap();
+        let repo = channel("repo").await;
+        let artifact = repo
+            .basic_get("repo_ingest", BasicGetOptions::default())
+            .await
+            .unwrap()
+            .unwrap();
+        artifact
+            .reject(BasicRejectOptions { requeue: false })
+            .await
+            .unwrap();
+        for role in ["worker", "repo", "notifier"] {
+            let ch = channel(role).await;
+            assert!(
+                publish(&ch, "repo_ingest", b"forged retention")
+                    .await
+                    .is_err()
+            );
+        }
+        for role in ["server", "repo", "notifier"] {
+            let ch = channel(role).await;
+            assert!(
+                ch.basic_get("pkg_build", BasicGetOptions::default())
+                    .await
+                    .is_err()
+            );
+        }
+        let ch = channel("worker").await;
+        assert!(
+            ch.basic_publish(
+                "",
+                "repo_ingest",
+                BasicPublishOptions::default(),
+                b"forged",
+                BasicProperties::default()
+            )
+            .await
+            .unwrap()
+            .await
+            .is_err()
+        );
+        let ch = channel("worker").await;
+        assert!(
+            ch.queue_bind(
+                "pkg_build",
+                "ab.notifications",
+                "notifications",
+                QueueBindOptions::default(),
+                FieldTable::default()
+            )
+            .await
+            .is_err()
+        );
+        let ch = channel("worker").await;
+        assert!(
+            ch.queue_delete("pkg_build", QueueDeleteOptions::default())
+                .await
+                .is_err()
+        );
+    }
 }

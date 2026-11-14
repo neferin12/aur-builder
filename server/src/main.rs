@@ -44,7 +44,7 @@ async fn main() {
         loop {
             match cleanup_db.cleanup_orphan_waiting_attempts().await {
                 Ok(count) if count > 0 => info!("Retired {count} orphan waiting build attempts"),
-                Ok(_) => {},
+                Ok(_) => {}
                 Err(error) => error!("Failed to clean up orphan waiting build attempts: {error}"),
             }
             sleep(Duration::from_secs(60)).await;
@@ -62,30 +62,36 @@ async fn main() {
         let storage = dispatch_storage;
         let build_tx = dispatch_tx;
         loop {
-        // Recover tasks recorded before a crash between persistence and broker confirmation.
-        for mut pending in db.pending_attempts().await.unwrap() {
-            if !db.approved_task(&pending).await.unwrap()
-                || !db.latest_attempt(&pending).await.unwrap()
-            {
-                db.attempt_state(&pending.attempt, "superseded")
-                    .await
-                    .unwrap();
-                continue;
-            }
-            debug!("Dispatching pending build: package={}, attempt={}", pending.name, pending.attempt);
-            storage.renew(&mut pending).unwrap();
-            common::messaging::publish(
-                &build_tx,
-                "pkg_build",
-                &serde_json::to_vec(&pending).unwrap(),
-            )
-            .await
-            .unwrap();
-            info!("Build dispatched: package={}, attempt={}", pending.name, pending.attempt);
-            db.attempt_state(&pending.attempt, "dispatched")
+            // Recover tasks recorded before a crash between persistence and broker confirmation.
+            for mut pending in db.pending_attempts().await.unwrap() {
+                if !db.approved_task(&pending).await.unwrap()
+                    || !db.latest_attempt(&pending).await.unwrap()
+                {
+                    db.attempt_state(&pending.attempt, "superseded")
+                        .await
+                        .unwrap();
+                    continue;
+                }
+                debug!(
+                    "Dispatching pending build: package={:?}, attempt={:?}",
+                    pending.name, pending.attempt
+                );
+                storage.renew(&mut pending).unwrap();
+                common::messaging::publish(
+                    &build_tx,
+                    "pkg_build",
+                    &serde_json::to_vec(&pending).unwrap(),
+                )
                 .await
                 .unwrap();
-        }
+                info!(
+                    "Build dispatched: package={:?}, attempt={:?}",
+                    pending.name, pending.attempt
+                );
+                db.attempt_state(&pending.attempt, "dispatched")
+                    .await
+                    .unwrap();
+            }
             sleep(Duration::from_secs(5)).await;
         }
     });
@@ -103,18 +109,25 @@ async fn main() {
             error!("Could not request repository cleanup: {e}");
         }
         let check_started = Instant::now();
-        info!("Checking for package updates: aur={}, git={}", config.aur_packages.len(), config.git_packages.len());
+        info!(
+            "Checking for package updates: aur={}, git={}",
+            config.aur_packages.len(),
+            config.git_packages.len()
+        );
         let mut package_data = Vec::new();
 
         for pkg in &config.aur_packages {
-            debug!("Getting data for AUR package {}", pkg.name);
+            debug!("Getting data for AUR package {:?}", pkg.name);
             let aur_result = aur::get_aur_data(pkg).await;
             match aur_result {
                 Ok(aur) => {
                     package_data.push(aur);
                 }
                 Err(e) => {
-                    error!("Failed to get data for aur package \"{}\": {:?}", pkg.name, e);
+                    error!(
+                        "Failed to get data for aur package \"{}\": {:?}",
+                        pkg.name, e
+                    );
                 }
             }
         }
@@ -144,16 +157,27 @@ async fn main() {
                         .observe_release(&data, &revision, &fingerprint, &snapshot)
                         .await
                     {
-                        error!("Could not persist release candidate for {}: {e:?}", data.name);
+                        error!(
+                            "Could not persist release candidate for {}: {e:?}",
+                            data.name
+                        );
                     } else {
                         observed += 1;
                     }
                 }
-                Err(e) => error!("Could not capture packaging source for {}: {e}", data.name),
+                Err(e) => error!(
+                    "Could not capture packaging source for {:?}: {e:?}",
+                    data.name
+                ),
             }
         }
         let sleep_seconds = config.sleepduration.unwrap_or(60 * 5);
-        info!("Package update check completed: fetched={fetched}, fetch_failed={}, observed={observed}, observation_failed={}, elapsed_ms={}, next_check_seconds={sleep_seconds}", config.aur_packages.len() + config.git_packages.len() - fetched, fetched - observed, check_started.elapsed().as_millis());
+        info!(
+            "Package update check completed: fetched={fetched}, fetch_failed={}, observed={observed}, observation_failed={}, elapsed_ms={}, next_check_seconds={sleep_seconds}",
+            config.aur_packages.len() + config.git_packages.len() - fetched,
+            fetched - observed,
+            check_started.elapsed().as_millis()
+        );
         sleep(Duration::from_secs(sleep_seconds)).await;
     }
 }

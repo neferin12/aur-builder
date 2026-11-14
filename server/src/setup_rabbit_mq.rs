@@ -3,7 +3,7 @@ use common::types::BuildResultTransmissionFormat;
 use database::Database;
 use futures_util::StreamExt;
 use lapin::Channel;
-use lapin::options::{BasicAckOptions, BasicConsumeOptions, QueueDeclareOptions};
+use lapin::options::{BasicAckOptions, BasicConsumeOptions};
 use lapin::types::FieldTable;
 
 pub struct RabbitChannels {
@@ -19,47 +19,14 @@ pub async fn setup_rabbitmq(db: &Database) -> RabbitChannels {
         .confirm_select(lapin::options::ConfirmSelectOptions::default())
         .await
         .unwrap();
-    build_tx
-        .queue_declare(
-            "pkg_build",
-            QueueDeclareOptions {
-                durable: true,
-                ..Default::default()
-            },
-            FieldTable::default(),
-        )
-        .await
-        .unwrap();
 
     let notify_tx = conn.create_channel().await.unwrap();
     notify_tx
         .confirm_select(lapin::options::ConfirmSelectOptions::default())
         .await
         .unwrap();
-    notify_tx
-        .queue_declare(
-            "notifications",
-            QueueDeclareOptions {
-                durable: true,
-                ..Default::default()
-            },
-            FieldTable::default(),
-        )
-        .await
-        .unwrap();
 
     let results_channel = conn.create_channel().await.unwrap();
-    results_channel
-        .queue_declare(
-            "build_results",
-            QueueDeclareOptions {
-                durable: true,
-                ..Default::default()
-            },
-            FieldTable::default(),
-        )
-        .await
-        .unwrap();
 
     let mut results_consumer = results_channel
         .basic_consume(
@@ -71,21 +38,7 @@ pub async fn setup_rabbitmq(db: &Database) -> RabbitChannels {
         .await
         .unwrap();
 
-    common::messaging::declare_repo_queue(&notify_tx)
-        .await
-        .unwrap();
     let expired = conn.create_channel().await.unwrap();
-    expired
-        .queue_declare(
-            "expired_tasks",
-            QueueDeclareOptions {
-                durable: true,
-                ..Default::default()
-            },
-            FieldTable::default(),
-        )
-        .await
-        .unwrap();
     let mut expired_rx = expired
         .basic_consume(
             "expired_tasks",
@@ -168,7 +121,9 @@ pub async fn setup_rabbitmq(db: &Database) -> RabbitChannels {
             common::messaging::publish(
                 &notify_tx,
                 "notifications",
-                serde_json::to_string(&data).unwrap().as_ref(),
+                serde_json::to_string(&data.notification_summary())
+                    .unwrap()
+                    .as_ref(),
             )
             .await
             .unwrap();

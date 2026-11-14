@@ -19,6 +19,31 @@ jobs:
       - uses: Swatinem/rust-cache@v2
 
       - run: |
-          cargo check
-          cargo test --workspace
-          cargo build --release
+          cargo check --locked
+          cargo test --workspace --locked
+          cargo build --release --locked
+
+      - name: Verify RabbitMQ service permissions
+        run: python3 scripts/test_broker_integration.py
+      - name: Verify broker provisioning
+        run: python3 -m unittest discover -s scripts -p 'test_broker_provision.py'
+      - name: Verify worker artifact delivery
+        run: |
+          docker pull alpine
+          cargo test -p worker frozen_tmpfs_bundle_is_uploaded_and_authenticated -- --ignored
+      - name: Verify build network isolation
+        run: |
+          docker build -t aur-builder-egress-test build-egress
+          python3 scripts/test_build_network.py
+      - name: Verify rootless Arch dependency builds
+        run: |
+          docker build -t aur-builder-rootless-test build-container
+          python3 scripts/test_rootless_build.py
+      - name: Verify complete worker builds
+        run: python3 scripts/test_worker_build.py
+      - name: Verify signing runtime ownership
+        run: AB_RUNTIME_INTEGRATION=1 python3 -m unittest discover -s scripts -p test_runtime_permissions.py
+      - name: Verify hostile resource exhaustion
+        run: python3 scripts/test_resource_limits.py
+      - name: Verify private signed publication and real pacman downloads
+        run: AB_PUBLICATION_IN_CONTAINER=1 python3 scripts/test_publication.py

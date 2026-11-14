@@ -1,0 +1,12 @@
+# Narrow applicability decisions reviewed 2026-11-12. All other findings remain fatal.
+# These decisions expire and must be reassessed rather than extended automatically.
+
+[[IgnoredVulns]]
+id = "GHSA-vjh5-4x84-xrqp"
+ignoreUntil = 2026-12-12
+reason = "Incorrect upstream OSV range flags Nuxt 4.6.4. The Nuxt maintainer advisory explicitly identifies 4.6.2 as patched; both nuxt and @nuxt/nitro-server are locked to 4.6.4. https://github.com/nuxt/nuxt/security/advisories/GHSA-vjh5-4x84-xrqp"
+
+[[IgnoredVulns]]
+id = "GHSA-gcqx-w48m-w2h4"
+ignoreUntil = 2026-12-12
+reason = "deepmerge 4.3.1 has no upstream patched release. scripts/patch-deepmerge.mjs applies SHA256-anchored rejection of __proto__, constructor and prototype in BOTH merge loops on every npm install; security.test.ts tests the exploit and null-prototype input. It is a Rollup build dependency absent from the production output. Remove this exception with the upstream fix."

@@ -53,3 +53,7 @@ pub fn get_rand_string() -> String {
 pub mod storage;
 
 pub mod messaging;
+
+pub mod redact;
+
+pub mod artifact;

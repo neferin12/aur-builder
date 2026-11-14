@@ -1,7 +1,0 @@
-{% extends "base.html" %}
-{% block title %}User management{% endblock title %}
-{% block location %}User management{% endblock location %}
-{% block content %}
-<div class="page-heading"><div><p class="eyebrow">ADMINISTRATION</p><h1>User management</h1><p class="subtitle">Users appear after signing in. Permissions apply to all packages. Saving revokes the user's active sessions.</p></div></div>
-{% for user in users %}<section class="review-card"><h2>{{user.display_name}} {% if user.admin %}<span class="review-state approved">OIDC administrator</span>{% endif %}</h2><p class="muted">{{user.issuer}} · {{user.subject}}</p><form class="user-grants" method="post" action="/admin/users/{{user.id}}"><input type="hidden" name="csrf" value="{{csrf}}"><label><input type="checkbox" name="can_view" {% if user.can_view %}checked{% endif %}> View packages, logs and reviews</label><label><input type="checkbox" name="can_rebuild" {% if user.can_rebuild %}checked{% endif %}> Rebuild approved releases</label><label><input type="checkbox" name="can_approve" {% if user.can_approve %}checked{% endif %}> Approve or reject releases</label><label><input type="checkbox" name="disabled" {% if user.disabled %}checked{% endif %}> Disable account</label><button class="button primary">Save access</button></form><p class="muted">Rebuild and approval also require view access. Administrators inherit all permissions from their OIDC group.</p></section>{% endfor %}
-{% endblock content %}

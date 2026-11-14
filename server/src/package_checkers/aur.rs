@@ -47,6 +47,17 @@ pub struct AurPackageInfo {
 pub async fn get_aur_data(
     package: &AurPackageSettings,
 ) -> Result<PackageSearchResult, Box<dyn Error>> {
+    fn valid_name(name: &str) -> bool {
+        !name.is_empty()
+            && name
+                .bytes()
+                .all(|b| b.is_ascii_alphanumeric() || b"@._+-".contains(&b))
+            && !name.starts_with('.')
+            && !name.starts_with('-')
+    }
+    if !valid_name(&package.name) {
+        return Err("invalid AUR package name".into());
+    }
     let url = format!(
         "https://aur.archlinux.org/rpc/v5/info?arg[]={}",
         package.name
@@ -65,10 +76,20 @@ pub async fn get_aur_data(
         return Err(AurRequestError::new(package.name.clone(), resp.status().as_u16()).into());
     }
     let status = resp.status();
-    let content_type = resp.headers().get(reqwest::header::CONTENT_TYPE)
-        .and_then(|value| value.to_str().ok()).unwrap_or("unknown").to_owned();
+    let content_type = resp
+        .headers()
+        .get(reqwest::header::CONTENT_TYPE)
+        .and_then(|value| value.to_str().ok())
+        .unwrap_or("unknown")
+        .to_owned();
     let resp_json = resp.json::<AurResponse>().await.map_err(|error| {
-        log::error!("AUR metadata decoding failed: package={}, status={}, content_type={:?}, error={:?}", package.name, status, content_type, error);
+        log::error!(
+            "AUR metadata decoding failed: package={:?}, status={}, content_type={:?}, error={:?}",
+            package.name,
+            status,
+            content_type,
+            error
+        );
         error
     })?;
 
@@ -77,6 +98,9 @@ pub async fn get_aur_data(
         .get(0)
         .ok_or_else(|| MissingFieldError::new("results".to_string()))?;
 
+    if !valid_name(&package_info.package_base) {
+        return Err("invalid AUR package base".into());
+    }
     let result = PackageSearchResult {
         name: package_info.name.clone(),
         version: package_info.version.clone(),

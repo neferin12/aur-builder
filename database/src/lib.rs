@@ -8,7 +8,6 @@ use std::process::exit;
 use std::time::Duration;
 use tokio::time::sleep;
 
-pub mod access;
 pub mod entities;
 pub mod migrator;
 pub mod reviews;
@@ -219,7 +218,15 @@ impl Database {
             id: ActiveValue::NotSet,
             package_id: ActiveValue::Set(package.id as i64),
             exit_code: ActiveValue::Set(data.status_code as i32),
-            build_log: ActiveValue::Set(Some(data.log_lines.join(""))),
+            build_log: ActiveValue::Set(Some(common::redact::build_log(
+                &data.log_lines,
+                &data
+                    .task
+                    .env
+                    .as_ref()
+                    .map(|vars| vars.iter().map(|v| v.value.clone()).collect::<Vec<_>>())
+                    .unwrap_or_default(),
+            ))),
             success: ActiveValue::Set(data.success),
             finished_at: ActiveValue::Set(Some(data.timestamps.end)),
             started_at: ActiveValue::Set(Some(data.timestamps.start)),
@@ -359,7 +366,11 @@ impl Database {
         let expected: String = row.try_get("", "task")?;
         let mut clean = task.clone();
         clean.upload = None;
-        Ok(expected == serde_json::to_string(&clean).unwrap())
+        // Nuxt and Rust serialize object keys in different orders. Compare the
+        // complete JSON values, preserving every field and array ordering.
+        let expected: serde_json::Value =
+            serde_json::from_str(&expected).map_err(|error| DbErr::Custom(error.to_string()))?;
+        Ok(expected == serde_json::to_value(&clean).unwrap())
     }
     pub async fn latest_attempt(
         &self,
@@ -489,11 +500,20 @@ mod storage_tests {
         }
         assert_eq!(db.cleanup_orphan_waiting_attempts().await.unwrap(), 2);
         for (attempt, expected) in [
-            ("old-queued", "superseded"), ("old-dispatched", "superseded"),
-            ("running", "building"), ("finished", "finished"),
-            ("latest", "queued"), ("other-package", "dispatched"),
+            ("old-queued", "superseded"),
+            ("old-dispatched", "superseded"),
+            ("running", "building"),
+            ("finished", "finished"),
+            ("latest", "queued"),
+            ("other-package", "dispatched"),
         ] {
-            let query = db.storage_query("SELECT state FROM build_attempt WHERE attempt=?", vec![attempt.into()]).await.unwrap();
+            let query = db
+                .storage_query(
+                    "SELECT state FROM build_attempt WHERE attempt=?",
+                    vec![attempt.into()],
+                )
+                .await
+                .unwrap();
             let row = db.db.query_one(query).await.unwrap().unwrap();
             assert_eq!(row.try_get::<String>("", "state").unwrap(), expected);
         }
@@ -517,6 +537,7 @@ mod storage_tests {
         let task = approved_fixture(&db, &data, "status-1").await;
         let now = sea_orm::sqlx::types::chrono::Utc::now().naive_utc();
         let mut result = BuildResultTransmissionFormat {
+            artifact: None,
             task: task.clone(),
             status_code: 0,
             log_lines: vec![],

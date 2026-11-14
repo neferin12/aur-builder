@@ -3,13 +3,15 @@ services:
     image: rabbitmq:3-management-alpine
     container_name: 'rabbitmq'
     ports:
-        - "5672:5672"
-        - "15672:15672"
+        - "127.0.0.1:5672:5672"
+        - "127.0.0.1:15672:15672"
     volumes:
         - rabbitmq-data:/var/lib/rabbitmq/
-    env_file:
-      - .env
+        - ./rabbitmq/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf:ro
+        - ./rabbitmq-security/definitions.json:/etc/rabbitmq/definitions.json:ro
     environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER:?set RabbitMQ administrator}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS:?set RabbitMQ password}
       RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS: "-rabbit consumer_timeout 36000000"
   server:
     image: ghcr.io/neferin12/aur-builder-server:2
@@ -19,17 +21,41 @@ services:
         dockerfile: Dockerfile
         target: server
     env_file:
-      - .env
+      - .env.server
     environment:
       AB_CONFIG_PATH: /config.yaml
     volumes:
       - ./db:/app/db
-      - ./config.yaml:/config.yaml
+      - ./config.yaml:/config.yaml:ro
       - ./server_tmp:/tmp
     depends_on:
-      - rabbitmq
+      rabbitmq:
+        condition: service_started
+      migrate:
+        condition: service_completed_successfully
+    restart: always
+  build-egress:
+    build: ./build-egress
+    image: aur-builder-build-egress
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    mem_limit: 256m
+    pids_limit: 64
+    tmpfs:
+      - /tmp:size=16m,mode=1777
+    volumes:
+      - ./build-egress/host-deny.acl:/etc/squid/host-deny.acl:ro
+    networks:
+      - build
+      - build-egress
     restart: always
   worker:
+    user: "10001:10001"
+    group_add:
+      - "${DOCKER_SOCKET_GID:?run scripts/provision_build_network.py}"
+    env_file:
+      - .env.worker
     image: ghcr.io/neferin12/aur-builder-worker:2
     deploy:
         mode: replicated
@@ -40,16 +66,28 @@ services:
         target: worker
     environment:
       DATABASE_URL: ${DATABASE_URL}
-      AMQP_ADDR: ${AMQP_ADDR}
       RUST_LOG: ${RUST_LOG:-info}
       AB_BUILDER: ${AB_BUILDER:-ghcr.io/neferin12/aur-builder-build-container}
       AB_BUILDER_TAG: ${AB_BUILDER_TAG:-2}
     depends_on:
       - rabbitmq
+      - build-egress
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
+      - ${DOCKER_SOCKET_PATH:-/var/run/docker.sock}:/var/run/docker.sock
       - ./db:/app/db
     restart: always
+  migrate:
+    image: ghcr.io/neferin12/aur-builder-server:2
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: server
+    env_file:
+      - .env.migrate
+    volumes:
+      - ./db:/app/db
+    command: ["/usr/local/bin/migrate"]
+    restart: "no"
   web:
     image: ghcr.io/neferin12/aur-builder-web:2
     build:
@@ -58,8 +96,11 @@ services:
       target: web
     ports:
       - "3000:3000"
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
     env_file:
-      - .env
+      - .env.web
     restart: always
     volumes:
       - ./db:/app/db
@@ -70,7 +111,7 @@ services:
       dockerfile: Dockerfile
       target: notifier
     env_file:
-      - .env
+      - .env.notifier
     restart: always
   garage:
     image: dxflrs/garage:v2.1.0
@@ -78,7 +119,7 @@ services:
     environment:
       GARAGE_RPC_SECRET: ${GARAGE_RPC_SECRET:?set GARAGE_RPC_SECRET}
     ports:
-      - "3900:3900"
+      - "127.0.0.1:3900:3900"
     volumes:
       - ./garage.toml:/etc/garage.toml:ro
       - garage-meta:/var/lib/garage/meta
@@ -89,22 +130,34 @@ services:
       context: .
       target: repo
     env_file:
-      - .env
+      - .env.repo
     environment:
       GNUPGHOME: /run/repo-gnupg
     tmpfs:
-      - /run/repo-gnupg:mode=0700
+      - /run/repo-gnupg:mode=0700,uid=10001,gid=10001
     command: ["/bin/sh", "-c", "cp -a /run/signing-source/. /run/repo-gnupg/ && chmod 700 /run/repo-gnupg && exec repo"]
     ports:
-      - "3001:3001"
+      - "127.0.0.1:3001:3001"
     volumes:
       - ./db:/app/db
-      - ./repo-gnupg:/run/signing-source:ro
+      - ./repo-signing-runtime:/run/signing-source:ro
     depends_on:
-      - rabbitmq
-      - garage
+      rabbitmq:
+        condition: service_started
+      garage:
+        condition: service_started
+      migrate:
+        condition: service_completed_successfully
     restart: always
 volumes:
     rabbitmq-data:
     garage-meta:
     garage-data:
+networks:
+    build:
+      name: aur-builder-build
+      internal: true
+      driver_opts:
+        com.docker.network.bridge.gateway_mode_ipv4: isolated
+        com.docker.network.bridge.gateway_mode_ipv6: isolated
+    build-egress: {}
